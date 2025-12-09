@@ -1,0 +1,36 @@
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: entgo_gateway_dev
+    restart: on-failure
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_HOST: entgo_redis_shared
+      REDIS_PORT: 6379
+      # Go build cache
+      GOMODCACHE: /go/pkg/mod
+      GOCACHE: /root/.cache/go-build
+      CGO_ENABLED: 0
+    volumes:
+      - ./:/src:cached
+      - gomodcache:/go/pkg/mod
+      - gocache:/root/.cache/go-build
+    command: ["air", "-c", ".air.toml"]
+    networks:
+      - entgo_network
+
+volumes:
+  gomodcache:
+  gocache:
+
+networks:
+  entgo_network:
+    external: true
+

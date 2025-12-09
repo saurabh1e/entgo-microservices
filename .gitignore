@@ -1,0 +1,49 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+# But keep .env.example files
+!.env.example
+!**/.env.example
+# Certificates (never commit these!)
+certs/
+*.pem
+*.key
+*.crt
+*.csr
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+find /Users/saurabh/GolandProjects/entgo-microservices -name "CHECKLIST.md" 2>/dev/null*.out
+/tmp/
+/bin/
+/auth/auth
+/gateway/gateway
+# Go workspace
+go.work.sum
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+# Logs
+logs/
+*.log
+# Docker
+.env.docker
+# Build artifacts
+/dist/
+/build/
+# Test coverage
+*.cover
+coverage.out
+# Dependencies
+vendor/
+# Air (hot reload)
+tmp/

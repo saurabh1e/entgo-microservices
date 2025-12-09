@@ -1,0 +1,17 @@
+.git
+node_modules
+/tmp
+/tmp/*
+bin
+bin/*
+.tmp
+.DS_Store
+*.log
+.env
+.idea
+.vscode
+*.exe
+*.dll
+*.so
+*.dylib
+

@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package user.v1;
+option go_package = "github.com/saurabh/entgo-microservices/pkg/user/v1;userv1";
+
+import "google/protobuf/timestamp.proto";
+
+service UserService {
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse);
+  rpc GetUsersByIDs(GetUsersByIDsRequest) returns (GetUsersByIDsResponse);
+  rpc ValidateUser(ValidateUserRequest) returns (ValidateUserResponse);
+}
+
+message User {
+  int32 id = 1;
+  string username = 2;
+  string email = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+  optional int32 tenant_id = 6;
+}
+
+message GetUserByIDRequest {
+  int32 id = 1;
+}
+
+message GetUserByIDResponse {
+  User user = 1;
+}
+
+message GetUsersByIDsRequest {
+  repeated int32 ids = 1;
+}
+
+message GetUsersByIDsResponse {
+  repeated User users = 1;
+}
+
+message ValidateUserRequest {
+  int32 user_id = 1;
+}
+
+message ValidateUserResponse {
+  bool valid = 1;
+  User user = 2;
+}
+

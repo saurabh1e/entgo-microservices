@@ -1,0 +1,18 @@
+extend type Query {
+	RolePermissionByID(id: Int!): RolePermission @auth
+	RolePermissions(
+		first: Int
+		after: Cursor
+		last: Int
+		before: Cursor
+		orderBy: RolePermissionOrder
+		where: RolePermissionWhereInput
+	): RolePermissionConnection! @auth
+}
+
+extend type Mutation {
+	createRolePermission(input: CreateRolePermissionInput!): RolePermission! @auth
+	createBulkRolePermission(input: [CreateRolePermissionInput!]!): [RolePermission!]! @auth
+	updateRolePermission(id: Int!, input: UpdateRolePermissionInput!): RolePermission! @auth
+	deleteRolePermission(id: Int!): Boolean! @auth
+}

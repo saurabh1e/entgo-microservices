@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package permission.v1;
+option go_package = "github.com/saurabh/entgo-microservices/pkg/permission/v1;permissionv1";
+
+import "google/protobuf/timestamp.proto";
+
+service PermissionService {
+  rpc GetPermissionByID(GetPermissionByIDRequest) returns (GetPermissionByIDResponse);
+  rpc GetPermissionsByIDs(GetPermissionsByIDsRequest) returns (GetPermissionsByIDsResponse);
+}
+
+message Permission {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message GetPermissionByIDRequest {
+  int32 id = 1;
+}
+
+message GetPermissionByIDResponse {
+  Permission permission = 1;
+}
+
+message GetPermissionsByIDsRequest {
+  repeated int32 ids = 1;
+}
+
+message GetPermissionsByIDsResponse {
+  repeated Permission permissions = 1;
+}
+

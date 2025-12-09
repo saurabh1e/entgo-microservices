@@ -1,0 +1,42 @@
+
+extend type Mutation {
+    login(input: LoginInput!): LoginResponse!
+    register(input: RegisterInput!): RegisterResponse!
+    logout: LogoutResponse! @auth
+    refreshToken: TokenResponse!
+}
+
+extend type Query {
+    me: User @auth
+}
+
+type TokenResponse {
+    accessToken: String!
+    refreshToken: String!
+}
+
+type LoginResponse {
+    user: User!
+    accessToken: String!
+    refreshToken: String!
+}
+type RegisterResponse {
+    user: User!
+    accessToken: String!
+    refreshToken: String!
+}
+
+type LogoutResponse {
+    success: Boolean!
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+input RegisterInput {
+    email: String!
+    password: String!
+    name: String!
+}

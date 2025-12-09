@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package dummy.v1;
+option go_package = "github.com/saurabh/entgo-microservices/pkg/dummy/v1;dummyv1";
+
+import "google/protobuf/timestamp.proto";
+
+service DummyService {
+  rpc GetDummyByID(GetDummyByIDRequest) returns (GetDummyByIDResponse);
+  rpc GetDummysByIDs(GetDummysByIDsRequest) returns (GetDummysByIDsResponse);
+}
+
+message Dummy {
+  int32 id = 1;
+  optional string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message GetDummyByIDRequest {
+  int32 id = 1;
+}
+
+message GetDummyByIDResponse {
+  Dummy dummy = 1;
+}
+
+message GetDummysByIDsRequest {
+  repeated int32 ids = 1;
+}
+
+message GetDummysByIDsResponse {
+  repeated Dummy dummys = 1;
+}

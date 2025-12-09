@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package common.v1;
+option go_package = "github.com/saurabh/entgo-microservices/pkg/common/v1;commonv1";
+
+import "google/protobuf/timestamp.proto";
+
+// Pagination request
+message PaginationRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+// Pagination response
+message PaginationResponse {
+  int32 page = 1;
+  int32 page_size = 2;
+  int32 total_pages = 3;
+  int64 total_count = 4;
+}
+
+// Generic error details
+message ErrorDetail {
+  string field = 1;
+  string message = 2;
+}
+

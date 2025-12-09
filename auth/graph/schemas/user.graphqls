@@ -1,0 +1,18 @@
+extend type Query {
+	UserByID(id: Int!): User @auth
+	Users(
+		first: Int
+		after: Cursor
+		last: Int
+		before: Cursor
+		orderBy: UserOrder
+		where: UserWhereInput
+	): UserConnection! @auth
+}
+
+extend type Mutation {
+	createUser(input: CreateUserInput!): User! @auth
+	createBulkUser(input: [CreateUserInput!]!): [User!]! @auth
+	updateUser(id: Int!, input: UpdateUserInput!): User! @auth
+	deleteUser(id: Int!): Boolean! @auth
+}

@@ -1,0 +1,61 @@
+services:
+  auth:
+    build:
+      context: ..
+      dockerfile: auth/Dockerfile
+      target: dev
+    container_name: entgo_auth_dev
+    restart: on-failure
+    env_file:
+      - .env  # Path relative to this compose file (auth directory)
+    environment:
+      # Override specific vars for Docker environment
+      DB_HOST: entgo_auth_postgres
+      REDIS_HOST: entgo_redis_shared
+
+      # Go build cache
+      GOMODCACHE: /go/pkg/mod
+      GOCACHE: /root/.cache/go-build
+      CGO_ENABLED: 0
+    ports:
+      - "8081:8081"  # HTTP/GraphQL
+      - "9081:9081"  # gRPC
+    volumes:
+      - ./:/src:cached
+      - ../pkg:/pkg:cached
+      - gomodcache:/go/pkg/mod
+      - gocache:/root/.cache/go-build
+    command: ["air", "-c", ".air.toml"]
+    depends_on:
+      auth_postgres:
+        condition: service_healthy
+    networks:
+      - entgo_network
+
+  auth_postgres:
+    image: postgres:15-alpine
+    container_name: entgo_auth_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth
+    volumes:
+      - auth_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - entgo_network
+
+volumes:
+  gomodcache:
+  gocache:
+  auth_postgres_data:
+
+networks:
+  entgo_network:
+    external: true
+

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package rolepermission.v1;
+option go_package = "github.com/saurabh/entgo-microservices/pkg/rolepermission/v1;rolepermissionv1";
+
+import "google/protobuf/timestamp.proto";
+
+service RolePermissionService {
+  rpc GetRolePermissionByID(GetRolePermissionByIDRequest) returns (GetRolePermissionByIDResponse);
+  rpc GetRolePermissionsByIDs(GetRolePermissionsByIDsRequest) returns (GetRolePermissionsByIDsResponse);
+}
+
+message RolePermission {
+  int32 id = 1;
+  bool can_read = 2;
+  bool can_create = 3;
+  bool can_update = 4;
+  bool can_delete = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message GetRolePermissionByIDRequest {
+  int32 id = 1;
+}
+
+message GetRolePermissionByIDResponse {
+  RolePermission rolepermission = 1;
+}
+
+message GetRolePermissionsByIDsRequest {
+  repeated int32 ids = 1;
+}
+
+message GetRolePermissionsByIDsResponse {
+  repeated RolePermission rolepermissions = 1;
+}

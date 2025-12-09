@@ -1,0 +1,65 @@
+# syntax=docker/dockerfile:1.5
+
+# Base image with common packages
+FROM golang:1.25.5-alpine AS base
+RUN apk add --no-cache git ca-certificates bash
+WORKDIR /src
+
+# --------------------
+# Dev image (hot-reload)
+# --------------------
+FROM base AS dev
+# Install build tools needed by some go packages and for `go install` to work reliably
+RUN apk add --no-cache build-base
+
+ENV GOPATH=/go
+ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
+
+# Install air (hot-reload) into GOPATH/bin
+# Try the popular cosmtrek/air first, fall back to air-verse if unavailable
+RUN go install github.com/cosmtrek/air@latest || go install github.com/air-verse/air@latest
+
+# Copy module files and the local pkg module so `replace ../pkg` resolves during go mod download
+COPY test-service/go.mod test-service/go.sum ./
+COPY pkg /pkg
+RUN go env -w GOPROXY=https://proxy.golang.org && go mod download
+
+# Copy the rest of the source for the dev environment (mounted in compose for live edits)
+COPY test-service .
+
+EXPOSE 8082
+# Default command for dev target — can be overridden by docker-compose.dev.yml
+CMD ["air", "-c", ".air.toml"]
+
+# --------------------
+# Builder for production
+# --------------------
+FROM golang:1.25.5-alpine AS builder
+RUN apk add --no-cache git ca-certificates
+WORKDIR /src
+
+# Copy module files and local pkg module for build
+COPY test-service/go.mod test-service/go.sum ./
+COPY pkg /pkg
+RUN go env -w GOPROXY=https://proxy.golang.org && go mod download
+COPY test-service .
+
+# Build a static binary for smaller final image
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./tmp/main ./
+
+# --------------------
+# Production image (final)
+# --------------------
+FROM alpine:3.18 AS prod
+RUN apk add --no-cache ca-certificates
+WORKDIR /app
+
+# Copy binary from builder
+COPY --from=builder /src/tmp/main /app/main
+
+# Copy default .env example (do not include secrets in image — prefer docker-compose env_file)
+# If you want to avoid copying .env into image altogether, remove the next line
+COPY .env /app/.env
+
+EXPOSE 8082
+ENTRYPOINT ["/app/main"]

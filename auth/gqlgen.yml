@@ -1,0 +1,68 @@
+# GraphQL schema files
+schema:
+  - "graph/*.graphqls"
+  - "graph/**/**/*.graphqls"
+
+# Generated server code
+exec:
+  filename: graph/generated.go
+  package: graph
+  dir: graph
+  layout: single-file
+
+# Generated models
+model:
+  filename: graph/model/models_gen.go
+  package: model
+
+# Resolver implementation structure
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+  filename_template: "{name}.resolvers.go"
+
+
+# Automatically bind types from Ent
+autobind:
+  - github.com/saurabh/entgo-microservices/auth/internal/ent
+
+# Scalar mappings
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.ID
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+      - github.com/99designs/gqlgen/graphql.Int32
+
+  Time:
+    model:
+      - github.com/99designs/gqlgen/graphql.Time
+
+  JSON:
+    model:
+      - github.com/99designs/gqlgen/graphql.Map
+
+  Json:
+    model:
+      - github.com/99designs/gqlgen/graphql.Map
+
+  Map:
+    model:
+      - github.com/99designs/gqlgen/graphql.Map
+
+  Any:
+    model:
+      - github.com/99designs/gqlgen/graphql.Map
+
+# Directive configuration
+directives:
+  auth:
+    skip_runtime: false
+  hasRole:
+    skip_runtime: false
+  hasPermission:
+    skip_runtime: false
+
+skip_validation: true
