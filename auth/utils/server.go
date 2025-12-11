@@ -52,7 +52,8 @@ func InitializeServer(cfg *config.Config, db *database.DB, jwtService *jwt.Servi
 	router.Use(pkgmiddleware.CORS())
 
 	// Initialize GraphQL resolver with JWT service and Redis client
-	resolver := graph.NewResolver(db.Client, jwtService, redis.Client)
+	// Gateway client will be initialized on-demand when needed (since gateway starts after microservices)
+	resolver := graph.NewResolver(db.Client, jwtService, redis.Client, nil)
 
 	// Create GraphQL server with directive configuration
 	graphqlSrv := handler.New(graph.NewExecutableSchema(graph.Config{

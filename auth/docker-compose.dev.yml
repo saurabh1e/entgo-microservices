@@ -58,4 +58,3 @@ volumes:
 networks:
   entgo_network:
     external: true
-

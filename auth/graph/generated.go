@@ -18,7 +18,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/saurabh/entgo-microservices/auth/graph/model"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent"
-	"github.com/saurabh/entgo-microservices/auth/internal/ent/user"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -6824,7 +6823,7 @@ func (ec *executionContext) _User_userType(ctx context.Context, field graphql.Co
 			return obj.UserType, nil
 		},
 		nil,
-		ec.marshalNUserUserType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType,
+		ec.marshalNString2string,
 		true,
 		true,
 	)
@@ -6837,7 +6836,7 @@ func (ec *executionContext) fieldContext_User_userType(_ context.Context, field 
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UserUserType does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -6911,7 +6910,7 @@ func (ec *executionContext) _User_customerType(ctx context.Context, field graphq
 			return obj.CustomerType, nil
 		},
 		nil,
-		ec.marshalOUserCustomerType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType,
+		ec.marshalOString2string,
 		true,
 		false,
 	)
@@ -6924,7 +6923,7 @@ func (ec *executionContext) fieldContext_User_customerType(_ context.Context, fi
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type UserCustomerType does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -9034,7 +9033,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 			it.Address = data
 		case "userType":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userType"))
-			data, err := ec.unmarshalOUserUserType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9055,7 +9054,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 			it.CompanyName = data
 		case "customerType":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerType"))
-			data, err := ec.unmarshalOUserCustomerType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11582,7 +11581,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 			it.ClearAddress = data
 		case "userType":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userType"))
-			data, err := ec.unmarshalOUserUserType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11617,7 +11616,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 			it.ClearCompanyName = data
 		case "customerType":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerType"))
-			data, err := ec.unmarshalOUserCustomerType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11743,7 +11742,7 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "tenantIDIsNil", "tenantIDNotNil", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "username", "usernameNEQ", "usernameIn", "usernameNotIn", "usernameGT", "usernameGTE", "usernameLT", "usernameLTE", "usernameContains", "usernameHasPrefix", "usernameHasSuffix", "usernameEqualFold", "usernameContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "phone", "phoneNEQ", "phoneIn", "phoneNotIn", "phoneGT", "phoneGTE", "phoneLT", "phoneLTE", "phoneContains", "phoneHasPrefix", "phoneHasSuffix", "phoneIsNil", "phoneNotNil", "phoneEqualFold", "phoneContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressIsNil", "addressNotNil", "addressEqualFold", "addressContainsFold", "userType", "userTypeNEQ", "userTypeIn", "userTypeNotIn", "userCode", "userCodeNEQ", "userCodeIn", "userCodeNotIn", "userCodeGT", "userCodeGTE", "userCodeLT", "userCodeLTE", "userCodeContains", "userCodeHasPrefix", "userCodeHasSuffix", "userCodeIsNil", "userCodeNotNil", "userCodeEqualFold", "userCodeContainsFold", "companyName", "companyNameNEQ", "companyNameIn", "companyNameNotIn", "companyNameGT", "companyNameGTE", "companyNameLT", "companyNameLTE", "companyNameContains", "companyNameHasPrefix", "companyNameHasSuffix", "companyNameIsNil", "companyNameNotNil", "companyNameEqualFold", "companyNameContainsFold", "customerType", "customerTypeNEQ", "customerTypeIn", "customerTypeNotIn", "customerTypeIsNil", "customerTypeNotNil", "paymentTerms", "paymentTermsNEQ", "paymentTermsIn", "paymentTermsNotIn", "paymentTermsGT", "paymentTermsGTE", "paymentTermsLT", "paymentTermsLTE", "paymentTermsIsNil", "paymentTermsNotNil", "isActive", "isActiveNEQ", "emailVerified", "emailVerifiedNEQ", "emailVerifiedAt", "emailVerifiedAtNEQ", "emailVerifiedAtIn", "emailVerifiedAtNotIn", "emailVerifiedAtGT", "emailVerifiedAtGTE", "emailVerifiedAtLT", "emailVerifiedAtLTE", "emailVerifiedAtIsNil", "emailVerifiedAtNotNil", "lastLogin", "lastLoginNEQ", "lastLoginIn", "lastLoginNotIn", "lastLoginGT", "lastLoginGTE", "lastLoginLT", "lastLoginLTE", "lastLoginIsNil", "lastLoginNotNil", "hasRoleRef", "hasRoleRefWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "tenantIDIsNil", "tenantIDNotNil", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "username", "usernameNEQ", "usernameIn", "usernameNotIn", "usernameGT", "usernameGTE", "usernameLT", "usernameLTE", "usernameContains", "usernameHasPrefix", "usernameHasSuffix", "usernameEqualFold", "usernameContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "phone", "phoneNEQ", "phoneIn", "phoneNotIn", "phoneGT", "phoneGTE", "phoneLT", "phoneLTE", "phoneContains", "phoneHasPrefix", "phoneHasSuffix", "phoneIsNil", "phoneNotNil", "phoneEqualFold", "phoneContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressIsNil", "addressNotNil", "addressEqualFold", "addressContainsFold", "userType", "userTypeNEQ", "userTypeIn", "userTypeNotIn", "userTypeGT", "userTypeGTE", "userTypeLT", "userTypeLTE", "userTypeContains", "userTypeHasPrefix", "userTypeHasSuffix", "userTypeEqualFold", "userTypeContainsFold", "userCode", "userCodeNEQ", "userCodeIn", "userCodeNotIn", "userCodeGT", "userCodeGTE", "userCodeLT", "userCodeLTE", "userCodeContains", "userCodeHasPrefix", "userCodeHasSuffix", "userCodeIsNil", "userCodeNotNil", "userCodeEqualFold", "userCodeContainsFold", "companyName", "companyNameNEQ", "companyNameIn", "companyNameNotIn", "companyNameGT", "companyNameGTE", "companyNameLT", "companyNameLTE", "companyNameContains", "companyNameHasPrefix", "companyNameHasSuffix", "companyNameIsNil", "companyNameNotNil", "companyNameEqualFold", "companyNameContainsFold", "customerType", "customerTypeNEQ", "customerTypeIn", "customerTypeNotIn", "customerTypeGT", "customerTypeGTE", "customerTypeLT", "customerTypeLTE", "customerTypeContains", "customerTypeHasPrefix", "customerTypeHasSuffix", "customerTypeIsNil", "customerTypeNotNil", "customerTypeEqualFold", "customerTypeContainsFold", "paymentTerms", "paymentTermsNEQ", "paymentTermsIn", "paymentTermsNotIn", "paymentTermsGT", "paymentTermsGTE", "paymentTermsLT", "paymentTermsLTE", "paymentTermsIsNil", "paymentTermsNotNil", "isActive", "isActiveNEQ", "emailVerified", "emailVerifiedNEQ", "emailVerifiedAt", "emailVerifiedAtNEQ", "emailVerifiedAtIn", "emailVerifiedAtNotIn", "emailVerifiedAtGT", "emailVerifiedAtGTE", "emailVerifiedAtLT", "emailVerifiedAtLTE", "emailVerifiedAtIsNil", "emailVerifiedAtNotNil", "lastLogin", "lastLoginNEQ", "lastLoginIn", "lastLoginNotIn", "lastLoginGT", "lastLoginGTE", "lastLoginLT", "lastLoginLTE", "lastLoginIsNil", "lastLoginNotNil", "hasRoleRef", "hasRoleRefWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12578,32 +12577,95 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 			it.AddressContainsFold = data
 		case "userType":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userType"))
-			data, err := ec.unmarshalOUserUserType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UserType = data
 		case "userTypeNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeNEQ"))
-			data, err := ec.unmarshalOUserUserType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UserTypeNEQ = data
 		case "userTypeIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeIn"))
-			data, err := ec.unmarshalOUserUserType2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UserTypeIn = data
 		case "userTypeNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeNotIn"))
-			data, err := ec.unmarshalOUserUserType2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.UserTypeNotIn = data
+		case "userTypeGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeGT = data
+		case "userTypeGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeGTE = data
+		case "userTypeLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeLT = data
+		case "userTypeLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeLTE = data
+		case "userTypeContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeContains = data
+		case "userTypeHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeHasPrefix = data
+		case "userTypeHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeHasSuffix = data
+		case "userTypeEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeEqualFold = data
+		case "userTypeContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userTypeContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.UserTypeContainsFold = data
 		case "userCode":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("userCode"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -12816,32 +12878,81 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 			it.CompanyNameContainsFold = data
 		case "customerType":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerType"))
-			data, err := ec.unmarshalOUserCustomerType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CustomerType = data
 		case "customerTypeNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeNEQ"))
-			data, err := ec.unmarshalOUserCustomerType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx, v)
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CustomerTypeNEQ = data
 		case "customerTypeIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeIn"))
-			data, err := ec.unmarshalOUserCustomerType2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CustomerTypeIn = data
 		case "customerTypeNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeNotIn"))
-			data, err := ec.unmarshalOUserCustomerType2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.CustomerTypeNotIn = data
+		case "customerTypeGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeGT = data
+		case "customerTypeGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeGTE = data
+		case "customerTypeLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeLT = data
+		case "customerTypeLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeLTE = data
+		case "customerTypeContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeContains = data
+		case "customerTypeHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeHasPrefix = data
+		case "customerTypeHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeHasSuffix = data
 		case "customerTypeIsNil":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeIsNil"))
 			data, err := ec.unmarshalOBoolean2bool(ctx, v)
@@ -12856,6 +12967,20 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.CustomerTypeNotNil = data
+		case "customerTypeEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeEqualFold = data
+		case "customerTypeContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("customerTypeContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CustomerTypeContainsFold = data
 		case "paymentTerms":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("paymentTerms"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
@@ -15794,16 +15919,6 @@ func (ec *executionContext) marshalNUserConnection2ᚖgithubᚗcomᚋsaurabhᚋe
 	return ec._UserConnection(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUserCustomerType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx context.Context, v any) (user.CustomerType, error) {
-	var res user.CustomerType
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNUserCustomerType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx context.Context, sel ast.SelectionSet, v user.CustomerType) graphql.Marshaler {
-	return v
-}
-
 func (ec *executionContext) unmarshalNUserOrderField2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUserOrderField(ctx context.Context, v any) (*ent.UserOrderField, error) {
 	var res = new(ent.UserOrderField)
 	err := res.UnmarshalGQL(v)
@@ -15817,16 +15932,6 @@ func (ec *executionContext) marshalNUserOrderField2ᚖgithubᚗcomᚋsaurabhᚋe
 		}
 		return graphql.Null
 	}
-	return v
-}
-
-func (ec *executionContext) unmarshalNUserUserType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx context.Context, v any) (user.UserType, error) {
-	var res user.UserType
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNUserUserType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx context.Context, sel ast.SelectionSet, v user.UserType) graphql.Marshaler {
 	return v
 }
 
@@ -16655,97 +16760,6 @@ func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmic
 	return ec._User(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOUserCustomerType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx context.Context, v any) (user.CustomerType, error) {
-	var res user.CustomerType
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOUserCustomerType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx context.Context, sel ast.SelectionSet, v user.CustomerType) graphql.Marshaler {
-	return v
-}
-
-func (ec *executionContext) unmarshalOUserCustomerType2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerTypeᚄ(ctx context.Context, v any) ([]user.CustomerType, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []any
-	vSlice = graphql.CoerceList(v)
-	var err error
-	res := make([]user.CustomerType, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNUserCustomerType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOUserCustomerType2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []user.CustomerType) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNUserCustomerType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) unmarshalOUserCustomerType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx context.Context, v any) (*user.CustomerType, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(user.CustomerType)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOUserCustomerType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐCustomerType(ctx context.Context, sel ast.SelectionSet, v *user.CustomerType) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
-}
-
 func (ec *executionContext) marshalOUserEdge2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUserEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.UserEdge) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -16800,87 +16814,6 @@ func (ec *executionContext) unmarshalOUserOrder2ᚖgithubᚗcomᚋsaurabhᚋentg
 	}
 	res, err := ec.unmarshalInputUserOrder(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) unmarshalOUserUserType2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserTypeᚄ(ctx context.Context, v any) ([]user.UserType, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []any
-	vSlice = graphql.CoerceList(v)
-	var err error
-	res := make([]user.UserType, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNUserUserType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalOUserUserType2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []user.UserType) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNUserUserType2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) unmarshalOUserUserType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx context.Context, v any) (*user.UserType, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var res = new(user.UserType)
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalOUserUserType2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚋuserᚐUserType(ctx context.Context, sel ast.SelectionSet, v *user.UserType) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return v
 }
 
 func (ec *executionContext) unmarshalOUserWhereInput2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUserWhereInputᚄ(ctx context.Context, v any) ([]*ent.UserWhereInput, error) {

@@ -368,9 +368,22 @@ tmp_dir = "tmp"
 EOF
     fi
 
-    # Generate GraphQL only for development
-    log_info "🔄 Regenerating GraphQL for development..."
-    generate_graphql_only
+    # Run go mod tidy before starting
+    log_info "📦 Running go mod tidy..."
+    if go mod tidy; then
+        log_success "✅ Go modules tidied successfully"
+    else
+        log_warning "⚠️  Warning: go mod tidy had issues (may be okay in workspace mode)"
+    fi
+
+    # Generate all code before starting air
+    log_info "🔄 Generating all code with generate.go..."
+    if go generate generate.go; then
+        log_success "✅ Code generation completed successfully"
+    else
+        log_error "❌ Failed to generate code"
+        exit 1
+    fi
 
     # Start air for hot reload using full path
     log_info "🔥 Starting hot reload with Air..."

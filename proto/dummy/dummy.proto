@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package dummy.v1;
-option go_package = "github.com/saurabh/entgo-microservices/pkg/dummy/v1;dummyv1";
+option go_package = "github.com/saurabh/entgo-microservices/pkg/proto/dummy/v1;dummyv1";
 
 import "google/protobuf/timestamp.proto";
 

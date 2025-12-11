@@ -4,7 +4,7 @@ COMPOSE_SHARED := -f docker-compose.shared.yml
 COMPOSE_DEV := -f docker-compose.shared.yml -f auth/docker-compose.dev.yml -f gateway/docker-compose.dev.yml
 COMPOSE_PROD := -f docker-compose.shared.yml -f auth/docker-compose.yml -f gateway/docker-compose.yml
 
-.PHONY: help network shared dev prod up down build logs ps clean proto
+.PHONY: help network shared dev prod up down build logs ps clean proto generate-grpc generate-clients
 
 help:
 	@echo "Usage: make [target]"
@@ -18,8 +18,10 @@ help:
 	@echo "  build   - build images for prod"
 	@echo "  logs    - follow logs from services"
 	@echo "  ps      - show running containers"
-	@echo "  proto   - generate proto files"
-	@echo "  clean   - remove generated files and containers"
+	@echo "  proto           - generate proto files"
+	@echo "  generate-grpc   - generate gRPC service clients for all microservices"
+	@echo "  generate-clients- aggregate metadata and generate service_clients.go"
+	@echo "  clean           - remove generated files and containers"
 
 # Create Docker network
 network:
@@ -75,6 +77,21 @@ proto:
 	@echo "🔧 Generating proto files..."
 	cd proto && make proto
 	@echo "✅ Proto generation complete"
+
+# Generate gRPC service clients for all microservices
+generate-grpc:
+	@echo "🔧 Generating gRPC service clients..."
+	@cd auth && go run cmd/generate-grpc/main.go
+	@cd attendance && go run cmd/generate-grpc/main.go
+	@cd route && go run cmd/generate-grpc/main.go
+	@cd yard && go run cmd/generate-grpc/main.go
+	@echo "✅ gRPC service clients generated for all microservices"
+
+# Aggregate metadata and generate service_clients.go
+generate-clients: generate-grpc
+	@echo "🔧 Generating consolidated service_clients.go..."
+	@./scripts/generate-service-clients.sh
+	@echo "✅ Service clients generation complete"
 
 # Clean up
 clean:

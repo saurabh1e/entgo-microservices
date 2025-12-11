@@ -42,13 +42,13 @@ type User struct {
 	// Address holds the value of the "address" field.
 	Address string `json:"address,omitempty"`
 	// Type of user - admin, staff, vendor, or customer
-	UserType user.UserType `json:"user_type,omitempty"`
+	UserType string `json:"user_type,omitempty"`
 	// Vendor code or Customer code
 	UserCode string `json:"user_code,omitempty"`
 	// For vendors and corporate customers
 	CompanyName string `json:"company_name,omitempty"`
 	// For customers only - individual or corporate
-	CustomerType user.CustomerType `json:"customer_type,omitempty"`
+	CustomerType string `json:"customer_type,omitempty"`
 	// For vendors only - payment days
 	PaymentTerms int `json:"payment_terms,omitempty"`
 	// IsActive holds the value of the "is_active" field.
@@ -197,7 +197,7 @@ func (_m *User) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field user_type", values[i])
 			} else if value.Valid {
-				_m.UserType = user.UserType(value.String)
+				_m.UserType = value.String
 			}
 		case user.FieldUserCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -215,7 +215,7 @@ func (_m *User) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field customer_type", values[i])
 			} else if value.Valid {
-				_m.CustomerType = user.CustomerType(value.String)
+				_m.CustomerType = value.String
 			}
 		case user.FieldPaymentTerms:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -336,7 +336,7 @@ func (_m *User) String() string {
 	builder.WriteString(_m.Address)
 	builder.WriteString(", ")
 	builder.WriteString("user_type=")
-	builder.WriteString(fmt.Sprintf("%v", _m.UserType))
+	builder.WriteString(_m.UserType)
 	builder.WriteString(", ")
 	builder.WriteString("user_code=")
 	builder.WriteString(_m.UserCode)
@@ -345,7 +345,7 @@ func (_m *User) String() string {
 	builder.WriteString(_m.CompanyName)
 	builder.WriteString(", ")
 	builder.WriteString("customer_type=")
-	builder.WriteString(fmt.Sprintf("%v", _m.CustomerType))
+	builder.WriteString(_m.CustomerType)
 	builder.WriteString(", ")
 	builder.WriteString("payment_terms=")
 	builder.WriteString(fmt.Sprintf("%v", _m.PaymentTerms))

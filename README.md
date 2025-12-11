@@ -38,7 +38,7 @@ Reusable components shared across all microservices:
 - **`pkg/redis`**: Redis client factory and token management with service namespacing
 - **`pkg/middleware`**: CORS and authentication middleware
 - **`pkg/proto`**: Generated gRPC protocol buffers (user, role, permission)
-- **`pkg/grpc`**: gRPC client utilities (future)
+- **`pkg/grpc`**: gRPC client utilities with gateway proxy support
 
 ### Auth Service
 Full-featured authentication service with:
@@ -50,7 +50,11 @@ Full-featured authentication service with:
 - Individual PostgreSQL database
 
 ### Gateway Service
-HTTP gateway for routing requests to microservices
+Unified gateway for routing requests to microservices:
+- **HTTP/GraphQL Gateway** (port 8080): Routes GraphQL queries to appropriate services
+- **gRPC Proxy** (port 50051): Transparent routing for inter-service gRPC communication
+- Service discovery and connection pooling
+- Centralized observability for all requests
 
 ## 🚀 Key Features
 
@@ -62,12 +66,14 @@ HTTP gateway for routing requests to microservices
 
 ### ✅ gRPC Inter-Service Communication
 - Type-safe protocol buffers
+- **gRPC Gateway Proxy** for centralized routing (port 50051)
 - Services exposed via gRPC:
   - `UserService`: GetUserByID, GetUsersByIDs, ValidateUser
   - `RoleService`: GetRoleByID, GetRolesByIDs
   - `PermissionService`: GetPermissionByID, GetPermissionsByIDs
 - Health checks and reflection enabled
 - Logging and recovery interceptors
+- Service discovery and connection pooling
 
 ### ✅ Go Workspace
 - Simplified local development with `go.work`

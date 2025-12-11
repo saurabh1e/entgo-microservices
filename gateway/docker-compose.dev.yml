@@ -10,10 +10,17 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "8080:8080"   # HTTP/GraphQL Gateway
+      - "50051:50051" # gRPC Proxy
     environment:
       REDIS_HOST: entgo_redis_shared
       REDIS_PORT: 6379
+      GRPC_PROXY_PORT: 50051
+      # gRPC backend service URLs
+      AUTH_GRPC_URL: entgo_auth_dev:9081
+      ROUTE_GRPC_URL: entgo_route_dev:9082
+      ATTENDANCE_GRPC_URL: entgo_attendance_dev:9083
+      YARD_GRPC_URL: entgo_yard_dev:9084
       # Go build cache
       GOMODCACHE: /go/pkg/mod
       GOCACHE: /root/.cache/go-build

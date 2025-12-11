@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package rolepermission.v1;
-option go_package = "github.com/saurabh/entgo-microservices/pkg/rolepermission/v1;rolepermissionv1";
+option go_package = "github.com/saurabh/entgo-microservices/pkg/proto/rolepermission/v1;rolepermissionv1";
 
 import "google/protobuf/timestamp.proto";
 

@@ -1,0 +1,26 @@
+[
+  {
+    "service": "permission.v1.PermissionService",
+    "proto_package": "permission.v1",
+    "microservice_name": "auth",
+    "entity_name": "Permission"
+  },
+  {
+    "service": "role.v1.RoleService",
+    "proto_package": "role.v1",
+    "microservice_name": "auth",
+    "entity_name": "Role"
+  },
+  {
+    "service": "rolepermission.v1.RolePermissionService",
+    "proto_package": "rolepermission.v1",
+    "microservice_name": "auth",
+    "entity_name": "RolePermission"
+  },
+  {
+    "service": "user.v1.UserService",
+    "proto_package": "user.v1",
+    "microservice_name": "auth",
+    "entity_name": "User"
+  }
+]

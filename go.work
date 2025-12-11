@@ -3,6 +3,6 @@ go 1.25.5
 use (
 	./auth
 	./gateway
+	./microservice
 	./pkg
-	./test-service
 )

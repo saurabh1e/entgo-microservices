@@ -146,13 +146,13 @@ func (_c *UserCreate) SetNillableAddress(v *string) *UserCreate {
 }
 
 // SetUserType sets the "user_type" field.
-func (_c *UserCreate) SetUserType(v user.UserType) *UserCreate {
+func (_c *UserCreate) SetUserType(v string) *UserCreate {
 	_c.mutation.SetUserType(v)
 	return _c
 }
 
 // SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (_c *UserCreate) SetNillableUserType(v *user.UserType) *UserCreate {
+func (_c *UserCreate) SetNillableUserType(v *string) *UserCreate {
 	if v != nil {
 		_c.SetUserType(*v)
 	}
@@ -188,13 +188,13 @@ func (_c *UserCreate) SetNillableCompanyName(v *string) *UserCreate {
 }
 
 // SetCustomerType sets the "customer_type" field.
-func (_c *UserCreate) SetCustomerType(v user.CustomerType) *UserCreate {
+func (_c *UserCreate) SetCustomerType(v string) *UserCreate {
 	_c.mutation.SetCustomerType(v)
 	return _c
 }
 
 // SetNillableCustomerType sets the "customer_type" field if the given value is not nil.
-func (_c *UserCreate) SetNillableCustomerType(v *user.CustomerType) *UserCreate {
+func (_c *UserCreate) SetNillableCustomerType(v *string) *UserCreate {
 	if v != nil {
 		_c.SetCustomerType(*v)
 	}
@@ -514,7 +514,7 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.Address = value
 	}
 	if value, ok := _c.mutation.UserType(); ok {
-		_spec.SetField(user.FieldUserType, field.TypeEnum, value)
+		_spec.SetField(user.FieldUserType, field.TypeString, value)
 		_node.UserType = value
 	}
 	if value, ok := _c.mutation.UserCode(); ok {
@@ -526,7 +526,7 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.CompanyName = value
 	}
 	if value, ok := _c.mutation.CustomerType(); ok {
-		_spec.SetField(user.FieldCustomerType, field.TypeEnum, value)
+		_spec.SetField(user.FieldCustomerType, field.TypeString, value)
 		_node.CustomerType = value
 	}
 	if value, ok := _c.mutation.PaymentTerms(); ok {
@@ -787,7 +787,7 @@ func (u *UserUpsert) ClearAddress() *UserUpsert {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *UserUpsert) SetUserType(v user.UserType) *UserUpsert {
+func (u *UserUpsert) SetUserType(v string) *UserUpsert {
 	u.Set(user.FieldUserType, v)
 	return u
 }
@@ -835,7 +835,7 @@ func (u *UserUpsert) ClearCompanyName() *UserUpsert {
 }
 
 // SetCustomerType sets the "customer_type" field.
-func (u *UserUpsert) SetCustomerType(v user.CustomerType) *UserUpsert {
+func (u *UserUpsert) SetCustomerType(v string) *UserUpsert {
 	u.Set(user.FieldCustomerType, v)
 	return u
 }
@@ -1184,7 +1184,7 @@ func (u *UserUpsertOne) ClearAddress() *UserUpsertOne {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *UserUpsertOne) SetUserType(v user.UserType) *UserUpsertOne {
+func (u *UserUpsertOne) SetUserType(v string) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.SetUserType(v)
 	})
@@ -1240,7 +1240,7 @@ func (u *UserUpsertOne) ClearCompanyName() *UserUpsertOne {
 }
 
 // SetCustomerType sets the "customer_type" field.
-func (u *UserUpsertOne) SetCustomerType(v user.CustomerType) *UserUpsertOne {
+func (u *UserUpsertOne) SetCustomerType(v string) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.SetCustomerType(v)
 	})
@@ -1772,7 +1772,7 @@ func (u *UserUpsertBulk) ClearAddress() *UserUpsertBulk {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *UserUpsertBulk) SetUserType(v user.UserType) *UserUpsertBulk {
+func (u *UserUpsertBulk) SetUserType(v string) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.SetUserType(v)
 	})
@@ -1828,7 +1828,7 @@ func (u *UserUpsertBulk) ClearCompanyName() *UserUpsertBulk {
 }
 
 // SetCustomerType sets the "customer_type" field.
-func (u *UserUpsertBulk) SetCustomerType(v user.CustomerType) *UserUpsertBulk {
+func (u *UserUpsertBulk) SetCustomerType(v string) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.SetCustomerType(v)
 	})

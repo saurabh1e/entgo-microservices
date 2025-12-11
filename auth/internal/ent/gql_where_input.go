@@ -1622,10 +1622,19 @@ type UserWhereInput struct {
 	AddressContainsFold *string  `json:"addressContainsFold,omitempty"`
 
 	// "user_type" field predicates.
-	UserType      *user.UserType  `json:"userType,omitempty"`
-	UserTypeNEQ   *user.UserType  `json:"userTypeNEQ,omitempty"`
-	UserTypeIn    []user.UserType `json:"userTypeIn,omitempty"`
-	UserTypeNotIn []user.UserType `json:"userTypeNotIn,omitempty"`
+	UserType             *string  `json:"userType,omitempty"`
+	UserTypeNEQ          *string  `json:"userTypeNEQ,omitempty"`
+	UserTypeIn           []string `json:"userTypeIn,omitempty"`
+	UserTypeNotIn        []string `json:"userTypeNotIn,omitempty"`
+	UserTypeGT           *string  `json:"userTypeGT,omitempty"`
+	UserTypeGTE          *string  `json:"userTypeGTE,omitempty"`
+	UserTypeLT           *string  `json:"userTypeLT,omitempty"`
+	UserTypeLTE          *string  `json:"userTypeLTE,omitempty"`
+	UserTypeContains     *string  `json:"userTypeContains,omitempty"`
+	UserTypeHasPrefix    *string  `json:"userTypeHasPrefix,omitempty"`
+	UserTypeHasSuffix    *string  `json:"userTypeHasSuffix,omitempty"`
+	UserTypeEqualFold    *string  `json:"userTypeEqualFold,omitempty"`
+	UserTypeContainsFold *string  `json:"userTypeContainsFold,omitempty"`
 
 	// "user_code" field predicates.
 	UserCode             *string  `json:"userCode,omitempty"`
@@ -1662,12 +1671,21 @@ type UserWhereInput struct {
 	CompanyNameContainsFold *string  `json:"companyNameContainsFold,omitempty"`
 
 	// "customer_type" field predicates.
-	CustomerType       *user.CustomerType  `json:"customerType,omitempty"`
-	CustomerTypeNEQ    *user.CustomerType  `json:"customerTypeNEQ,omitempty"`
-	CustomerTypeIn     []user.CustomerType `json:"customerTypeIn,omitempty"`
-	CustomerTypeNotIn  []user.CustomerType `json:"customerTypeNotIn,omitempty"`
-	CustomerTypeIsNil  bool                `json:"customerTypeIsNil,omitempty"`
-	CustomerTypeNotNil bool                `json:"customerTypeNotNil,omitempty"`
+	CustomerType             *string  `json:"customerType,omitempty"`
+	CustomerTypeNEQ          *string  `json:"customerTypeNEQ,omitempty"`
+	CustomerTypeIn           []string `json:"customerTypeIn,omitempty"`
+	CustomerTypeNotIn        []string `json:"customerTypeNotIn,omitempty"`
+	CustomerTypeGT           *string  `json:"customerTypeGT,omitempty"`
+	CustomerTypeGTE          *string  `json:"customerTypeGTE,omitempty"`
+	CustomerTypeLT           *string  `json:"customerTypeLT,omitempty"`
+	CustomerTypeLTE          *string  `json:"customerTypeLTE,omitempty"`
+	CustomerTypeContains     *string  `json:"customerTypeContains,omitempty"`
+	CustomerTypeHasPrefix    *string  `json:"customerTypeHasPrefix,omitempty"`
+	CustomerTypeHasSuffix    *string  `json:"customerTypeHasSuffix,omitempty"`
+	CustomerTypeIsNil        bool     `json:"customerTypeIsNil,omitempty"`
+	CustomerTypeNotNil       bool     `json:"customerTypeNotNil,omitempty"`
+	CustomerTypeEqualFold    *string  `json:"customerTypeEqualFold,omitempty"`
+	CustomerTypeContainsFold *string  `json:"customerTypeContainsFold,omitempty"`
 
 	// "payment_terms" field predicates.
 	PaymentTerms       *int  `json:"paymentTerms,omitempty"`
@@ -2185,6 +2203,33 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	if len(i.UserTypeNotIn) > 0 {
 		predicates = append(predicates, user.UserTypeNotIn(i.UserTypeNotIn...))
 	}
+	if i.UserTypeGT != nil {
+		predicates = append(predicates, user.UserTypeGT(*i.UserTypeGT))
+	}
+	if i.UserTypeGTE != nil {
+		predicates = append(predicates, user.UserTypeGTE(*i.UserTypeGTE))
+	}
+	if i.UserTypeLT != nil {
+		predicates = append(predicates, user.UserTypeLT(*i.UserTypeLT))
+	}
+	if i.UserTypeLTE != nil {
+		predicates = append(predicates, user.UserTypeLTE(*i.UserTypeLTE))
+	}
+	if i.UserTypeContains != nil {
+		predicates = append(predicates, user.UserTypeContains(*i.UserTypeContains))
+	}
+	if i.UserTypeHasPrefix != nil {
+		predicates = append(predicates, user.UserTypeHasPrefix(*i.UserTypeHasPrefix))
+	}
+	if i.UserTypeHasSuffix != nil {
+		predicates = append(predicates, user.UserTypeHasSuffix(*i.UserTypeHasSuffix))
+	}
+	if i.UserTypeEqualFold != nil {
+		predicates = append(predicates, user.UserTypeEqualFold(*i.UserTypeEqualFold))
+	}
+	if i.UserTypeContainsFold != nil {
+		predicates = append(predicates, user.UserTypeContainsFold(*i.UserTypeContainsFold))
+	}
 	if i.UserCode != nil {
 		predicates = append(predicates, user.UserCodeEQ(*i.UserCode))
 	}
@@ -2287,11 +2332,38 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	if len(i.CustomerTypeNotIn) > 0 {
 		predicates = append(predicates, user.CustomerTypeNotIn(i.CustomerTypeNotIn...))
 	}
+	if i.CustomerTypeGT != nil {
+		predicates = append(predicates, user.CustomerTypeGT(*i.CustomerTypeGT))
+	}
+	if i.CustomerTypeGTE != nil {
+		predicates = append(predicates, user.CustomerTypeGTE(*i.CustomerTypeGTE))
+	}
+	if i.CustomerTypeLT != nil {
+		predicates = append(predicates, user.CustomerTypeLT(*i.CustomerTypeLT))
+	}
+	if i.CustomerTypeLTE != nil {
+		predicates = append(predicates, user.CustomerTypeLTE(*i.CustomerTypeLTE))
+	}
+	if i.CustomerTypeContains != nil {
+		predicates = append(predicates, user.CustomerTypeContains(*i.CustomerTypeContains))
+	}
+	if i.CustomerTypeHasPrefix != nil {
+		predicates = append(predicates, user.CustomerTypeHasPrefix(*i.CustomerTypeHasPrefix))
+	}
+	if i.CustomerTypeHasSuffix != nil {
+		predicates = append(predicates, user.CustomerTypeHasSuffix(*i.CustomerTypeHasSuffix))
+	}
 	if i.CustomerTypeIsNil {
 		predicates = append(predicates, user.CustomerTypeIsNil())
 	}
 	if i.CustomerTypeNotNil {
 		predicates = append(predicates, user.CustomerTypeNotNil())
+	}
+	if i.CustomerTypeEqualFold != nil {
+		predicates = append(predicates, user.CustomerTypeEqualFold(*i.CustomerTypeEqualFold))
+	}
+	if i.CustomerTypeContainsFold != nil {
+		predicates = append(predicates, user.CustomerTypeContainsFold(*i.CustomerTypeContainsFold))
 	}
 	if i.PaymentTerms != nil {
 		predicates = append(predicates, user.PaymentTermsEQ(*i.PaymentTerms))

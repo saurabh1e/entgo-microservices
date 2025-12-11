@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package role.v1;
-option go_package = "github.com/saurabh/entgo-microservices/pkg/role/v1;rolev1";
+option go_package = "github.com/saurabh/entgo-microservices/pkg/proto/role/v1;rolev1";
 
 import "google/protobuf/timestamp.proto";
 
@@ -13,9 +13,12 @@ service RoleService {
 message Role {
   int32 id = 1;
   string name = 2;
-  string description = 3;
-  google.protobuf.Timestamp created_at = 4;
-  google.protobuf.Timestamp updated_at = 5;
+  string display_name = 3;
+  string description = 4;
+  bool is_active = 5;
+  int32 priority = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
 }
 
 message GetRoleByIDRequest {
@@ -33,4 +36,3 @@ message GetRolesByIDsRequest {
 message GetRolesByIDsResponse {
   repeated Role roles = 1;
 }
-

@@ -1,12 +1,12 @@
 package schema
 
 import (
-	privacy "github.com/saurabh/entgo-microservices/auth/ent/schema_privacy"
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	privacy "github.com/saurabh/entgo-microservices/auth/ent/schema_privacy"
 )
 
 // Role holds the schema definition for the Role entity.
@@ -24,6 +24,7 @@ func (Role) Mixin() []ent.Mixin {
 // @generate-resolver: true
 // @generate-mutation: true
 // @generate-privacy: true
+// @generate-grpc: true
 // @role-level: admin
 // @permission-level: user
 func (Role) Fields() []ent.Field {

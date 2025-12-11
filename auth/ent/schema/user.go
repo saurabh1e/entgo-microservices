@@ -1,12 +1,12 @@
 package schema
 
 import (
-	hook "github.com/saurabh/entgo-microservices/auth/ent/schema_hooks"
-	privacy "github.com/saurabh/entgo-microservices/auth/ent/schema_privacy"
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	hook "github.com/saurabh/entgo-microservices/auth/ent/schema_hooks"
+	privacy "github.com/saurabh/entgo-microservices/auth/ent/schema_privacy"
 )
 
 type User struct {
@@ -24,6 +24,7 @@ func (User) Mixin() []ent.Mixin {
 // @generate-mutation: true
 // @generate-hooks: true
 // @generate-privacy: true
+// @generate-grpc: true
 // @role-level: admin
 // @permission-level: user
 func (User) Fields() []ent.Field {
@@ -51,8 +52,8 @@ func (User) Fields() []ent.Field {
 			Optional(),
 
 		// User type field
-		field.Enum("user_type").
-			Values("admin", "staff", "vendor", "customer").
+		field.String("user_type").
+			MaxLen(50).
 			Default("staff").
 			Comment("Type of user - admin, staff, vendor, or customer"),
 
@@ -66,9 +67,9 @@ func (User) Fields() []ent.Field {
 			Optional().
 			MaxLen(200).
 			Comment("For vendors and corporate customers"),
-		field.Enum("customer_type").
-			Values("individual", "corporate").
+		field.String("customer_type").
 			Optional().
+			MaxLen(50).
 			Comment("For customers only - individual or corporate"),
 		field.Int("payment_terms").
 			Optional().

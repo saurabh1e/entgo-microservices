@@ -214,13 +214,13 @@ func (_u *UserUpdate) ClearAddress() *UserUpdate {
 }
 
 // SetUserType sets the "user_type" field.
-func (_u *UserUpdate) SetUserType(v user.UserType) *UserUpdate {
+func (_u *UserUpdate) SetUserType(v string) *UserUpdate {
 	_u.mutation.SetUserType(v)
 	return _u
 }
 
 // SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (_u *UserUpdate) SetNillableUserType(v *user.UserType) *UserUpdate {
+func (_u *UserUpdate) SetNillableUserType(v *string) *UserUpdate {
 	if v != nil {
 		_u.SetUserType(*v)
 	}
@@ -268,13 +268,13 @@ func (_u *UserUpdate) ClearCompanyName() *UserUpdate {
 }
 
 // SetCustomerType sets the "customer_type" field.
-func (_u *UserUpdate) SetCustomerType(v user.CustomerType) *UserUpdate {
+func (_u *UserUpdate) SetCustomerType(v string) *UserUpdate {
 	_u.mutation.SetCustomerType(v)
 	return _u
 }
 
 // SetNillableCustomerType sets the "customer_type" field if the given value is not nil.
-func (_u *UserUpdate) SetNillableCustomerType(v *user.CustomerType) *UserUpdate {
+func (_u *UserUpdate) SetNillableCustomerType(v *string) *UserUpdate {
 	if v != nil {
 		_u.SetCustomerType(*v)
 	}
@@ -572,7 +572,7 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(user.FieldAddress, field.TypeString)
 	}
 	if value, ok := _u.mutation.UserType(); ok {
-		_spec.SetField(user.FieldUserType, field.TypeEnum, value)
+		_spec.SetField(user.FieldUserType, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UserCode(); ok {
 		_spec.SetField(user.FieldUserCode, field.TypeString, value)
@@ -587,10 +587,10 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(user.FieldCompanyName, field.TypeString)
 	}
 	if value, ok := _u.mutation.CustomerType(); ok {
-		_spec.SetField(user.FieldCustomerType, field.TypeEnum, value)
+		_spec.SetField(user.FieldCustomerType, field.TypeString, value)
 	}
 	if _u.mutation.CustomerTypeCleared() {
-		_spec.ClearField(user.FieldCustomerType, field.TypeEnum)
+		_spec.ClearField(user.FieldCustomerType, field.TypeString)
 	}
 	if value, ok := _u.mutation.PaymentTerms(); ok {
 		_spec.SetField(user.FieldPaymentTerms, field.TypeInt, value)
@@ -854,13 +854,13 @@ func (_u *UserUpdateOne) ClearAddress() *UserUpdateOne {
 }
 
 // SetUserType sets the "user_type" field.
-func (_u *UserUpdateOne) SetUserType(v user.UserType) *UserUpdateOne {
+func (_u *UserUpdateOne) SetUserType(v string) *UserUpdateOne {
 	_u.mutation.SetUserType(v)
 	return _u
 }
 
 // SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (_u *UserUpdateOne) SetNillableUserType(v *user.UserType) *UserUpdateOne {
+func (_u *UserUpdateOne) SetNillableUserType(v *string) *UserUpdateOne {
 	if v != nil {
 		_u.SetUserType(*v)
 	}
@@ -908,13 +908,13 @@ func (_u *UserUpdateOne) ClearCompanyName() *UserUpdateOne {
 }
 
 // SetCustomerType sets the "customer_type" field.
-func (_u *UserUpdateOne) SetCustomerType(v user.CustomerType) *UserUpdateOne {
+func (_u *UserUpdateOne) SetCustomerType(v string) *UserUpdateOne {
 	_u.mutation.SetCustomerType(v)
 	return _u
 }
 
 // SetNillableCustomerType sets the "customer_type" field if the given value is not nil.
-func (_u *UserUpdateOne) SetNillableCustomerType(v *user.CustomerType) *UserUpdateOne {
+func (_u *UserUpdateOne) SetNillableCustomerType(v *string) *UserUpdateOne {
 	if v != nil {
 		_u.SetCustomerType(*v)
 	}
@@ -1242,7 +1242,7 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 		_spec.ClearField(user.FieldAddress, field.TypeString)
 	}
 	if value, ok := _u.mutation.UserType(); ok {
-		_spec.SetField(user.FieldUserType, field.TypeEnum, value)
+		_spec.SetField(user.FieldUserType, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UserCode(); ok {
 		_spec.SetField(user.FieldUserCode, field.TypeString, value)
@@ -1257,10 +1257,10 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 		_spec.ClearField(user.FieldCompanyName, field.TypeString)
 	}
 	if value, ok := _u.mutation.CustomerType(); ok {
-		_spec.SetField(user.FieldCustomerType, field.TypeEnum, value)
+		_spec.SetField(user.FieldCustomerType, field.TypeString, value)
 	}
 	if _u.mutation.CustomerTypeCleared() {
-		_spec.ClearField(user.FieldCustomerType, field.TypeEnum)
+		_spec.ClearField(user.FieldCustomerType, field.TypeString)
 	}
 	if value, ok := _u.mutation.PaymentTerms(); ok {
 		_spec.SetField(user.FieldPaymentTerms, field.TypeInt, value)

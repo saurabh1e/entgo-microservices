@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
 
+	"github.com/saurabh/entgo-microservices/gateway/grpc"
 	"github.com/saurabh/entgo-microservices/gateway/router"
 	"github.com/saurabh/entgo-microservices/gateway/utils"
 
@@ -12,6 +16,8 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 )
+
+var grpcProxyServer *grpc.ProxyServer
 
 func main() {
 	// Load environment variables
@@ -28,6 +34,23 @@ func main() {
 		os.Exit(1)
 	}
 	defer cleanupDependencies()
+
+	// Initialize gRPC proxy server
+	grpcPort := getGRPCPort()
+	var err error
+	grpcProxyServer, err = grpc.NewProxyServer(grpcPort)
+	if err != nil {
+		fmt.Printf("❌ Failed to initialize gRPC proxy: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Start gRPC proxy server in background
+	go func() {
+		if err := grpcProxyServer.Start(); err != nil {
+			fmt.Printf("❌ gRPC proxy server failed: %v\n", err)
+			os.Exit(1)
+		}
+	}()
 
 	// Setup gateway components
 	gatewayRouter := Setup()
@@ -60,11 +83,14 @@ func main() {
 	fmt.Println("  • GraphQL API: http://localhost:" + config.Port + "/graphql")
 	fmt.Println("  • GraphQL Playground: http://localhost:" + config.Port + "/playground")
 	fmt.Println("  • REST API: http://localhost:" + config.Port + "/api/v1/{service_name}/{path}")
+	fmt.Printf("  • gRPC Proxy: localhost:%d\n", grpcPort)
+
+	// Setup graceful shutdown
+	setupGracefulShutdown()
 
 	// Start server
 	fmt.Printf("🚀 GraphQL Gateway running on port %s...\n", config.Port)
-	err := http.ListenAndServe(":"+config.Port, r)
-	if err != nil {
+	if err := http.ListenAndServe(":"+config.Port, r); err != nil {
 		fmt.Printf("❌ Server failed to start: %v\n", err)
 		os.Exit(1)
 	}
@@ -104,4 +130,34 @@ func initDependencies() error {
 // cleanupDependencies performs cleanup of resources
 func cleanupDependencies() {
 	utils.CloseRedis()
+	if grpcProxyServer != nil {
+		grpcProxyServer.Stop()
+	}
+}
+
+// getGRPCPort returns the gRPC proxy port from env or default
+func getGRPCPort() int {
+	portStr := os.Getenv("GRPC_PROXY_PORT")
+	if portStr == "" {
+		return 50051 // Default gRPC proxy port
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		fmt.Printf("⚠️  Invalid GRPC_PROXY_PORT, using default 50051\n")
+		return 50051
+	}
+	return port
+}
+
+// setupGracefulShutdown configures signal handling for graceful shutdown
+func setupGracefulShutdown() {
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-quit
+		fmt.Println("\n🛑 Shutdown signal received...")
+		cleanupDependencies()
+		os.Exit(0)
+	}()
 }

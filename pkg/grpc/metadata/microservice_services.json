@@ -1,0 +1,8 @@
+[
+  {
+    "service": "dummy.v1.DummyService",
+    "proto_package": "dummy.v1",
+    "microservice_name": "microservice",
+    "entity_name": "Dummy"
+  }
+]

@@ -4,8 +4,6 @@ package ent
 
 import (
 	"time"
-
-	"github.com/saurabh/entgo-microservices/auth/internal/ent/user"
 )
 
 // CreatePermissionInput represents a mutation input for creating permissions.
@@ -288,10 +286,10 @@ type CreateUserInput struct {
 	Name            string
 	Phone           *string
 	Address         *string
-	UserType        *user.UserType
+	UserType        *string
 	UserCode        *string
 	CompanyName     *string
-	CustomerType    *user.CustomerType
+	CustomerType    *string
 	PaymentTerms    *int
 	IsActive        *bool
 	EmailVerified   *bool
@@ -358,13 +356,13 @@ type UpdateUserInput struct {
 	Phone                *string
 	ClearAddress         bool
 	Address              *string
-	UserType             *user.UserType
+	UserType             *string
 	ClearUserCode        bool
 	UserCode             *string
 	ClearCompanyName     bool
 	CompanyName          *string
 	ClearCustomerType    bool
-	CustomerType         *user.CustomerType
+	CustomerType         *string
 	ClearPaymentTerms    bool
 	PaymentTerms         *int
 	IsActive             *bool

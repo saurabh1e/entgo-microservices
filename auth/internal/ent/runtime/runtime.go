@@ -296,6 +296,12 @@ func init() {
 	userDescPhone := userFields[4].Descriptor()
 	// user.PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	user.PhoneValidator = userDescPhone.Validators[0].(func(string) error)
+	// userDescUserType is the schema descriptor for user_type field.
+	userDescUserType := userFields[6].Descriptor()
+	// user.DefaultUserType holds the default value on creation for the user_type field.
+	user.DefaultUserType = userDescUserType.Default.(string)
+	// user.UserTypeValidator is a validator for the "user_type" field. It is called by the builders before save.
+	user.UserTypeValidator = userDescUserType.Validators[0].(func(string) error)
 	// userDescUserCode is the schema descriptor for user_code field.
 	userDescUserCode := userFields[7].Descriptor()
 	// user.UserCodeValidator is a validator for the "user_code" field. It is called by the builders before save.
@@ -304,6 +310,10 @@ func init() {
 	userDescCompanyName := userFields[8].Descriptor()
 	// user.CompanyNameValidator is a validator for the "company_name" field. It is called by the builders before save.
 	user.CompanyNameValidator = userDescCompanyName.Validators[0].(func(string) error)
+	// userDescCustomerType is the schema descriptor for customer_type field.
+	userDescCustomerType := userFields[9].Descriptor()
+	// user.CustomerTypeValidator is a validator for the "customer_type" field. It is called by the builders before save.
+	user.CustomerTypeValidator = userDescCustomerType.Validators[0].(func(string) error)
 	// userDescIsActive is the schema descriptor for is_active field.
 	userDescIsActive := userFields[11].Descriptor()
 	// user.DefaultIsActive holds the default value on creation for the is_active field.

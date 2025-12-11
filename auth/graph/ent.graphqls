@@ -96,7 +96,7 @@ input CreateUserInput {
   """
   Type of user - admin, staff, vendor, or customer
   """
-  userType: UserUserType
+  userType: String
   """
   Vendor code or Customer code
   """
@@ -108,7 +108,7 @@ input CreateUserInput {
   """
   For customers only - individual or corporate
   """
-  customerType: UserCustomerType
+  customerType: String
   """
   For vendors only - payment days
   """
@@ -1074,7 +1074,7 @@ input UpdateUserInput {
   """
   Type of user - admin, staff, vendor, or customer
   """
-  userType: UserUserType
+  userType: String
   """
   Vendor code or Customer code
   """
@@ -1088,7 +1088,7 @@ input UpdateUserInput {
   """
   For customers only - individual or corporate
   """
-  customerType: UserCustomerType
+  customerType: String
   clearCustomerType: Boolean
   """
   For vendors only - payment days
@@ -1136,7 +1136,7 @@ type User implements Node {
   """
   Type of user - admin, staff, vendor, or customer
   """
-  userType: UserUserType!
+  userType: String!
   """
   Vendor code or Customer code
   """
@@ -1148,7 +1148,7 @@ type User implements Node {
   """
   For customers only - individual or corporate
   """
-  customerType: UserCustomerType
+  customerType: String
   """
   For vendors only - payment days
   """
@@ -1178,13 +1178,6 @@ type UserConnection {
   Identifies the total count of items in the connection.
   """
   totalCount: Int!
-}
-"""
-UserCustomerType is enum for the field customer_type
-"""
-enum UserCustomerType @goModel(model: "github.com/saurabh/entgo-microservices/auth/internal/ent/user.CustomerType") {
-  individual
-  corporate
 }
 """
 An edge in a connection.
@@ -1218,15 +1211,6 @@ Properties by which User connections can be ordered.
 enum UserOrderField {
   ID
   NAME
-}
-"""
-UserUserType is enum for the field user_type
-"""
-enum UserUserType @goModel(model: "github.com/saurabh/entgo-microservices/auth/internal/ent/user.UserType") {
-  admin
-  staff
-  vendor
-  customer
 }
 """
 UserWhereInput is used for filtering User objects.
@@ -1384,10 +1368,19 @@ input UserWhereInput {
   """
   user_type field predicates
   """
-  userType: UserUserType
-  userTypeNEQ: UserUserType
-  userTypeIn: [UserUserType!]
-  userTypeNotIn: [UserUserType!]
+  userType: String
+  userTypeNEQ: String
+  userTypeIn: [String!]
+  userTypeNotIn: [String!]
+  userTypeGT: String
+  userTypeGTE: String
+  userTypeLT: String
+  userTypeLTE: String
+  userTypeContains: String
+  userTypeHasPrefix: String
+  userTypeHasSuffix: String
+  userTypeEqualFold: String
+  userTypeContainsFold: String
   """
   user_code field predicates
   """
@@ -1427,12 +1420,21 @@ input UserWhereInput {
   """
   customer_type field predicates
   """
-  customerType: UserCustomerType
-  customerTypeNEQ: UserCustomerType
-  customerTypeIn: [UserCustomerType!]
-  customerTypeNotIn: [UserCustomerType!]
+  customerType: String
+  customerTypeNEQ: String
+  customerTypeIn: [String!]
+  customerTypeNotIn: [String!]
+  customerTypeGT: String
+  customerTypeGTE: String
+  customerTypeLT: String
+  customerTypeLTE: String
+  customerTypeContains: String
+  customerTypeHasPrefix: String
+  customerTypeHasSuffix: String
   customerTypeIsNil: Boolean
   customerTypeNotNil: Boolean
+  customerTypeEqualFold: String
+  customerTypeContainsFold: String
   """
   payment_terms field predicates
   """

@@ -3,9 +3,6 @@
 package user
 
 import (
-	"fmt"
-	"io"
-	"strconv"
 	"time"
 
 	"entgo.io/ent"
@@ -141,10 +138,16 @@ var (
 	NameValidator func(string) error
 	// PhoneValidator is a validator for the "phone" field. It is called by the builders before save.
 	PhoneValidator func(string) error
+	// DefaultUserType holds the default value on creation for the "user_type" field.
+	DefaultUserType string
+	// UserTypeValidator is a validator for the "user_type" field. It is called by the builders before save.
+	UserTypeValidator func(string) error
 	// UserCodeValidator is a validator for the "user_code" field. It is called by the builders before save.
 	UserCodeValidator func(string) error
 	// CompanyNameValidator is a validator for the "company_name" field. It is called by the builders before save.
 	CompanyNameValidator func(string) error
+	// CustomerTypeValidator is a validator for the "customer_type" field. It is called by the builders before save.
+	CustomerTypeValidator func(string) error
 	// DefaultIsActive holds the default value on creation for the "is_active" field.
 	DefaultIsActive bool
 	// DefaultEmailVerified holds the default value on creation for the "email_verified" field.
@@ -152,57 +155,6 @@ var (
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(int) error
 )
-
-// UserType defines the type for the "user_type" enum field.
-type UserType string
-
-// UserTypeStaff is the default value of the UserType enum.
-const DefaultUserType = UserTypeStaff
-
-// UserType values.
-const (
-	UserTypeAdmin    UserType = "admin"
-	UserTypeStaff    UserType = "staff"
-	UserTypeVendor   UserType = "vendor"
-	UserTypeCustomer UserType = "customer"
-)
-
-func (ut UserType) String() string {
-	return string(ut)
-}
-
-// UserTypeValidator is a validator for the "user_type" field enum values. It is called by the builders before save.
-func UserTypeValidator(ut UserType) error {
-	switch ut {
-	case UserTypeAdmin, UserTypeStaff, UserTypeVendor, UserTypeCustomer:
-		return nil
-	default:
-		return fmt.Errorf("user: invalid enum value for user_type field: %q", ut)
-	}
-}
-
-// CustomerType defines the type for the "customer_type" enum field.
-type CustomerType string
-
-// CustomerType values.
-const (
-	CustomerTypeIndividual CustomerType = "individual"
-	CustomerTypeCorporate  CustomerType = "corporate"
-)
-
-func (ct CustomerType) String() string {
-	return string(ct)
-}
-
-// CustomerTypeValidator is a validator for the "customer_type" field enum values. It is called by the builders before save.
-func CustomerTypeValidator(ct CustomerType) error {
-	switch ct {
-	case CustomerTypeIndividual, CustomerTypeCorporate:
-		return nil
-	default:
-		return fmt.Errorf("user: invalid enum value for customer_type field: %q", ct)
-	}
-}
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
@@ -324,40 +276,4 @@ func newRoleRefStep() *sqlgraph.Step {
 		sqlgraph.To(RoleRefInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, RoleRefTable, RoleRefColumn),
 	)
-}
-
-// MarshalGQL implements graphql.Marshaler interface.
-func (e UserType) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(e.String()))
-}
-
-// UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *UserType) UnmarshalGQL(val interface{}) error {
-	str, ok := val.(string)
-	if !ok {
-		return fmt.Errorf("enum %T must be a string", val)
-	}
-	*e = UserType(str)
-	if err := UserTypeValidator(*e); err != nil {
-		return fmt.Errorf("%s is not a valid UserType", str)
-	}
-	return nil
-}
-
-// MarshalGQL implements graphql.Marshaler interface.
-func (e CustomerType) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(e.String()))
-}
-
-// UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *CustomerType) UnmarshalGQL(val interface{}) error {
-	str, ok := val.(string)
-	if !ok {
-		return fmt.Errorf("enum %T must be a string", val)
-	}
-	*e = CustomerType(str)
-	if err := CustomerTypeValidator(*e); err != nil {
-		return fmt.Errorf("%s is not a valid CustomerType", str)
-	}
-	return nil
 }

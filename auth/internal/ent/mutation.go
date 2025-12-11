@@ -3414,10 +3414,10 @@ type UserMutation struct {
 	name              *string
 	phone             *string
 	address           *string
-	user_type         *user.UserType
+	user_type         *string
 	user_code         *string
 	company_name      *string
-	customer_type     *user.CustomerType
+	customer_type     *string
 	payment_terms     *int
 	addpayment_terms  *int
 	is_active         *bool
@@ -4061,12 +4061,12 @@ func (m *UserMutation) ResetAddress() {
 }
 
 // SetUserType sets the "user_type" field.
-func (m *UserMutation) SetUserType(ut user.UserType) {
-	m.user_type = &ut
+func (m *UserMutation) SetUserType(s string) {
+	m.user_type = &s
 }
 
 // UserType returns the value of the "user_type" field in the mutation.
-func (m *UserMutation) UserType() (r user.UserType, exists bool) {
+func (m *UserMutation) UserType() (r string, exists bool) {
 	v := m.user_type
 	if v == nil {
 		return
@@ -4077,7 +4077,7 @@ func (m *UserMutation) UserType() (r user.UserType, exists bool) {
 // OldUserType returns the old "user_type" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldUserType(ctx context.Context) (v user.UserType, err error) {
+func (m *UserMutation) OldUserType(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUserType is only allowed on UpdateOne operations")
 	}
@@ -4195,12 +4195,12 @@ func (m *UserMutation) ResetCompanyName() {
 }
 
 // SetCustomerType sets the "customer_type" field.
-func (m *UserMutation) SetCustomerType(ut user.CustomerType) {
-	m.customer_type = &ut
+func (m *UserMutation) SetCustomerType(s string) {
+	m.customer_type = &s
 }
 
 // CustomerType returns the value of the "customer_type" field in the mutation.
-func (m *UserMutation) CustomerType() (r user.CustomerType, exists bool) {
+func (m *UserMutation) CustomerType() (r string, exists bool) {
 	v := m.customer_type
 	if v == nil {
 		return
@@ -4211,7 +4211,7 @@ func (m *UserMutation) CustomerType() (r user.CustomerType, exists bool) {
 // OldCustomerType returns the old "customer_type" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldCustomerType(ctx context.Context) (v user.CustomerType, err error) {
+func (m *UserMutation) OldCustomerType(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCustomerType is only allowed on UpdateOne operations")
 	}
@@ -4801,7 +4801,7 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		m.SetAddress(v)
 		return nil
 	case user.FieldUserType:
-		v, ok := value.(user.UserType)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4822,7 +4822,7 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		m.SetCompanyName(v)
 		return nil
 	case user.FieldCustomerType:
-		v, ok := value.(user.CustomerType)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

@@ -22,6 +22,7 @@ func (Permission) Mixin() []ent.Mixin {
 // Fields of the Permission.
 // @generate-mutation: true
 // @generate-resolver: true
+// @generate-grpc: true
 func (Permission) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").

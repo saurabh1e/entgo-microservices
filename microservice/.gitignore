@@ -1,0 +1,38 @@
+# Go binaries
+auth
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with ` + "`" + `go test -c` + "`" + `
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Environment files
+.env
+.env.*
+!/.env.example
+
+# Log files
+logs/
+*.log
+
+# Editor directories and files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+.history/*
+
+# Ent temporary files
+.entc/
+
+tmp/

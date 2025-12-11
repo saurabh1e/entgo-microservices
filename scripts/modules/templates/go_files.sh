@@ -131,8 +131,8 @@ generate_generate_go() {
 // Step 7: Generate GraphQL resolvers
 //go:generate go run ./cmd/generate-resolvers/main.go
 
-// Step 8: Final GraphQL code generation
-//go:generate go run github.com/99designs/gqlgen
+// Step 8: Final GraphQL code generation (use installed binary instead of go run)
+//go:generate gqlgen
 
 //go:build ignore
 

@@ -31,3 +31,7 @@ logs/
 *.sw?
 
 .history/*
+
+# Ent temporary files
+.entc/
+

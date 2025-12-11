@@ -10,7 +10,8 @@ WORKDIR /src
 # --------------------
 FROM base AS dev
 # Install build tools needed by some go packages and for `go install` to work reliably
-RUN apk add --no-cache build-base
+# Also install protoc and protobuf-dev for gRPC code generation
+RUN apk add --no-cache build-base protobuf protobuf-dev
 
 ENV GOPATH=/go
 ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
@@ -19,16 +20,24 @@ ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
 # Try the popular cosmtrek/air first, fall back to air-verse if unavailable
 RUN go install github.com/cosmtrek/air@latest || go install github.com/air-verse/air@latest
 
+# Install protoc-gen-go and protoc-gen-go-grpc for gRPC code generation
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
 # Copy module files and the local pkg module so `replace ../pkg` resolves during go mod download
 COPY auth/go.mod auth/go.sum ./
 COPY pkg /pkg
 RUN go env -w GOPROXY=https://proxy.golang.org && go mod download
 
 # Copy the rest of the source for the dev environment (mounted in compose for live edits)
-COPY . .
+COPY auth .
+
+# Copy and set up the development entrypoint script
+COPY auth/docker-entrypoint-dev.sh /usr/local/bin/docker-entrypoint-dev.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint-dev.sh
 
 EXPOSE 8081
-# Default command for dev target — can be overridden by docker-compose.dev.yml
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint-dev.sh"]
 CMD ["air", "-c", ".air.toml"]
 
 # --------------------
