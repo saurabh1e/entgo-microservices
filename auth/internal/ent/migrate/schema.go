@@ -8,13 +8,60 @@ import (
 )
 
 var (
+	// BrandsColumns holds the columns for the "brands" table.
+	BrandsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "created_by", Type: field.TypeInt, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt},
+		{Name: "code", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Size: 100},
+	}
+	// BrandsTable holds the schema information for the "brands" table.
+	BrandsTable = &schema.Table{
+		Name:       "brands",
+		Columns:    BrandsColumns,
+		PrimaryKey: []*schema.Column{BrandsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "brand_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{BrandsColumns[1]},
+			},
+			{
+				Name:    "brand_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{BrandsColumns[2]},
+			},
+			{
+				Name:    "brand_id",
+				Unique:  false,
+				Columns: []*schema.Column{BrandsColumns[0]},
+			},
+			{
+				Name:    "brand_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{BrandsColumns[4]},
+			},
+			{
+				Name:    "brand_tenant_id_code",
+				Unique:  true,
+				Columns: []*schema.Column{BrandsColumns[4], BrandsColumns[5]},
+			},
+			{
+				Name:    "brand_name",
+				Unique:  false,
+				Columns: []*schema.Column{BrandsColumns[6]},
+			},
+		},
+	}
 	// PermissionsColumns holds the columns for the "permissions" table.
 	PermissionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
-		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Unique: true, Size: 100},
 		{Name: "display_name", Type: field.TypeString, Size: 150},
@@ -29,14 +76,34 @@ var (
 		PrimaryKey: []*schema.Column{PermissionsColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "permission_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{PermissionsColumns[1]},
+			},
+			{
+				Name:    "permission_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{PermissionsColumns[2]},
+			},
+			{
+				Name:    "permission_id",
+				Unique:  false,
+				Columns: []*schema.Column{PermissionsColumns[0]},
+			},
+			{
+				Name:    "permission_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{PermissionsColumns[4]},
+			},
+			{
 				Name:    "permission_name",
 				Unique:  true,
-				Columns: []*schema.Column{PermissionsColumns[6]},
+				Columns: []*schema.Column{PermissionsColumns[5]},
 			},
 			{
 				Name:    "permission_is_active",
 				Unique:  false,
-				Columns: []*schema.Column{PermissionsColumns[10]},
+				Columns: []*schema.Column{PermissionsColumns[9]},
 			},
 			{
 				Name:    "permission_created_at",
@@ -51,7 +118,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
-		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "display_name", Type: field.TypeString, Size: 100},
@@ -66,19 +132,39 @@ var (
 		PrimaryKey: []*schema.Column{RolesColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "role_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{RolesColumns[1]},
+			},
+			{
+				Name:    "role_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{RolesColumns[2]},
+			},
+			{
+				Name:    "role_id",
+				Unique:  false,
+				Columns: []*schema.Column{RolesColumns[0]},
+			},
+			{
+				Name:    "role_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{RolesColumns[4]},
+			},
+			{
 				Name:    "role_name",
 				Unique:  true,
-				Columns: []*schema.Column{RolesColumns[6]},
+				Columns: []*schema.Column{RolesColumns[5]},
 			},
 			{
 				Name:    "role_is_active",
 				Unique:  false,
-				Columns: []*schema.Column{RolesColumns[9]},
+				Columns: []*schema.Column{RolesColumns[8]},
 			},
 			{
 				Name:    "role_priority",
 				Unique:  false,
-				Columns: []*schema.Column{RolesColumns[10]},
+				Columns: []*schema.Column{RolesColumns[9]},
 			},
 			{
 				Name:    "role_created_at",
@@ -93,7 +179,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
-		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "can_read", Type: field.TypeBool, Default: false},
 		{Name: "can_create", Type: field.TypeBool, Default: false},
@@ -110,15 +195,37 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "role_permissions_roles_role",
-				Columns:    []*schema.Column{RolePermissionsColumns[10]},
+				Columns:    []*schema.Column{RolePermissionsColumns[9]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "role_permissions_permissions_permission",
-				Columns:    []*schema.Column{RolePermissionsColumns[11]},
+				Columns:    []*schema.Column{RolePermissionsColumns[10]},
 				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "rolepermission_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{RolePermissionsColumns[1]},
+			},
+			{
+				Name:    "rolepermission_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{RolePermissionsColumns[2]},
+			},
+			{
+				Name:    "rolepermission_id",
+				Unique:  false,
+				Columns: []*schema.Column{RolePermissionsColumns[0]},
+			},
+			{
+				Name:    "rolepermission_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{RolePermissionsColumns[4]},
 			},
 		},
 	}
@@ -128,7 +235,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
-		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
 		{Name: "name", Type: field.TypeString, Size: 100},
 		{Name: "slug", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "domain", Type: field.TypeString, Nullable: true, Size: 255},
@@ -146,24 +252,39 @@ var (
 		PrimaryKey: []*schema.Column{TenantsColumns[0]},
 		Indexes: []*schema.Index{
 			{
+				Name:    "tenant_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TenantsColumns[1]},
+			},
+			{
+				Name:    "tenant_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{TenantsColumns[2]},
+			},
+			{
+				Name:    "tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{TenantsColumns[0]},
+			},
+			{
 				Name:    "tenant_slug",
 				Unique:  true,
-				Columns: []*schema.Column{TenantsColumns[6]},
+				Columns: []*schema.Column{TenantsColumns[5]},
 			},
 			{
 				Name:    "tenant_domain",
 				Unique:  true,
-				Columns: []*schema.Column{TenantsColumns[7]},
+				Columns: []*schema.Column{TenantsColumns[6]},
 			},
 			{
 				Name:    "tenant_status",
 				Unique:  false,
-				Columns: []*schema.Column{TenantsColumns[9]},
+				Columns: []*schema.Column{TenantsColumns[8]},
 			},
 			{
 				Name:    "tenant_is_active",
 				Unique:  false,
-				Columns: []*schema.Column{TenantsColumns[13]},
+				Columns: []*schema.Column{TenantsColumns[12]},
 			},
 			{
 				Name:    "tenant_created_at",
@@ -178,7 +299,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
-		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "username", Type: field.TypeString, Unique: true, Size: 50},
@@ -205,14 +325,37 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "users_roles_role",
-				Columns:    []*schema.Column{UsersColumns[21]},
+				Columns:    []*schema.Column{UsersColumns[20]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "user_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[1]},
+			},
+			{
+				Name:    "user_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[2]},
+			},
+			{
+				Name:    "user_id",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[0]},
+			},
+			{
+				Name:    "user_tenant_id",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[4]},
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		BrandsTable,
 		PermissionsTable,
 		RolesTable,
 		RolePermissionsTable,

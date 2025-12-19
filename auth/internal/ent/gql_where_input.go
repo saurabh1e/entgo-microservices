@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/brand"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/permission"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/predicate"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
@@ -14,6 +15,348 @@ import (
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/tenant"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/user"
 )
+
+// BrandWhereInput represents a where input for filtering Brand queries.
+type BrandWhereInput struct {
+	Predicates []predicate.Brand  `json:"-"`
+	Not        *BrandWhereInput   `json:"not,omitempty"`
+	Or         []*BrandWhereInput `json:"or,omitempty"`
+	And        []*BrandWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "created_at" field predicates.
+	CreatedAt      *time.Time  `json:"createdAt,omitempty"`
+	CreatedAtNEQ   *time.Time  `json:"createdAtNEQ,omitempty"`
+	CreatedAtIn    []time.Time `json:"createdAtIn,omitempty"`
+	CreatedAtNotIn []time.Time `json:"createdAtNotIn,omitempty"`
+	CreatedAtGT    *time.Time  `json:"createdAtGT,omitempty"`
+	CreatedAtGTE   *time.Time  `json:"createdAtGTE,omitempty"`
+	CreatedAtLT    *time.Time  `json:"createdAtLT,omitempty"`
+	CreatedAtLTE   *time.Time  `json:"createdAtLTE,omitempty"`
+
+	// "created_by" field predicates.
+	CreatedBy       *int  `json:"createdBy,omitempty"`
+	CreatedByNEQ    *int  `json:"createdByNEQ,omitempty"`
+	CreatedByIn     []int `json:"createdByIn,omitempty"`
+	CreatedByNotIn  []int `json:"createdByNotIn,omitempty"`
+	CreatedByGT     *int  `json:"createdByGT,omitempty"`
+	CreatedByGTE    *int  `json:"createdByGTE,omitempty"`
+	CreatedByLT     *int  `json:"createdByLT,omitempty"`
+	CreatedByLTE    *int  `json:"createdByLTE,omitempty"`
+	CreatedByIsNil  bool  `json:"createdByIsNil,omitempty"`
+	CreatedByNotNil bool  `json:"createdByNotNil,omitempty"`
+
+	// "tenant_id" field predicates.
+	TenantID      *int  `json:"tenantID,omitempty"`
+	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
+	TenantIDIn    []int `json:"tenantIDIn,omitempty"`
+	TenantIDNotIn []int `json:"tenantIDNotIn,omitempty"`
+	TenantIDGT    *int  `json:"tenantIDGT,omitempty"`
+	TenantIDGTE   *int  `json:"tenantIDGTE,omitempty"`
+	TenantIDLT    *int  `json:"tenantIDLT,omitempty"`
+	TenantIDLTE   *int  `json:"tenantIDLTE,omitempty"`
+
+	// "code" field predicates.
+	Code             *string  `json:"code,omitempty"`
+	CodeNEQ          *string  `json:"codeNEQ,omitempty"`
+	CodeIn           []string `json:"codeIn,omitempty"`
+	CodeNotIn        []string `json:"codeNotIn,omitempty"`
+	CodeGT           *string  `json:"codeGT,omitempty"`
+	CodeGTE          *string  `json:"codeGTE,omitempty"`
+	CodeLT           *string  `json:"codeLT,omitempty"`
+	CodeLTE          *string  `json:"codeLTE,omitempty"`
+	CodeContains     *string  `json:"codeContains,omitempty"`
+	CodeHasPrefix    *string  `json:"codeHasPrefix,omitempty"`
+	CodeHasSuffix    *string  `json:"codeHasSuffix,omitempty"`
+	CodeEqualFold    *string  `json:"codeEqualFold,omitempty"`
+	CodeContainsFold *string  `json:"codeContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *BrandWhereInput) AddPredicates(predicates ...predicate.Brand) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the BrandWhereInput filter on the BrandQuery builder.
+func (i *BrandWhereInput) Filter(q *BrandQuery) (*BrandQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyBrandWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyBrandWhereInput is returned in case the BrandWhereInput is empty.
+var ErrEmptyBrandWhereInput = errors.New("ent: empty predicate BrandWhereInput")
+
+// P returns a predicate for filtering brands.
+// An error is returned if the input is empty or invalid.
+func (i *BrandWhereInput) P() (predicate.Brand, error) {
+	var predicates []predicate.Brand
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, brand.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Brand, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, brand.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Brand, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, brand.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, brand.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, brand.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, brand.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, brand.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, brand.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, brand.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, brand.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, brand.IDLTE(*i.IDLTE))
+	}
+	if i.CreatedAt != nil {
+		predicates = append(predicates, brand.CreatedAtEQ(*i.CreatedAt))
+	}
+	if i.CreatedAtNEQ != nil {
+		predicates = append(predicates, brand.CreatedAtNEQ(*i.CreatedAtNEQ))
+	}
+	if len(i.CreatedAtIn) > 0 {
+		predicates = append(predicates, brand.CreatedAtIn(i.CreatedAtIn...))
+	}
+	if len(i.CreatedAtNotIn) > 0 {
+		predicates = append(predicates, brand.CreatedAtNotIn(i.CreatedAtNotIn...))
+	}
+	if i.CreatedAtGT != nil {
+		predicates = append(predicates, brand.CreatedAtGT(*i.CreatedAtGT))
+	}
+	if i.CreatedAtGTE != nil {
+		predicates = append(predicates, brand.CreatedAtGTE(*i.CreatedAtGTE))
+	}
+	if i.CreatedAtLT != nil {
+		predicates = append(predicates, brand.CreatedAtLT(*i.CreatedAtLT))
+	}
+	if i.CreatedAtLTE != nil {
+		predicates = append(predicates, brand.CreatedAtLTE(*i.CreatedAtLTE))
+	}
+	if i.CreatedBy != nil {
+		predicates = append(predicates, brand.CreatedByEQ(*i.CreatedBy))
+	}
+	if i.CreatedByNEQ != nil {
+		predicates = append(predicates, brand.CreatedByNEQ(*i.CreatedByNEQ))
+	}
+	if len(i.CreatedByIn) > 0 {
+		predicates = append(predicates, brand.CreatedByIn(i.CreatedByIn...))
+	}
+	if len(i.CreatedByNotIn) > 0 {
+		predicates = append(predicates, brand.CreatedByNotIn(i.CreatedByNotIn...))
+	}
+	if i.CreatedByGT != nil {
+		predicates = append(predicates, brand.CreatedByGT(*i.CreatedByGT))
+	}
+	if i.CreatedByGTE != nil {
+		predicates = append(predicates, brand.CreatedByGTE(*i.CreatedByGTE))
+	}
+	if i.CreatedByLT != nil {
+		predicates = append(predicates, brand.CreatedByLT(*i.CreatedByLT))
+	}
+	if i.CreatedByLTE != nil {
+		predicates = append(predicates, brand.CreatedByLTE(*i.CreatedByLTE))
+	}
+	if i.CreatedByIsNil {
+		predicates = append(predicates, brand.CreatedByIsNil())
+	}
+	if i.CreatedByNotNil {
+		predicates = append(predicates, brand.CreatedByNotNil())
+	}
+	if i.TenantID != nil {
+		predicates = append(predicates, brand.TenantIDEQ(*i.TenantID))
+	}
+	if i.TenantIDNEQ != nil {
+		predicates = append(predicates, brand.TenantIDNEQ(*i.TenantIDNEQ))
+	}
+	if len(i.TenantIDIn) > 0 {
+		predicates = append(predicates, brand.TenantIDIn(i.TenantIDIn...))
+	}
+	if len(i.TenantIDNotIn) > 0 {
+		predicates = append(predicates, brand.TenantIDNotIn(i.TenantIDNotIn...))
+	}
+	if i.TenantIDGT != nil {
+		predicates = append(predicates, brand.TenantIDGT(*i.TenantIDGT))
+	}
+	if i.TenantIDGTE != nil {
+		predicates = append(predicates, brand.TenantIDGTE(*i.TenantIDGTE))
+	}
+	if i.TenantIDLT != nil {
+		predicates = append(predicates, brand.TenantIDLT(*i.TenantIDLT))
+	}
+	if i.TenantIDLTE != nil {
+		predicates = append(predicates, brand.TenantIDLTE(*i.TenantIDLTE))
+	}
+	if i.Code != nil {
+		predicates = append(predicates, brand.CodeEQ(*i.Code))
+	}
+	if i.CodeNEQ != nil {
+		predicates = append(predicates, brand.CodeNEQ(*i.CodeNEQ))
+	}
+	if len(i.CodeIn) > 0 {
+		predicates = append(predicates, brand.CodeIn(i.CodeIn...))
+	}
+	if len(i.CodeNotIn) > 0 {
+		predicates = append(predicates, brand.CodeNotIn(i.CodeNotIn...))
+	}
+	if i.CodeGT != nil {
+		predicates = append(predicates, brand.CodeGT(*i.CodeGT))
+	}
+	if i.CodeGTE != nil {
+		predicates = append(predicates, brand.CodeGTE(*i.CodeGTE))
+	}
+	if i.CodeLT != nil {
+		predicates = append(predicates, brand.CodeLT(*i.CodeLT))
+	}
+	if i.CodeLTE != nil {
+		predicates = append(predicates, brand.CodeLTE(*i.CodeLTE))
+	}
+	if i.CodeContains != nil {
+		predicates = append(predicates, brand.CodeContains(*i.CodeContains))
+	}
+	if i.CodeHasPrefix != nil {
+		predicates = append(predicates, brand.CodeHasPrefix(*i.CodeHasPrefix))
+	}
+	if i.CodeHasSuffix != nil {
+		predicates = append(predicates, brand.CodeHasSuffix(*i.CodeHasSuffix))
+	}
+	if i.CodeEqualFold != nil {
+		predicates = append(predicates, brand.CodeEqualFold(*i.CodeEqualFold))
+	}
+	if i.CodeContainsFold != nil {
+		predicates = append(predicates, brand.CodeContainsFold(*i.CodeContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, brand.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, brand.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, brand.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, brand.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, brand.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, brand.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, brand.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, brand.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, brand.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, brand.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, brand.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, brand.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, brand.NameContainsFold(*i.NameContainsFold))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyBrandWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return brand.And(predicates...), nil
+	}
+}
 
 // PermissionWhereInput represents a where input for filtering Permission queries.
 type PermissionWhereInput struct {
@@ -53,18 +396,6 @@ type PermissionWhereInput struct {
 	CreatedByLTE    *int  `json:"createdByLTE,omitempty"`
 	CreatedByIsNil  bool  `json:"createdByIsNil,omitempty"`
 	CreatedByNotNil bool  `json:"createdByNotNil,omitempty"`
-
-	// "owned_by" field predicates.
-	OwnedBy       *int  `json:"ownedBy,omitempty"`
-	OwnedByNEQ    *int  `json:"ownedByNEQ,omitempty"`
-	OwnedByIn     []int `json:"ownedByIn,omitempty"`
-	OwnedByNotIn  []int `json:"ownedByNotIn,omitempty"`
-	OwnedByGT     *int  `json:"ownedByGT,omitempty"`
-	OwnedByGTE    *int  `json:"ownedByGTE,omitempty"`
-	OwnedByLT     *int  `json:"ownedByLT,omitempty"`
-	OwnedByLTE    *int  `json:"ownedByLTE,omitempty"`
-	OwnedByIsNil  bool  `json:"ownedByIsNil,omitempty"`
-	OwnedByNotNil bool  `json:"ownedByNotNil,omitempty"`
 
 	// "tenant_id" field predicates.
 	TenantID      *int  `json:"tenantID,omitempty"`
@@ -295,36 +626,6 @@ func (i *PermissionWhereInput) P() (predicate.Permission, error) {
 	}
 	if i.CreatedByNotNil {
 		predicates = append(predicates, permission.CreatedByNotNil())
-	}
-	if i.OwnedBy != nil {
-		predicates = append(predicates, permission.OwnedByEQ(*i.OwnedBy))
-	}
-	if i.OwnedByNEQ != nil {
-		predicates = append(predicates, permission.OwnedByNEQ(*i.OwnedByNEQ))
-	}
-	if len(i.OwnedByIn) > 0 {
-		predicates = append(predicates, permission.OwnedByIn(i.OwnedByIn...))
-	}
-	if len(i.OwnedByNotIn) > 0 {
-		predicates = append(predicates, permission.OwnedByNotIn(i.OwnedByNotIn...))
-	}
-	if i.OwnedByGT != nil {
-		predicates = append(predicates, permission.OwnedByGT(*i.OwnedByGT))
-	}
-	if i.OwnedByGTE != nil {
-		predicates = append(predicates, permission.OwnedByGTE(*i.OwnedByGTE))
-	}
-	if i.OwnedByLT != nil {
-		predicates = append(predicates, permission.OwnedByLT(*i.OwnedByLT))
-	}
-	if i.OwnedByLTE != nil {
-		predicates = append(predicates, permission.OwnedByLTE(*i.OwnedByLTE))
-	}
-	if i.OwnedByIsNil {
-		predicates = append(predicates, permission.OwnedByIsNil())
-	}
-	if i.OwnedByNotNil {
-		predicates = append(predicates, permission.OwnedByNotNil())
 	}
 	if i.TenantID != nil {
 		predicates = append(predicates, permission.TenantIDEQ(*i.TenantID))
@@ -586,18 +887,6 @@ type RoleWhereInput struct {
 	CreatedByIsNil  bool  `json:"createdByIsNil,omitempty"`
 	CreatedByNotNil bool  `json:"createdByNotNil,omitempty"`
 
-	// "owned_by" field predicates.
-	OwnedBy       *int  `json:"ownedBy,omitempty"`
-	OwnedByNEQ    *int  `json:"ownedByNEQ,omitempty"`
-	OwnedByIn     []int `json:"ownedByIn,omitempty"`
-	OwnedByNotIn  []int `json:"ownedByNotIn,omitempty"`
-	OwnedByGT     *int  `json:"ownedByGT,omitempty"`
-	OwnedByGTE    *int  `json:"ownedByGTE,omitempty"`
-	OwnedByLT     *int  `json:"ownedByLT,omitempty"`
-	OwnedByLTE    *int  `json:"ownedByLTE,omitempty"`
-	OwnedByIsNil  bool  `json:"ownedByIsNil,omitempty"`
-	OwnedByNotNil bool  `json:"ownedByNotNil,omitempty"`
-
 	// "tenant_id" field predicates.
 	TenantID      *int  `json:"tenantID,omitempty"`
 	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
@@ -826,36 +1115,6 @@ func (i *RoleWhereInput) P() (predicate.Role, error) {
 	}
 	if i.CreatedByNotNil {
 		predicates = append(predicates, role.CreatedByNotNil())
-	}
-	if i.OwnedBy != nil {
-		predicates = append(predicates, role.OwnedByEQ(*i.OwnedBy))
-	}
-	if i.OwnedByNEQ != nil {
-		predicates = append(predicates, role.OwnedByNEQ(*i.OwnedByNEQ))
-	}
-	if len(i.OwnedByIn) > 0 {
-		predicates = append(predicates, role.OwnedByIn(i.OwnedByIn...))
-	}
-	if len(i.OwnedByNotIn) > 0 {
-		predicates = append(predicates, role.OwnedByNotIn(i.OwnedByNotIn...))
-	}
-	if i.OwnedByGT != nil {
-		predicates = append(predicates, role.OwnedByGT(*i.OwnedByGT))
-	}
-	if i.OwnedByGTE != nil {
-		predicates = append(predicates, role.OwnedByGTE(*i.OwnedByGTE))
-	}
-	if i.OwnedByLT != nil {
-		predicates = append(predicates, role.OwnedByLT(*i.OwnedByLT))
-	}
-	if i.OwnedByLTE != nil {
-		predicates = append(predicates, role.OwnedByLTE(*i.OwnedByLTE))
-	}
-	if i.OwnedByIsNil {
-		predicates = append(predicates, role.OwnedByIsNil())
-	}
-	if i.OwnedByNotNil {
-		predicates = append(predicates, role.OwnedByNotNil())
 	}
 	if i.TenantID != nil {
 		predicates = append(predicates, role.TenantIDEQ(*i.TenantID))
@@ -1120,18 +1379,6 @@ type RolePermissionWhereInput struct {
 	CreatedByIsNil  bool  `json:"createdByIsNil,omitempty"`
 	CreatedByNotNil bool  `json:"createdByNotNil,omitempty"`
 
-	// "owned_by" field predicates.
-	OwnedBy       *int  `json:"ownedBy,omitempty"`
-	OwnedByNEQ    *int  `json:"ownedByNEQ,omitempty"`
-	OwnedByIn     []int `json:"ownedByIn,omitempty"`
-	OwnedByNotIn  []int `json:"ownedByNotIn,omitempty"`
-	OwnedByGT     *int  `json:"ownedByGT,omitempty"`
-	OwnedByGTE    *int  `json:"ownedByGTE,omitempty"`
-	OwnedByLT     *int  `json:"ownedByLT,omitempty"`
-	OwnedByLTE    *int  `json:"ownedByLTE,omitempty"`
-	OwnedByIsNil  bool  `json:"ownedByIsNil,omitempty"`
-	OwnedByNotNil bool  `json:"ownedByNotNil,omitempty"`
-
 	// "tenant_id" field predicates.
 	TenantID      *int  `json:"tenantID,omitempty"`
 	TenantIDNEQ   *int  `json:"tenantIDNEQ,omitempty"`
@@ -1316,36 +1563,6 @@ func (i *RolePermissionWhereInput) P() (predicate.RolePermission, error) {
 	if i.CreatedByNotNil {
 		predicates = append(predicates, rolepermission.CreatedByNotNil())
 	}
-	if i.OwnedBy != nil {
-		predicates = append(predicates, rolepermission.OwnedByEQ(*i.OwnedBy))
-	}
-	if i.OwnedByNEQ != nil {
-		predicates = append(predicates, rolepermission.OwnedByNEQ(*i.OwnedByNEQ))
-	}
-	if len(i.OwnedByIn) > 0 {
-		predicates = append(predicates, rolepermission.OwnedByIn(i.OwnedByIn...))
-	}
-	if len(i.OwnedByNotIn) > 0 {
-		predicates = append(predicates, rolepermission.OwnedByNotIn(i.OwnedByNotIn...))
-	}
-	if i.OwnedByGT != nil {
-		predicates = append(predicates, rolepermission.OwnedByGT(*i.OwnedByGT))
-	}
-	if i.OwnedByGTE != nil {
-		predicates = append(predicates, rolepermission.OwnedByGTE(*i.OwnedByGTE))
-	}
-	if i.OwnedByLT != nil {
-		predicates = append(predicates, rolepermission.OwnedByLT(*i.OwnedByLT))
-	}
-	if i.OwnedByLTE != nil {
-		predicates = append(predicates, rolepermission.OwnedByLTE(*i.OwnedByLTE))
-	}
-	if i.OwnedByIsNil {
-		predicates = append(predicates, rolepermission.OwnedByIsNil())
-	}
-	if i.OwnedByNotNil {
-		predicates = append(predicates, rolepermission.OwnedByNotNil())
-	}
 	if i.TenantID != nil {
 		predicates = append(predicates, rolepermission.TenantIDEQ(*i.TenantID))
 	}
@@ -1479,18 +1696,6 @@ type TenantWhereInput struct {
 	CreatedByLTE    *int  `json:"createdByLTE,omitempty"`
 	CreatedByIsNil  bool  `json:"createdByIsNil,omitempty"`
 	CreatedByNotNil bool  `json:"createdByNotNil,omitempty"`
-
-	// "owned_by" field predicates.
-	OwnedBy       *int  `json:"ownedBy,omitempty"`
-	OwnedByNEQ    *int  `json:"ownedByNEQ,omitempty"`
-	OwnedByIn     []int `json:"ownedByIn,omitempty"`
-	OwnedByNotIn  []int `json:"ownedByNotIn,omitempty"`
-	OwnedByGT     *int  `json:"ownedByGT,omitempty"`
-	OwnedByGTE    *int  `json:"ownedByGTE,omitempty"`
-	OwnedByLT     *int  `json:"ownedByLT,omitempty"`
-	OwnedByLTE    *int  `json:"ownedByLTE,omitempty"`
-	OwnedByIsNil  bool  `json:"ownedByIsNil,omitempty"`
-	OwnedByNotNil bool  `json:"ownedByNotNil,omitempty"`
 
 	// "name" field predicates.
 	Name             *string  `json:"name,omitempty"`
@@ -1727,36 +1932,6 @@ func (i *TenantWhereInput) P() (predicate.Tenant, error) {
 	}
 	if i.CreatedByNotNil {
 		predicates = append(predicates, tenant.CreatedByNotNil())
-	}
-	if i.OwnedBy != nil {
-		predicates = append(predicates, tenant.OwnedByEQ(*i.OwnedBy))
-	}
-	if i.OwnedByNEQ != nil {
-		predicates = append(predicates, tenant.OwnedByNEQ(*i.OwnedByNEQ))
-	}
-	if len(i.OwnedByIn) > 0 {
-		predicates = append(predicates, tenant.OwnedByIn(i.OwnedByIn...))
-	}
-	if len(i.OwnedByNotIn) > 0 {
-		predicates = append(predicates, tenant.OwnedByNotIn(i.OwnedByNotIn...))
-	}
-	if i.OwnedByGT != nil {
-		predicates = append(predicates, tenant.OwnedByGT(*i.OwnedByGT))
-	}
-	if i.OwnedByGTE != nil {
-		predicates = append(predicates, tenant.OwnedByGTE(*i.OwnedByGTE))
-	}
-	if i.OwnedByLT != nil {
-		predicates = append(predicates, tenant.OwnedByLT(*i.OwnedByLT))
-	}
-	if i.OwnedByLTE != nil {
-		predicates = append(predicates, tenant.OwnedByLTE(*i.OwnedByLTE))
-	}
-	if i.OwnedByIsNil {
-		predicates = append(predicates, tenant.OwnedByIsNil())
-	}
-	if i.OwnedByNotNil {
-		predicates = append(predicates, tenant.OwnedByNotNil())
 	}
 	if i.Name != nil {
 		predicates = append(predicates, tenant.NameEQ(*i.Name))
@@ -2023,18 +2198,6 @@ type UserWhereInput struct {
 	CreatedByLTE    *int  `json:"createdByLTE,omitempty"`
 	CreatedByIsNil  bool  `json:"createdByIsNil,omitempty"`
 	CreatedByNotNil bool  `json:"createdByNotNil,omitempty"`
-
-	// "owned_by" field predicates.
-	OwnedBy       *int  `json:"ownedBy,omitempty"`
-	OwnedByNEQ    *int  `json:"ownedByNEQ,omitempty"`
-	OwnedByIn     []int `json:"ownedByIn,omitempty"`
-	OwnedByNotIn  []int `json:"ownedByNotIn,omitempty"`
-	OwnedByGT     *int  `json:"ownedByGT,omitempty"`
-	OwnedByGTE    *int  `json:"ownedByGTE,omitempty"`
-	OwnedByLT     *int  `json:"ownedByLT,omitempty"`
-	OwnedByLTE    *int  `json:"ownedByLTE,omitempty"`
-	OwnedByIsNil  bool  `json:"ownedByIsNil,omitempty"`
-	OwnedByNotNil bool  `json:"ownedByNotNil,omitempty"`
 
 	// "tenant_id" field predicates.
 	TenantID      *int  `json:"tenantID,omitempty"`
@@ -2403,36 +2566,6 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 	}
 	if i.CreatedByNotNil {
 		predicates = append(predicates, user.CreatedByNotNil())
-	}
-	if i.OwnedBy != nil {
-		predicates = append(predicates, user.OwnedByEQ(*i.OwnedBy))
-	}
-	if i.OwnedByNEQ != nil {
-		predicates = append(predicates, user.OwnedByNEQ(*i.OwnedByNEQ))
-	}
-	if len(i.OwnedByIn) > 0 {
-		predicates = append(predicates, user.OwnedByIn(i.OwnedByIn...))
-	}
-	if len(i.OwnedByNotIn) > 0 {
-		predicates = append(predicates, user.OwnedByNotIn(i.OwnedByNotIn...))
-	}
-	if i.OwnedByGT != nil {
-		predicates = append(predicates, user.OwnedByGT(*i.OwnedByGT))
-	}
-	if i.OwnedByGTE != nil {
-		predicates = append(predicates, user.OwnedByGTE(*i.OwnedByGTE))
-	}
-	if i.OwnedByLT != nil {
-		predicates = append(predicates, user.OwnedByLT(*i.OwnedByLT))
-	}
-	if i.OwnedByLTE != nil {
-		predicates = append(predicates, user.OwnedByLTE(*i.OwnedByLTE))
-	}
-	if i.OwnedByIsNil {
-		predicates = append(predicates, user.OwnedByIsNil())
-	}
-	if i.OwnedByNotNil {
-		predicates = append(predicates, user.OwnedByNotNil())
 	}
 	if i.TenantID != nil {
 		predicates = append(predicates, user.TenantIDEQ(*i.TenantID))

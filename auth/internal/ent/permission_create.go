@@ -65,20 +65,6 @@ func (_c *PermissionCreate) SetNillableCreatedBy(v *int) *PermissionCreate {
 	return _c
 }
 
-// SetOwnedBy sets the "owned_by" field.
-func (_c *PermissionCreate) SetOwnedBy(v int) *PermissionCreate {
-	_c.mutation.SetOwnedBy(v)
-	return _c
-}
-
-// SetNillableOwnedBy sets the "owned_by" field if the given value is not nil.
-func (_c *PermissionCreate) SetNillableOwnedBy(v *int) *PermissionCreate {
-	if v != nil {
-		_c.SetOwnedBy(*v)
-	}
-	return _c
-}
-
 // SetTenantID sets the "tenant_id" field.
 func (_c *PermissionCreate) SetTenantID(v int) *PermissionCreate {
 	_c.mutation.SetTenantID(v)
@@ -299,10 +285,6 @@ func (_c *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 		_spec.SetField(permission.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = &value
 	}
-	if value, ok := _c.mutation.OwnedBy(); ok {
-		_spec.SetField(permission.FieldOwnedBy, field.TypeInt, value)
-		_node.OwnedBy = &value
-	}
 	if value, ok := _c.mutation.TenantID(); ok {
 		_spec.SetField(permission.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
@@ -428,30 +410,6 @@ func (u *PermissionUpsert) AddCreatedBy(v int) *PermissionUpsert {
 // ClearCreatedBy clears the value of the "created_by" field.
 func (u *PermissionUpsert) ClearCreatedBy() *PermissionUpsert {
 	u.SetNull(permission.FieldCreatedBy)
-	return u
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *PermissionUpsert) SetOwnedBy(v int) *PermissionUpsert {
-	u.Set(permission.FieldOwnedBy, v)
-	return u
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *PermissionUpsert) UpdateOwnedBy() *PermissionUpsert {
-	u.SetExcluded(permission.FieldOwnedBy)
-	return u
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *PermissionUpsert) AddOwnedBy(v int) *PermissionUpsert {
-	u.Add(permission.FieldOwnedBy, v)
-	return u
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *PermissionUpsert) ClearOwnedBy() *PermissionUpsert {
-	u.SetNull(permission.FieldOwnedBy)
 	return u
 }
 
@@ -629,34 +587,6 @@ func (u *PermissionUpsertOne) UpdateCreatedBy() *PermissionUpsertOne {
 func (u *PermissionUpsertOne) ClearCreatedBy() *PermissionUpsertOne {
 	return u.Update(func(s *PermissionUpsert) {
 		s.ClearCreatedBy()
-	})
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *PermissionUpsertOne) SetOwnedBy(v int) *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.SetOwnedBy(v)
-	})
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *PermissionUpsertOne) AddOwnedBy(v int) *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.AddOwnedBy(v)
-	})
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *PermissionUpsertOne) UpdateOwnedBy() *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.UpdateOwnedBy()
-	})
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *PermissionUpsertOne) ClearOwnedBy() *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.ClearOwnedBy()
 	})
 }
 
@@ -1014,34 +944,6 @@ func (u *PermissionUpsertBulk) UpdateCreatedBy() *PermissionUpsertBulk {
 func (u *PermissionUpsertBulk) ClearCreatedBy() *PermissionUpsertBulk {
 	return u.Update(func(s *PermissionUpsert) {
 		s.ClearCreatedBy()
-	})
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *PermissionUpsertBulk) SetOwnedBy(v int) *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.SetOwnedBy(v)
-	})
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *PermissionUpsertBulk) AddOwnedBy(v int) *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.AddOwnedBy(v)
-	})
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *PermissionUpsertBulk) UpdateOwnedBy() *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.UpdateOwnedBy()
-	})
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *PermissionUpsertBulk) ClearOwnedBy() *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.ClearOwnedBy()
 	})
 }
 

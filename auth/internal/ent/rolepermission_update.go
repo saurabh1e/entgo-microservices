@@ -64,33 +64,6 @@ func (_u *RolePermissionUpdate) ClearCreatedBy() *RolePermissionUpdate {
 	return _u
 }
 
-// SetOwnedBy sets the "owned_by" field.
-func (_u *RolePermissionUpdate) SetOwnedBy(v int) *RolePermissionUpdate {
-	_u.mutation.ResetOwnedBy()
-	_u.mutation.SetOwnedBy(v)
-	return _u
-}
-
-// SetNillableOwnedBy sets the "owned_by" field if the given value is not nil.
-func (_u *RolePermissionUpdate) SetNillableOwnedBy(v *int) *RolePermissionUpdate {
-	if v != nil {
-		_u.SetOwnedBy(*v)
-	}
-	return _u
-}
-
-// AddOwnedBy adds value to the "owned_by" field.
-func (_u *RolePermissionUpdate) AddOwnedBy(v int) *RolePermissionUpdate {
-	_u.mutation.AddOwnedBy(v)
-	return _u
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (_u *RolePermissionUpdate) ClearOwnedBy() *RolePermissionUpdate {
-	_u.mutation.ClearOwnedBy()
-	return _u
-}
-
 // SetTenantID sets the "tenant_id" field.
 func (_u *RolePermissionUpdate) SetTenantID(v int) *RolePermissionUpdate {
 	_u.mutation.ResetTenantID()
@@ -295,15 +268,6 @@ func (_u *RolePermissionUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if _u.mutation.CreatedByCleared() {
 		_spec.ClearField(rolepermission.FieldCreatedBy, field.TypeInt)
 	}
-	if value, ok := _u.mutation.OwnedBy(); ok {
-		_spec.SetField(rolepermission.FieldOwnedBy, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedOwnedBy(); ok {
-		_spec.AddField(rolepermission.FieldOwnedBy, field.TypeInt, value)
-	}
-	if _u.mutation.OwnedByCleared() {
-		_spec.ClearField(rolepermission.FieldOwnedBy, field.TypeInt)
-	}
 	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt, value)
 	}
@@ -432,33 +396,6 @@ func (_u *RolePermissionUpdateOne) AddCreatedBy(v int) *RolePermissionUpdateOne 
 // ClearCreatedBy clears the value of the "created_by" field.
 func (_u *RolePermissionUpdateOne) ClearCreatedBy() *RolePermissionUpdateOne {
 	_u.mutation.ClearCreatedBy()
-	return _u
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (_u *RolePermissionUpdateOne) SetOwnedBy(v int) *RolePermissionUpdateOne {
-	_u.mutation.ResetOwnedBy()
-	_u.mutation.SetOwnedBy(v)
-	return _u
-}
-
-// SetNillableOwnedBy sets the "owned_by" field if the given value is not nil.
-func (_u *RolePermissionUpdateOne) SetNillableOwnedBy(v *int) *RolePermissionUpdateOne {
-	if v != nil {
-		_u.SetOwnedBy(*v)
-	}
-	return _u
-}
-
-// AddOwnedBy adds value to the "owned_by" field.
-func (_u *RolePermissionUpdateOne) AddOwnedBy(v int) *RolePermissionUpdateOne {
-	_u.mutation.AddOwnedBy(v)
-	return _u
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (_u *RolePermissionUpdateOne) ClearOwnedBy() *RolePermissionUpdateOne {
-	_u.mutation.ClearOwnedBy()
 	return _u
 }
 
@@ -695,15 +632,6 @@ func (_u *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePerm
 	}
 	if _u.mutation.CreatedByCleared() {
 		_spec.ClearField(rolepermission.FieldCreatedBy, field.TypeInt)
-	}
-	if value, ok := _u.mutation.OwnedBy(); ok {
-		_spec.SetField(rolepermission.FieldOwnedBy, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedOwnedBy(); ok {
-		_spec.AddField(rolepermission.FieldOwnedBy, field.TypeInt, value)
-	}
-	if _u.mutation.OwnedByCleared() {
-		_spec.ClearField(rolepermission.FieldOwnedBy, field.TypeInt)
 	}
 	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt, value)

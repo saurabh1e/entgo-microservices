@@ -4,6 +4,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
 )
 
@@ -20,5 +21,12 @@ func (TenantMixin) Fields() []ent.Field {
 			Positive().
 			Comment("Tenant ID for multi-tenancy isolation").
 			Annotations(entgql.Skip(entgql.SkipMutationCreateInput | entgql.SkipMutationUpdateInput)),
+	}
+}
+
+func (TenantMixin) Indexes() []ent.Index {
+	return []ent.Index{
+		// Indexes for common query fields
+		index.Fields("tenant_id"),
 	}
 }

@@ -8,6 +8,48 @@ import (
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/tenant"
 )
 
+// CreateBrandInput represents a mutation input for creating brands.
+type CreateBrandInput struct {
+	Code string
+	Name string
+}
+
+// Mutate applies the CreateBrandInput on the BrandMutation builder.
+func (i *CreateBrandInput) Mutate(m *BrandMutation) {
+	m.SetCode(i.Code)
+	m.SetName(i.Name)
+}
+
+// SetInput applies the change-set in the CreateBrandInput on the BrandCreate builder.
+func (c *BrandCreate) SetInput(i CreateBrandInput) *BrandCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateBrandInput represents a mutation input for updating brands.
+type UpdateBrandInput struct {
+	Name *string
+}
+
+// Mutate applies the UpdateBrandInput on the BrandMutation builder.
+func (i *UpdateBrandInput) Mutate(m *BrandMutation) {
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateBrandInput on the BrandUpdate builder.
+func (c *BrandUpdate) SetInput(i UpdateBrandInput) *BrandUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateBrandInput on the BrandUpdateOne builder.
+func (c *BrandUpdateOne) SetInput(i UpdateBrandInput) *BrandUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
 // CreatePermissionInput represents a mutation input for creating permissions.
 type CreatePermissionInput struct {
 	Name              string

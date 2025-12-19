@@ -22,8 +22,6 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldCreatedBy holds the string denoting the created_by field in the database.
 	FieldCreatedBy = "created_by"
-	// FieldOwnedBy holds the string denoting the owned_by field in the database.
-	FieldOwnedBy = "owned_by"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldSlug holds the string denoting the slug field in the database.
@@ -52,7 +50,6 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldCreatedBy,
-	FieldOwnedBy,
 	FieldName,
 	FieldSlug,
 	FieldDomain,
@@ -142,11 +139,6 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedBy orders the results by the created_by field.
 func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
-}
-
-// ByOwnedBy orders the results by the owned_by field.
-func ByOwnedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldOwnedBy, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

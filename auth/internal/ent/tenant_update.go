@@ -62,33 +62,6 @@ func (_u *TenantUpdate) ClearCreatedBy() *TenantUpdate {
 	return _u
 }
 
-// SetOwnedBy sets the "owned_by" field.
-func (_u *TenantUpdate) SetOwnedBy(v int) *TenantUpdate {
-	_u.mutation.ResetOwnedBy()
-	_u.mutation.SetOwnedBy(v)
-	return _u
-}
-
-// SetNillableOwnedBy sets the "owned_by" field if the given value is not nil.
-func (_u *TenantUpdate) SetNillableOwnedBy(v *int) *TenantUpdate {
-	if v != nil {
-		_u.SetOwnedBy(*v)
-	}
-	return _u
-}
-
-// AddOwnedBy adds value to the "owned_by" field.
-func (_u *TenantUpdate) AddOwnedBy(v int) *TenantUpdate {
-	_u.mutation.AddOwnedBy(v)
-	return _u
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (_u *TenantUpdate) ClearOwnedBy() *TenantUpdate {
-	_u.mutation.ClearOwnedBy()
-	return _u
-}
-
 // SetName sets the "name" field.
 func (_u *TenantUpdate) SetName(v string) *TenantUpdate {
 	_u.mutation.SetName(v)
@@ -325,15 +298,6 @@ func (_u *TenantUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.CreatedByCleared() {
 		_spec.ClearField(tenant.FieldCreatedBy, field.TypeInt)
 	}
-	if value, ok := _u.mutation.OwnedBy(); ok {
-		_spec.SetField(tenant.FieldOwnedBy, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedOwnedBy(); ok {
-		_spec.AddField(tenant.FieldOwnedBy, field.TypeInt, value)
-	}
-	if _u.mutation.OwnedByCleared() {
-		_spec.ClearField(tenant.FieldOwnedBy, field.TypeInt)
-	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(tenant.FieldName, field.TypeString, value)
 	}
@@ -428,33 +392,6 @@ func (_u *TenantUpdateOne) AddCreatedBy(v int) *TenantUpdateOne {
 // ClearCreatedBy clears the value of the "created_by" field.
 func (_u *TenantUpdateOne) ClearCreatedBy() *TenantUpdateOne {
 	_u.mutation.ClearCreatedBy()
-	return _u
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (_u *TenantUpdateOne) SetOwnedBy(v int) *TenantUpdateOne {
-	_u.mutation.ResetOwnedBy()
-	_u.mutation.SetOwnedBy(v)
-	return _u
-}
-
-// SetNillableOwnedBy sets the "owned_by" field if the given value is not nil.
-func (_u *TenantUpdateOne) SetNillableOwnedBy(v *int) *TenantUpdateOne {
-	if v != nil {
-		_u.SetOwnedBy(*v)
-	}
-	return _u
-}
-
-// AddOwnedBy adds value to the "owned_by" field.
-func (_u *TenantUpdateOne) AddOwnedBy(v int) *TenantUpdateOne {
-	_u.mutation.AddOwnedBy(v)
-	return _u
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (_u *TenantUpdateOne) ClearOwnedBy() *TenantUpdateOne {
-	_u.mutation.ClearOwnedBy()
 	return _u
 }
 
@@ -723,15 +660,6 @@ func (_u *TenantUpdateOne) sqlSave(ctx context.Context) (_node *Tenant, err erro
 	}
 	if _u.mutation.CreatedByCleared() {
 		_spec.ClearField(tenant.FieldCreatedBy, field.TypeInt)
-	}
-	if value, ok := _u.mutation.OwnedBy(); ok {
-		_spec.SetField(tenant.FieldOwnedBy, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedOwnedBy(); ok {
-		_spec.AddField(tenant.FieldOwnedBy, field.TypeInt, value)
-	}
-	if _u.mutation.OwnedByCleared() {
-		_spec.ClearField(tenant.FieldOwnedBy, field.TypeInt)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(tenant.FieldName, field.TypeString, value)

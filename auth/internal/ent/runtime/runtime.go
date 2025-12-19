@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/saurabh/entgo-microservices/auth/ent/schema"
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/brand"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/permission"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/rolepermission"
@@ -21,6 +22,55 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	brandMixin := schema.Brand{}.Mixin()
+	brandHooks := schema.Brand{}.Hooks()
+	brand.Hooks[0] = brandHooks[0]
+	brand.Hooks[1] = brandHooks[1]
+	brand.Hooks[2] = brandHooks[2]
+	brand.Hooks[3] = brandHooks[3]
+	brand.Hooks[4] = brandHooks[4]
+	brandMixinFields0 := brandMixin[0].Fields()
+	_ = brandMixinFields0
+	brandMixinFields1 := brandMixin[1].Fields()
+	_ = brandMixinFields1
+	brandFields := schema.Brand{}.Fields()
+	_ = brandFields
+	// brandDescCreatedAt is the schema descriptor for created_at field.
+	brandDescCreatedAt := brandMixinFields0[1].Descriptor()
+	// brand.DefaultCreatedAt holds the default value on creation for the created_at field.
+	brand.DefaultCreatedAt = brandDescCreatedAt.Default.(func() time.Time)
+	// brandDescUpdatedAt is the schema descriptor for updated_at field.
+	brandDescUpdatedAt := brandMixinFields0[2].Descriptor()
+	// brand.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	brand.DefaultUpdatedAt = brandDescUpdatedAt.Default.(func() time.Time)
+	// brand.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	brand.UpdateDefaultUpdatedAt = brandDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// brandDescTenantID is the schema descriptor for tenant_id field.
+	brandDescTenantID := brandMixinFields1[0].Descriptor()
+	// brand.TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	brand.TenantIDValidator = brandDescTenantID.Validators[0].(func(int) error)
+	// brandDescName is the schema descriptor for name field.
+	brandDescName := brandFields[0].Descriptor()
+	// brand.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	brand.NameValidator = func() func(string) error {
+		validators := brandDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// brandDescID is the schema descriptor for id field.
+	brandDescID := brandMixinFields0[0].Descriptor()
+	// brand.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	brand.IDValidator = brandDescID.Validators[0].(func(int) error)
 	permissionMixin := schema.Permission{}.Mixin()
 	permissionMixinFields0 := permissionMixin[0].Fields()
 	_ = permissionMixinFields0

@@ -24,8 +24,6 @@ type Permission struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// User ID who created this record
 	CreatedBy *int `json:"created_by,omitempty"`
-	// User ID who owns this record
-	OwnedBy *int `json:"owned_by,omitempty"`
 	// Tenant ID for multi-tenancy isolation
 	TenantID int `json:"tenant_id,omitempty"`
 	// Permission name (e.g., users.create, products.read)
@@ -73,7 +71,7 @@ func (*Permission) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case permission.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case permission.FieldID, permission.FieldCreatedBy, permission.FieldOwnedBy, permission.FieldTenantID:
+		case permission.FieldID, permission.FieldCreatedBy, permission.FieldTenantID:
 			values[i] = new(sql.NullInt64)
 		case permission.FieldName, permission.FieldDisplayName, permission.FieldDescription, permission.FieldResource:
 			values[i] = new(sql.NullString)
@@ -118,13 +116,6 @@ func (_m *Permission) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.CreatedBy = new(int)
 				*_m.CreatedBy = int(value.Int64)
-			}
-		case permission.FieldOwnedBy:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field owned_by", values[i])
-			} else if value.Valid {
-				_m.OwnedBy = new(int)
-				*_m.OwnedBy = int(value.Int64)
 			}
 		case permission.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -211,11 +202,6 @@ func (_m *Permission) String() string {
 	builder.WriteString(", ")
 	if v := _m.CreatedBy; v != nil {
 		builder.WriteString("created_by=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	if v := _m.OwnedBy; v != nil {
-		builder.WriteString("owned_by=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

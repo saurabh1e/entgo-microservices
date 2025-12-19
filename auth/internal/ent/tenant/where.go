@@ -69,11 +69,6 @@ func CreatedBy(v int) predicate.Tenant {
 	return predicate.Tenant(sql.FieldEQ(FieldCreatedBy, v))
 }
 
-// OwnedBy applies equality check predicate on the "owned_by" field. It's identical to OwnedByEQ.
-func OwnedBy(v int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldEQ(FieldOwnedBy, v))
-}
-
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Tenant {
 	return predicate.Tenant(sql.FieldEQ(FieldName, v))
@@ -232,56 +227,6 @@ func CreatedByIsNil() predicate.Tenant {
 // CreatedByNotNil applies the NotNil predicate on the "created_by" field.
 func CreatedByNotNil() predicate.Tenant {
 	return predicate.Tenant(sql.FieldNotNull(FieldCreatedBy))
-}
-
-// OwnedByEQ applies the EQ predicate on the "owned_by" field.
-func OwnedByEQ(v int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldEQ(FieldOwnedBy, v))
-}
-
-// OwnedByNEQ applies the NEQ predicate on the "owned_by" field.
-func OwnedByNEQ(v int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldNEQ(FieldOwnedBy, v))
-}
-
-// OwnedByIn applies the In predicate on the "owned_by" field.
-func OwnedByIn(vs ...int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldIn(FieldOwnedBy, vs...))
-}
-
-// OwnedByNotIn applies the NotIn predicate on the "owned_by" field.
-func OwnedByNotIn(vs ...int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldNotIn(FieldOwnedBy, vs...))
-}
-
-// OwnedByGT applies the GT predicate on the "owned_by" field.
-func OwnedByGT(v int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldGT(FieldOwnedBy, v))
-}
-
-// OwnedByGTE applies the GTE predicate on the "owned_by" field.
-func OwnedByGTE(v int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldGTE(FieldOwnedBy, v))
-}
-
-// OwnedByLT applies the LT predicate on the "owned_by" field.
-func OwnedByLT(v int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldLT(FieldOwnedBy, v))
-}
-
-// OwnedByLTE applies the LTE predicate on the "owned_by" field.
-func OwnedByLTE(v int) predicate.Tenant {
-	return predicate.Tenant(sql.FieldLTE(FieldOwnedBy, v))
-}
-
-// OwnedByIsNil applies the IsNil predicate on the "owned_by" field.
-func OwnedByIsNil() predicate.Tenant {
-	return predicate.Tenant(sql.FieldIsNull(FieldOwnedBy))
-}
-
-// OwnedByNotNil applies the NotNil predicate on the "owned_by" field.
-func OwnedByNotNil() predicate.Tenant {
-	return predicate.Tenant(sql.FieldNotNull(FieldOwnedBy))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.

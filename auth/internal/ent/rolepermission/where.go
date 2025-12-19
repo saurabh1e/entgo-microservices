@@ -70,11 +70,6 @@ func CreatedBy(v int) predicate.RolePermission {
 	return predicate.RolePermission(sql.FieldEQ(FieldCreatedBy, v))
 }
 
-// OwnedBy applies equality check predicate on the "owned_by" field. It's identical to OwnedByEQ.
-func OwnedBy(v int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldEQ(FieldOwnedBy, v))
-}
-
 // TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
 func TenantID(v int) predicate.RolePermission {
 	return predicate.RolePermission(sql.FieldEQ(FieldTenantID, v))
@@ -228,56 +223,6 @@ func CreatedByIsNil() predicate.RolePermission {
 // CreatedByNotNil applies the NotNil predicate on the "created_by" field.
 func CreatedByNotNil() predicate.RolePermission {
 	return predicate.RolePermission(sql.FieldNotNull(FieldCreatedBy))
-}
-
-// OwnedByEQ applies the EQ predicate on the "owned_by" field.
-func OwnedByEQ(v int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldEQ(FieldOwnedBy, v))
-}
-
-// OwnedByNEQ applies the NEQ predicate on the "owned_by" field.
-func OwnedByNEQ(v int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldNEQ(FieldOwnedBy, v))
-}
-
-// OwnedByIn applies the In predicate on the "owned_by" field.
-func OwnedByIn(vs ...int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldIn(FieldOwnedBy, vs...))
-}
-
-// OwnedByNotIn applies the NotIn predicate on the "owned_by" field.
-func OwnedByNotIn(vs ...int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldNotIn(FieldOwnedBy, vs...))
-}
-
-// OwnedByGT applies the GT predicate on the "owned_by" field.
-func OwnedByGT(v int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldGT(FieldOwnedBy, v))
-}
-
-// OwnedByGTE applies the GTE predicate on the "owned_by" field.
-func OwnedByGTE(v int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldGTE(FieldOwnedBy, v))
-}
-
-// OwnedByLT applies the LT predicate on the "owned_by" field.
-func OwnedByLT(v int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldLT(FieldOwnedBy, v))
-}
-
-// OwnedByLTE applies the LTE predicate on the "owned_by" field.
-func OwnedByLTE(v int) predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldLTE(FieldOwnedBy, v))
-}
-
-// OwnedByIsNil applies the IsNil predicate on the "owned_by" field.
-func OwnedByIsNil() predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldIsNull(FieldOwnedBy))
-}
-
-// OwnedByNotNil applies the NotNil predicate on the "owned_by" field.
-func OwnedByNotNil() predicate.RolePermission {
-	return predicate.RolePermission(sql.FieldNotNull(FieldOwnedBy))
 }
 
 // TenantIDEQ applies the EQ predicate on the "tenant_id" field.

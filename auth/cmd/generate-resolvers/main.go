@@ -80,12 +80,12 @@ import (
 )
 
 // {{.Name}}ByID is the resolver for the {{.Name}}ByID field.
-func (r *queryResolver) {{.Name}}ByID(ctx context.Context, id int64) (*ent.{{.Name}}, error) {
+func (r *queryResolver) {{.Name}}ByID(ctx context.Context, id int) (*ent.{{.Name}}, error) {
 	return r.Resolver.client.{{.Name}}.Get(ctx, id)
 }
 
 // {{.NamePlural}} is the resolver for the {{.NamePlural}} field.
-func (r *queryResolver) {{.NamePlural}}(ctx context.Context, first *int, after *entgql.Cursor[int64], last *int, before *entgql.Cursor[int64], orderBy *ent.{{.Name}}Order, where *ent.{{.Name}}WhereInput) (*ent.{{.Name}}Connection, error) {
+func (r *queryResolver) {{.NamePlural}}(ctx context.Context, first *int, after *entgql.Cursor[int], last *int, before *entgql.Cursor[int], orderBy *ent.{{.Name}}Order, where *ent.{{.Name}}WhereInput) (*ent.{{.Name}}Connection, error) {
 	return r.Resolver.client.{{.Name}}.Query().Paginate(ctx, after, first, before, last, ent.With{{.Name}}Filter(where.Filter), ent.With{{.Name}}Order(orderBy))
 }
 `
@@ -113,12 +113,12 @@ func (r *mutationResolver) CreateBulk{{.Name}}(ctx context.Context, input []ent.
 }
 
 // Update{{.Name}} is the resolver for the update{{.Name}} mutation.
-func (r *mutationResolver) Update{{.Name}}(ctx context.Context, id int64, input ent.Update{{.Name}}Input) (*ent.{{.Name}}, error) {
+func (r *mutationResolver) Update{{.Name}}(ctx context.Context, id int, input ent.Update{{.Name}}Input) (*ent.{{.Name}}, error) {
 	return r.Resolver.client.{{.Name}}.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
 // Delete{{.Name}} is the resolver for the delete{{.Name}} mutation.
-func (r *mutationResolver) Delete{{.Name}}(ctx context.Context, id int64) (bool, error) {
+func (r *mutationResolver) Delete{{.Name}}(ctx context.Context, id int) (bool, error) {
 	err := r.Resolver.client.{{.Name}}.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return false, err
@@ -138,12 +138,12 @@ import (
 )
 
 // {{.Name}}ByID is the resolver for the {{.Name}}ByID field.
-func (r *queryResolver) {{.Name}}ByID(ctx context.Context, id int64) (*ent.{{.Name}}, error) {
+func (r *queryResolver) {{.Name}}ByID(ctx context.Context, id int) (*ent.{{.Name}}, error) {
 	return r.Resolver.client.{{.Name}}.Get(ctx, id)
 }
 
 // {{.NamePlural}} is the resolver for the {{.NamePlural}} field.
-func (r *queryResolver) {{.NamePlural}}(ctx context.Context, first *int, after *entgql.Cursor[int64], last *int, before *entgql.Cursor[int64], orderBy *ent.{{.Name}}Order, where *ent.{{.Name}}WhereInput) (*ent.{{.Name}}Connection, error) {
+func (r *queryResolver) {{.NamePlural}}(ctx context.Context, first *int, after *entgql.Cursor[int], last *int, before *entgql.Cursor[int], orderBy *ent.{{.Name}}Order, where *ent.{{.Name}}WhereInput) (*ent.{{.Name}}Connection, error) {
 	return r.Resolver.client.{{.Name}}.Query().Paginate(ctx, after, first, before, last, ent.With{{.Name}}Filter(where.Filter), ent.With{{.Name}}Order(orderBy))
 }
 
@@ -162,12 +162,12 @@ func (r *mutationResolver) CreateBulk{{.Name}}(ctx context.Context, input []*ent
 }
 
 // Update{{.Name}} is the resolver for the update{{.Name}} mutation.
-func (r *mutationResolver) Update{{.Name}}(ctx context.Context, id int64, input ent.Update{{.Name}}Input) (*ent.{{.Name}}, error) {
+func (r *mutationResolver) Update{{.Name}}(ctx context.Context, id int, input ent.Update{{.Name}}Input) (*ent.{{.Name}}, error) {
 	return r.Resolver.client.{{.Name}}.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
 // Delete{{.Name}} is the resolver for the delete{{.Name}} mutation.
-func (r *mutationResolver) Delete{{.Name}}(ctx context.Context, id int64) (bool, error) {
+func (r *mutationResolver) Delete{{.Name}}(ctx context.Context, id int) (bool, error) {
 	err := r.Resolver.client.{{.Name}}.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return false, err

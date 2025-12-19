@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
 )
 
@@ -41,17 +42,17 @@ func (BaseMixin) Fields() []ent.Field {
 			Nillable().
 			Comment("User ID who created this record").
 			Annotations(entgql.Skip(entgql.SkipMutationCreateInput | entgql.SkipMutationUpdateInput)),
-		field.Int("owned_by").
-			Optional().
-			Nillable().
-			Comment("User ID who owns this record").
-			Annotations(entgql.Skip(entgql.SkipMutationCreateInput | entgql.SkipMutationUpdateInput)),
 	}
 }
 
 // Indexes of the BaseMixin.
 func (BaseMixin) Indexes() []ent.Index {
-	return []ent.Index{}
+	return []ent.Index{
+		// Indexes for common query fields
+		index.Fields("created_at"),
+		index.Fields("updated_at"),
+		index.Fields("id"),
+	}
 }
 
 // Policy of the BaseMixin (optional, can be overridden by schemas)

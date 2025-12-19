@@ -19,6 +19,7 @@ type EntityInfo struct {
 	NameCamel      string // e.g., "category"
 	ModuleName     string // e.g., "github.com/zyne-labs/syphoon_auth"
 	TenantIsolated bool   // Whether entity has @tenant-isolated: true
+	HasCodeMixin   bool   // Whether entity embeds schema.CodeMixin
 }
 
 // hooksTemplate defines the template for generating hooks files
@@ -26,10 +27,12 @@ const hooksTemplate = `package hooks
 
 import (
 	"context"
+	{{if .HasCodeMixin}}"fmt"{{end}}
 	"{{.ModuleName}}/internal/ent"
 	"{{.ModuleName}}/internal/ent/hook"
 	"github.com/saurabh/entgo-microservices/pkg/logger"
 	{{if .TenantIsolated}}pkgcontext "github.com/saurabh/entgo-microservices/pkg/context"{{end}}
+	{{if .HasCodeMixin}}"github.com/saurabh/entgo-microservices/pkg/ent/schema"{{end}}
 )
 
 func {{.Name}}CreateHook() ent.Hook {
@@ -49,6 +52,27 @@ func {{.Name}}CreateHook() ent.Hook {
 						return nil, err
 					}
 					{{.NameLower}}Mutation.SetTenantID(tenantID)
+				}
+				{{end}}
+				{{if .HasCodeMixin}}
+				// Auto-generate code field from tenant_id and name
+				if name, nameExists := {{.NameLower}}Mutation.Name(); nameExists {
+					if tenantID, tenantExists := {{.NameLower}}Mutation.TenantID(); tenantExists {
+						code := schema.GenerateCode(tenantID, name)
+						{{.NameLower}}Mutation.SetCode(code)
+					} else {
+						logger.WithFields(map[string]interface{}{
+							"entity": "{{.Name}}",
+							"operation": "create",
+						}).Error("tenant_id is required for code generation")
+						return nil, fmt.Errorf("tenant_id is required for code generation")
+					}
+				} else {
+					logger.WithFields(map[string]interface{}{
+						"entity": "{{.Name}}",
+						"operation": "create",
+					}).Error("name is required for code generation")
+					return nil, fmt.Errorf("name is required for code generation")
 				}
 				{{end}}
 
@@ -88,6 +112,9 @@ func {{.Name}}SingleUpdateHook() ent.Hook {
 			if {{.NameLower}}Mutation, ok := m.(*ent.{{.Name}}Mutation); ok {
 				// Hook executing for single update
 				_ = {{.NameLower}}Mutation
+				{{if .HasCodeMixin}}
+				// Note: code field is immutable, regeneration on update is not allowed
+				{{end}}
 
 				// Call the next mutator
 				result, err := next.Mutate(ctx, m)
@@ -225,6 +252,13 @@ func scanForHooksAnnotation() ([]EntityInfo, error) {
 				// Continue with tenantIsolated = false
 			}
 
+			// Check if entity has CodeMixin
+			hasCodeMixin, err := checkForCodeMixin(file)
+			if err != nil {
+				log.Printf("Error checking for CodeMixin in %s: %v", file, err)
+				// Continue with hasCodeMixin = false
+			}
+
 			// Extract filename without extension for file naming
 			fileBaseName := strings.TrimSuffix(basename, ".go")
 
@@ -234,6 +268,7 @@ func scanForHooksAnnotation() ([]EntityInfo, error) {
 				NameCamel:      toCamelCase(fileBaseName),     // camelCase like "apiKey"
 				ModuleName:     moduleName,
 				TenantIsolated: tenantIsolated,
+				HasCodeMixin:   hasCodeMixin,
 			}
 			entities = append(entities, entityInfo)
 		}
@@ -274,6 +309,40 @@ func checkForTenantIsolatedAnnotation(filename string) (bool, error) {
 		line := strings.TrimSpace(scanner.Text())
 		if strings.Contains(line, "// @tenant-isolated: true") {
 			return true, nil
+		}
+	}
+
+	return false, scanner.Err()
+}
+
+// checkForCodeMixin checks if a file contains schema.CodeMixin in the Mixin() method
+func checkForCodeMixin(filename string) (bool, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	inMixinFunction := false
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+
+		// Check if we're entering the Mixin() function
+		if strings.Contains(line, "func") && strings.Contains(line, "Mixin()") {
+			inMixinFunction = true
+			continue
+		}
+
+		// If we're in the Mixin function, look for schema.CodeMixin
+		if inMixinFunction {
+			if strings.Contains(line, "schema.CodeMixin") {
+				return true, nil
+			}
+			// Exit Mixin function if we hit the closing brace
+			if strings.Contains(line, "}") && !strings.Contains(line, "{") {
+				inMixinFunction = false
+			}
 		}
 	}
 

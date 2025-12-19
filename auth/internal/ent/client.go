@@ -15,6 +15,7 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/brand"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/permission"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/rolepermission"
@@ -27,6 +28,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Brand is the client for interacting with the Brand builders.
+	Brand *BrandClient
 	// Permission is the client for interacting with the Permission builders.
 	Permission *PermissionClient
 	// Role is the client for interacting with the Role builders.
@@ -50,6 +53,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Brand = NewBrandClient(c.config)
 	c.Permission = NewPermissionClient(c.config)
 	c.Role = NewRoleClient(c.config)
 	c.RolePermission = NewRolePermissionClient(c.config)
@@ -147,6 +151,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:            ctx,
 		config:         cfg,
+		Brand:          NewBrandClient(cfg),
 		Permission:     NewPermissionClient(cfg),
 		Role:           NewRoleClient(cfg),
 		RolePermission: NewRolePermissionClient(cfg),
@@ -171,6 +176,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:            ctx,
 		config:         cfg,
+		Brand:          NewBrandClient(cfg),
 		Permission:     NewPermissionClient(cfg),
 		Role:           NewRoleClient(cfg),
 		RolePermission: NewRolePermissionClient(cfg),
@@ -182,7 +188,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Permission.
+//		Brand.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -204,26 +210,28 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Permission.Use(hooks...)
-	c.Role.Use(hooks...)
-	c.RolePermission.Use(hooks...)
-	c.Tenant.Use(hooks...)
-	c.User.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Brand, c.Permission, c.Role, c.RolePermission, c.Tenant, c.User,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Permission.Intercept(interceptors...)
-	c.Role.Intercept(interceptors...)
-	c.RolePermission.Intercept(interceptors...)
-	c.Tenant.Intercept(interceptors...)
-	c.User.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Brand, c.Permission, c.Role, c.RolePermission, c.Tenant, c.User,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *BrandMutation:
+		return c.Brand.mutate(ctx, m)
 	case *PermissionMutation:
 		return c.Permission.mutate(ctx, m)
 	case *RoleMutation:
@@ -236,6 +244,140 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.User.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// BrandClient is a client for the Brand schema.
+type BrandClient struct {
+	config
+}
+
+// NewBrandClient returns a client for the Brand from the given config.
+func NewBrandClient(c config) *BrandClient {
+	return &BrandClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `brand.Hooks(f(g(h())))`.
+func (c *BrandClient) Use(hooks ...Hook) {
+	c.hooks.Brand = append(c.hooks.Brand, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `brand.Intercept(f(g(h())))`.
+func (c *BrandClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Brand = append(c.inters.Brand, interceptors...)
+}
+
+// Create returns a builder for creating a Brand entity.
+func (c *BrandClient) Create() *BrandCreate {
+	mutation := newBrandMutation(c.config, OpCreate)
+	return &BrandCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Brand entities.
+func (c *BrandClient) CreateBulk(builders ...*BrandCreate) *BrandCreateBulk {
+	return &BrandCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *BrandClient) MapCreateBulk(slice any, setFunc func(*BrandCreate, int)) *BrandCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &BrandCreateBulk{err: fmt.Errorf("calling to BrandClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*BrandCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &BrandCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Brand.
+func (c *BrandClient) Update() *BrandUpdate {
+	mutation := newBrandMutation(c.config, OpUpdate)
+	return &BrandUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *BrandClient) UpdateOne(_m *Brand) *BrandUpdateOne {
+	mutation := newBrandMutation(c.config, OpUpdateOne, withBrand(_m))
+	return &BrandUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *BrandClient) UpdateOneID(id int) *BrandUpdateOne {
+	mutation := newBrandMutation(c.config, OpUpdateOne, withBrandID(id))
+	return &BrandUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Brand.
+func (c *BrandClient) Delete() *BrandDelete {
+	mutation := newBrandMutation(c.config, OpDelete)
+	return &BrandDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *BrandClient) DeleteOne(_m *Brand) *BrandDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *BrandClient) DeleteOneID(id int) *BrandDeleteOne {
+	builder := c.Delete().Where(brand.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &BrandDeleteOne{builder}
+}
+
+// Query returns a query builder for Brand.
+func (c *BrandClient) Query() *BrandQuery {
+	return &BrandQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeBrand},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Brand entity by its id.
+func (c *BrandClient) Get(ctx context.Context, id int) (*Brand, error) {
+	return c.Query().Where(brand.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *BrandClient) GetX(ctx context.Context, id int) *Brand {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *BrandClient) Hooks() []Hook {
+	hooks := c.hooks.Brand
+	return append(hooks[:len(hooks):len(hooks)], brand.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *BrandClient) Interceptors() []Interceptor {
+	return c.inters.Brand
+}
+
+func (c *BrandClient) mutate(ctx context.Context, m *BrandMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BrandCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BrandUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BrandUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BrandDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Brand mutation op: %q", m.Op())
 	}
 }
 
@@ -1006,9 +1148,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Permission, Role, RolePermission, Tenant, User []ent.Hook
+		Brand, Permission, Role, RolePermission, Tenant, User []ent.Hook
 	}
 	inters struct {
-		Permission, Role, RolePermission, Tenant, User []ent.Interceptor
+		Brand, Permission, Role, RolePermission, Tenant, User []ent.Interceptor
 	}
 )

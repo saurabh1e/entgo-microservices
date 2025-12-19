@@ -64,20 +64,6 @@ func (_c *TenantCreate) SetNillableCreatedBy(v *int) *TenantCreate {
 	return _c
 }
 
-// SetOwnedBy sets the "owned_by" field.
-func (_c *TenantCreate) SetOwnedBy(v int) *TenantCreate {
-	_c.mutation.SetOwnedBy(v)
-	return _c
-}
-
-// SetNillableOwnedBy sets the "owned_by" field if the given value is not nil.
-func (_c *TenantCreate) SetNillableOwnedBy(v *int) *TenantCreate {
-	if v != nil {
-		_c.SetOwnedBy(*v)
-	}
-	return _c
-}
-
 // SetName sets the "name" field.
 func (_c *TenantCreate) SetName(v string) *TenantCreate {
 	_c.mutation.SetName(v)
@@ -321,10 +307,6 @@ func (_c *TenantCreate) createSpec() (*Tenant, *sqlgraph.CreateSpec) {
 		_spec.SetField(tenant.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = &value
 	}
-	if value, ok := _c.mutation.OwnedBy(); ok {
-		_spec.SetField(tenant.FieldOwnedBy, field.TypeInt, value)
-		_node.OwnedBy = &value
-	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(tenant.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -446,30 +428,6 @@ func (u *TenantUpsert) AddCreatedBy(v int) *TenantUpsert {
 // ClearCreatedBy clears the value of the "created_by" field.
 func (u *TenantUpsert) ClearCreatedBy() *TenantUpsert {
 	u.SetNull(tenant.FieldCreatedBy)
-	return u
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *TenantUpsert) SetOwnedBy(v int) *TenantUpsert {
-	u.Set(tenant.FieldOwnedBy, v)
-	return u
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *TenantUpsert) UpdateOwnedBy() *TenantUpsert {
-	u.SetExcluded(tenant.FieldOwnedBy)
-	return u
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *TenantUpsert) AddOwnedBy(v int) *TenantUpsert {
-	u.Add(tenant.FieldOwnedBy, v)
-	return u
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *TenantUpsert) ClearOwnedBy() *TenantUpsert {
-	u.SetNull(tenant.FieldOwnedBy)
 	return u
 }
 
@@ -701,34 +659,6 @@ func (u *TenantUpsertOne) UpdateCreatedBy() *TenantUpsertOne {
 func (u *TenantUpsertOne) ClearCreatedBy() *TenantUpsertOne {
 	return u.Update(func(s *TenantUpsert) {
 		s.ClearCreatedBy()
-	})
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *TenantUpsertOne) SetOwnedBy(v int) *TenantUpsertOne {
-	return u.Update(func(s *TenantUpsert) {
-		s.SetOwnedBy(v)
-	})
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *TenantUpsertOne) AddOwnedBy(v int) *TenantUpsertOne {
-	return u.Update(func(s *TenantUpsert) {
-		s.AddOwnedBy(v)
-	})
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *TenantUpsertOne) UpdateOwnedBy() *TenantUpsertOne {
-	return u.Update(func(s *TenantUpsert) {
-		s.UpdateOwnedBy()
-	})
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *TenantUpsertOne) ClearOwnedBy() *TenantUpsertOne {
-	return u.Update(func(s *TenantUpsert) {
-		s.ClearOwnedBy()
 	})
 }
 
@@ -1149,34 +1079,6 @@ func (u *TenantUpsertBulk) UpdateCreatedBy() *TenantUpsertBulk {
 func (u *TenantUpsertBulk) ClearCreatedBy() *TenantUpsertBulk {
 	return u.Update(func(s *TenantUpsert) {
 		s.ClearCreatedBy()
-	})
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *TenantUpsertBulk) SetOwnedBy(v int) *TenantUpsertBulk {
-	return u.Update(func(s *TenantUpsert) {
-		s.SetOwnedBy(v)
-	})
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *TenantUpsertBulk) AddOwnedBy(v int) *TenantUpsertBulk {
-	return u.Update(func(s *TenantUpsert) {
-		s.AddOwnedBy(v)
-	})
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *TenantUpsertBulk) UpdateOwnedBy() *TenantUpsertBulk {
-	return u.Update(func(s *TenantUpsert) {
-		s.UpdateOwnedBy()
-	})
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *TenantUpsertBulk) ClearOwnedBy() *TenantUpsertBulk {
-	return u.Update(func(s *TenantUpsert) {
-		s.ClearOwnedBy()
 	})
 }
 

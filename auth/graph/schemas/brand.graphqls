@@ -1,0 +1,18 @@
+extend type Query {
+	BrandByID(id: ID!): Brand @auth
+	Brands(
+		first: Int
+		after: Cursor
+		last: Int
+		before: Cursor
+		orderBy: BrandOrder
+		where: BrandWhereInput
+	): BrandConnection! @auth
+}
+
+extend type Mutation {
+	createBrand(input: CreateBrandInput!): Brand! @auth
+	createBulkBrand(input: [CreateBrandInput!]!): [Brand!]! @auth
+	updateBrand(id: ID!, input: UpdateBrandInput!): Brand! @auth
+	deleteBrand(id: ID!): Boolean! @auth
+}

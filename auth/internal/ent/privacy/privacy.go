@@ -111,6 +111,30 @@ func DenyMutationOperationRule(op ent.Op) MutationRule {
 	return OnMutationOperation(rule, op)
 }
 
+// The BrandQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type BrandQueryRuleFunc func(context.Context, *ent.BrandQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f BrandQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.BrandQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.BrandQuery", q)
+}
+
+// The BrandMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type BrandMutationRuleFunc func(context.Context, *ent.BrandMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f BrandMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.BrandMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.BrandMutation", m)
+}
+
 // The PermissionQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type PermissionQueryRuleFunc func(context.Context, *ent.PermissionQuery) error
@@ -266,6 +290,8 @@ var _ QueryMutationRule = FilterFunc(nil)
 
 func queryFilter(q ent.Query) (Filter, error) {
 	switch q := q.(type) {
+	case *ent.BrandQuery:
+		return q.Filter(), nil
 	case *ent.PermissionQuery:
 		return q.Filter(), nil
 	case *ent.RoleQuery:
@@ -283,6 +309,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 
 func mutationFilter(m ent.Mutation) (Filter, error) {
 	switch m := m.(type) {
+	case *ent.BrandMutation:
+		return m.Filter(), nil
 	case *ent.PermissionMutation:
 		return m.Filter(), nil
 	case *ent.RoleMutation:

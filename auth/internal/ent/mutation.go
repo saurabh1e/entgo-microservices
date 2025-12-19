@@ -11,6 +11,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/brand"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/permission"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/predicate"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
@@ -28,12 +29,707 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeBrand          = "Brand"
 	TypePermission     = "Permission"
 	TypeRole           = "Role"
 	TypeRolePermission = "RolePermission"
 	TypeTenant         = "Tenant"
 	TypeUser           = "User"
 )
+
+// BrandMutation represents an operation that mutates the Brand nodes in the graph.
+type BrandMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	created_at    *time.Time
+	updated_at    *time.Time
+	created_by    *int
+	addcreated_by *int
+	tenant_id     *int
+	addtenant_id  *int
+	code          *string
+	name          *string
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Brand, error)
+	predicates    []predicate.Brand
+}
+
+var _ ent.Mutation = (*BrandMutation)(nil)
+
+// brandOption allows management of the mutation configuration using functional options.
+type brandOption func(*BrandMutation)
+
+// newBrandMutation creates new mutation for the Brand entity.
+func newBrandMutation(c config, op Op, opts ...brandOption) *BrandMutation {
+	m := &BrandMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeBrand,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withBrandID sets the ID field of the mutation.
+func withBrandID(id int) brandOption {
+	return func(m *BrandMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Brand
+		)
+		m.oldValue = func(ctx context.Context) (*Brand, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Brand.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withBrand sets the old Brand of the mutation.
+func withBrand(node *Brand) brandOption {
+	return func(m *BrandMutation) {
+		m.oldValue = func(context.Context) (*Brand, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m BrandMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m BrandMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Brand entities.
+func (m *BrandMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *BrandMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *BrandMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Brand.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *BrandMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *BrandMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Brand entity.
+// If the Brand object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BrandMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *BrandMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *BrandMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *BrandMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Brand entity.
+// If the Brand object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BrandMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *BrandMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *BrandMutation) SetCreatedBy(i int) {
+	m.created_by = &i
+	m.addcreated_by = nil
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *BrandMutation) CreatedBy() (r int, exists bool) {
+	v := m.created_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the Brand entity.
+// If the Brand object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BrandMutation) OldCreatedBy(ctx context.Context) (v *int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// AddCreatedBy adds i to the "created_by" field.
+func (m *BrandMutation) AddCreatedBy(i int) {
+	if m.addcreated_by != nil {
+		*m.addcreated_by += i
+	} else {
+		m.addcreated_by = &i
+	}
+}
+
+// AddedCreatedBy returns the value that was added to the "created_by" field in this mutation.
+func (m *BrandMutation) AddedCreatedBy() (r int, exists bool) {
+	v := m.addcreated_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCreatedBy clears the value of the "created_by" field.
+func (m *BrandMutation) ClearCreatedBy() {
+	m.created_by = nil
+	m.addcreated_by = nil
+	m.clearedFields[brand.FieldCreatedBy] = struct{}{}
+}
+
+// CreatedByCleared returns if the "created_by" field was cleared in this mutation.
+func (m *BrandMutation) CreatedByCleared() bool {
+	_, ok := m.clearedFields[brand.FieldCreatedBy]
+	return ok
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *BrandMutation) ResetCreatedBy() {
+	m.created_by = nil
+	m.addcreated_by = nil
+	delete(m.clearedFields, brand.FieldCreatedBy)
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *BrandMutation) SetTenantID(i int) {
+	m.tenant_id = &i
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *BrandMutation) TenantID() (r int, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Brand entity.
+// If the Brand object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BrandMutation) OldTenantID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds i to the "tenant_id" field.
+func (m *BrandMutation) AddTenantID(i int) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += i
+	} else {
+		m.addtenant_id = &i
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *BrandMutation) AddedTenantID() (r int, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *BrandMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+}
+
+// SetCode sets the "code" field.
+func (m *BrandMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *BrandMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the Brand entity.
+// If the Brand object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BrandMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *BrandMutation) ResetCode() {
+	m.code = nil
+}
+
+// SetName sets the "name" field.
+func (m *BrandMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *BrandMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Brand entity.
+// If the Brand object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BrandMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *BrandMutation) ResetName() {
+	m.name = nil
+}
+
+// Where appends a list predicates to the BrandMutation builder.
+func (m *BrandMutation) Where(ps ...predicate.Brand) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the BrandMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *BrandMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Brand, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *BrandMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *BrandMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Brand).
+func (m *BrandMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *BrandMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.created_at != nil {
+		fields = append(fields, brand.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, brand.FieldUpdatedAt)
+	}
+	if m.created_by != nil {
+		fields = append(fields, brand.FieldCreatedBy)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, brand.FieldTenantID)
+	}
+	if m.code != nil {
+		fields = append(fields, brand.FieldCode)
+	}
+	if m.name != nil {
+		fields = append(fields, brand.FieldName)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *BrandMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case brand.FieldCreatedAt:
+		return m.CreatedAt()
+	case brand.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case brand.FieldCreatedBy:
+		return m.CreatedBy()
+	case brand.FieldTenantID:
+		return m.TenantID()
+	case brand.FieldCode:
+		return m.Code()
+	case brand.FieldName:
+		return m.Name()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *BrandMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case brand.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case brand.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case brand.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case brand.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case brand.FieldCode:
+		return m.OldCode(ctx)
+	case brand.FieldName:
+		return m.OldName(ctx)
+	}
+	return nil, fmt.Errorf("unknown Brand field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BrandMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case brand.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case brand.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case brand.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case brand.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case brand.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case brand.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Brand field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *BrandMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreated_by != nil {
+		fields = append(fields, brand.FieldCreatedBy)
+	}
+	if m.addtenant_id != nil {
+		fields = append(fields, brand.FieldTenantID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *BrandMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case brand.FieldCreatedBy:
+		return m.AddedCreatedBy()
+	case brand.FieldTenantID:
+		return m.AddedTenantID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *BrandMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case brand.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreatedBy(v)
+		return nil
+	case brand.FieldTenantID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Brand numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *BrandMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(brand.FieldCreatedBy) {
+		fields = append(fields, brand.FieldCreatedBy)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *BrandMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *BrandMutation) ClearField(name string) error {
+	switch name {
+	case brand.FieldCreatedBy:
+		m.ClearCreatedBy()
+		return nil
+	}
+	return fmt.Errorf("unknown Brand nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *BrandMutation) ResetField(name string) error {
+	switch name {
+	case brand.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case brand.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case brand.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case brand.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case brand.FieldCode:
+		m.ResetCode()
+		return nil
+	case brand.FieldName:
+		m.ResetName()
+		return nil
+	}
+	return fmt.Errorf("unknown Brand field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *BrandMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *BrandMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *BrandMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *BrandMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *BrandMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *BrandMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *BrandMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Brand unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *BrandMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Brand edge %s", name)
+}
 
 // PermissionMutation represents an operation that mutates the Permission nodes in the graph.
 type PermissionMutation struct {
@@ -45,8 +741,6 @@ type PermissionMutation struct {
 	updated_at              *time.Time
 	created_by              *int
 	addcreated_by           *int
-	owned_by                *int
-	addowned_by             *int
 	tenant_id               *int
 	addtenant_id            *int
 	name                    *string
@@ -307,76 +1001,6 @@ func (m *PermissionMutation) ResetCreatedBy() {
 	m.created_by = nil
 	m.addcreated_by = nil
 	delete(m.clearedFields, permission.FieldCreatedBy)
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (m *PermissionMutation) SetOwnedBy(i int) {
-	m.owned_by = &i
-	m.addowned_by = nil
-}
-
-// OwnedBy returns the value of the "owned_by" field in the mutation.
-func (m *PermissionMutation) OwnedBy() (r int, exists bool) {
-	v := m.owned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldOwnedBy returns the old "owned_by" field's value of the Permission entity.
-// If the Permission object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PermissionMutation) OldOwnedBy(ctx context.Context) (v *int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOwnedBy is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOwnedBy requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOwnedBy: %w", err)
-	}
-	return oldValue.OwnedBy, nil
-}
-
-// AddOwnedBy adds i to the "owned_by" field.
-func (m *PermissionMutation) AddOwnedBy(i int) {
-	if m.addowned_by != nil {
-		*m.addowned_by += i
-	} else {
-		m.addowned_by = &i
-	}
-}
-
-// AddedOwnedBy returns the value that was added to the "owned_by" field in this mutation.
-func (m *PermissionMutation) AddedOwnedBy() (r int, exists bool) {
-	v := m.addowned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (m *PermissionMutation) ClearOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	m.clearedFields[permission.FieldOwnedBy] = struct{}{}
-}
-
-// OwnedByCleared returns if the "owned_by" field was cleared in this mutation.
-func (m *PermissionMutation) OwnedByCleared() bool {
-	_, ok := m.clearedFields[permission.FieldOwnedBy]
-	return ok
-}
-
-// ResetOwnedBy resets all changes to the "owned_by" field.
-func (m *PermissionMutation) ResetOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	delete(m.clearedFields, permission.FieldOwnedBy)
 }
 
 // SetTenantID sets the "tenant_id" field.
@@ -716,7 +1340,7 @@ func (m *PermissionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PermissionMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, permission.FieldCreatedAt)
 	}
@@ -725,9 +1349,6 @@ func (m *PermissionMutation) Fields() []string {
 	}
 	if m.created_by != nil {
 		fields = append(fields, permission.FieldCreatedBy)
-	}
-	if m.owned_by != nil {
-		fields = append(fields, permission.FieldOwnedBy)
 	}
 	if m.tenant_id != nil {
 		fields = append(fields, permission.FieldTenantID)
@@ -761,8 +1382,6 @@ func (m *PermissionMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case permission.FieldCreatedBy:
 		return m.CreatedBy()
-	case permission.FieldOwnedBy:
-		return m.OwnedBy()
 	case permission.FieldTenantID:
 		return m.TenantID()
 	case permission.FieldName:
@@ -790,8 +1409,6 @@ func (m *PermissionMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldUpdatedAt(ctx)
 	case permission.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
-	case permission.FieldOwnedBy:
-		return m.OldOwnedBy(ctx)
 	case permission.FieldTenantID:
 		return m.OldTenantID(ctx)
 	case permission.FieldName:
@@ -833,13 +1450,6 @@ func (m *PermissionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedBy(v)
-		return nil
-	case permission.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOwnedBy(v)
 		return nil
 	case permission.FieldTenantID:
 		v, ok := value.(int)
@@ -894,9 +1504,6 @@ func (m *PermissionMutation) AddedFields() []string {
 	if m.addcreated_by != nil {
 		fields = append(fields, permission.FieldCreatedBy)
 	}
-	if m.addowned_by != nil {
-		fields = append(fields, permission.FieldOwnedBy)
-	}
 	if m.addtenant_id != nil {
 		fields = append(fields, permission.FieldTenantID)
 	}
@@ -910,8 +1517,6 @@ func (m *PermissionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case permission.FieldCreatedBy:
 		return m.AddedCreatedBy()
-	case permission.FieldOwnedBy:
-		return m.AddedOwnedBy()
 	case permission.FieldTenantID:
 		return m.AddedTenantID()
 	}
@@ -930,13 +1535,6 @@ func (m *PermissionMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddCreatedBy(v)
 		return nil
-	case permission.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddOwnedBy(v)
-		return nil
 	case permission.FieldTenantID:
 		v, ok := value.(int)
 		if !ok {
@@ -954,9 +1552,6 @@ func (m *PermissionMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(permission.FieldCreatedBy) {
 		fields = append(fields, permission.FieldCreatedBy)
-	}
-	if m.FieldCleared(permission.FieldOwnedBy) {
-		fields = append(fields, permission.FieldOwnedBy)
 	}
 	if m.FieldCleared(permission.FieldDescription) {
 		fields = append(fields, permission.FieldDescription)
@@ -978,9 +1573,6 @@ func (m *PermissionMutation) ClearField(name string) error {
 	case permission.FieldCreatedBy:
 		m.ClearCreatedBy()
 		return nil
-	case permission.FieldOwnedBy:
-		m.ClearOwnedBy()
-		return nil
 	case permission.FieldDescription:
 		m.ClearDescription()
 		return nil
@@ -1000,9 +1592,6 @@ func (m *PermissionMutation) ResetField(name string) error {
 		return nil
 	case permission.FieldCreatedBy:
 		m.ResetCreatedBy()
-		return nil
-	case permission.FieldOwnedBy:
-		m.ResetOwnedBy()
 		return nil
 	case permission.FieldTenantID:
 		m.ResetTenantID()
@@ -1120,8 +1709,6 @@ type RoleMutation struct {
 	updated_at              *time.Time
 	created_by              *int
 	addcreated_by           *int
-	owned_by                *int
-	addowned_by             *int
 	tenant_id               *int
 	addtenant_id            *int
 	name                    *string
@@ -1386,76 +1973,6 @@ func (m *RoleMutation) ResetCreatedBy() {
 	m.created_by = nil
 	m.addcreated_by = nil
 	delete(m.clearedFields, role.FieldCreatedBy)
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (m *RoleMutation) SetOwnedBy(i int) {
-	m.owned_by = &i
-	m.addowned_by = nil
-}
-
-// OwnedBy returns the value of the "owned_by" field in the mutation.
-func (m *RoleMutation) OwnedBy() (r int, exists bool) {
-	v := m.owned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldOwnedBy returns the old "owned_by" field's value of the Role entity.
-// If the Role object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RoleMutation) OldOwnedBy(ctx context.Context) (v *int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOwnedBy is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOwnedBy requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOwnedBy: %w", err)
-	}
-	return oldValue.OwnedBy, nil
-}
-
-// AddOwnedBy adds i to the "owned_by" field.
-func (m *RoleMutation) AddOwnedBy(i int) {
-	if m.addowned_by != nil {
-		*m.addowned_by += i
-	} else {
-		m.addowned_by = &i
-	}
-}
-
-// AddedOwnedBy returns the value that was added to the "owned_by" field in this mutation.
-func (m *RoleMutation) AddedOwnedBy() (r int, exists bool) {
-	v := m.addowned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (m *RoleMutation) ClearOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	m.clearedFields[role.FieldOwnedBy] = struct{}{}
-}
-
-// OwnedByCleared returns if the "owned_by" field was cleared in this mutation.
-func (m *RoleMutation) OwnedByCleared() bool {
-	_, ok := m.clearedFields[role.FieldOwnedBy]
-	return ok
-}
-
-// ResetOwnedBy resets all changes to the "owned_by" field.
-func (m *RoleMutation) ResetOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	delete(m.clearedFields, role.FieldOwnedBy)
 }
 
 // SetTenantID sets the "tenant_id" field.
@@ -1869,7 +2386,7 @@ func (m *RoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RoleMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, role.FieldCreatedAt)
 	}
@@ -1878,9 +2395,6 @@ func (m *RoleMutation) Fields() []string {
 	}
 	if m.created_by != nil {
 		fields = append(fields, role.FieldCreatedBy)
-	}
-	if m.owned_by != nil {
-		fields = append(fields, role.FieldOwnedBy)
 	}
 	if m.tenant_id != nil {
 		fields = append(fields, role.FieldTenantID)
@@ -1914,8 +2428,6 @@ func (m *RoleMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case role.FieldCreatedBy:
 		return m.CreatedBy()
-	case role.FieldOwnedBy:
-		return m.OwnedBy()
 	case role.FieldTenantID:
 		return m.TenantID()
 	case role.FieldName:
@@ -1943,8 +2455,6 @@ func (m *RoleMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case role.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
-	case role.FieldOwnedBy:
-		return m.OldOwnedBy(ctx)
 	case role.FieldTenantID:
 		return m.OldTenantID(ctx)
 	case role.FieldName:
@@ -1986,13 +2496,6 @@ func (m *RoleMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedBy(v)
-		return nil
-	case role.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOwnedBy(v)
 		return nil
 	case role.FieldTenantID:
 		v, ok := value.(int)
@@ -2047,9 +2550,6 @@ func (m *RoleMutation) AddedFields() []string {
 	if m.addcreated_by != nil {
 		fields = append(fields, role.FieldCreatedBy)
 	}
-	if m.addowned_by != nil {
-		fields = append(fields, role.FieldOwnedBy)
-	}
 	if m.addtenant_id != nil {
 		fields = append(fields, role.FieldTenantID)
 	}
@@ -2066,8 +2566,6 @@ func (m *RoleMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case role.FieldCreatedBy:
 		return m.AddedCreatedBy()
-	case role.FieldOwnedBy:
-		return m.AddedOwnedBy()
 	case role.FieldTenantID:
 		return m.AddedTenantID()
 	case role.FieldPriority:
@@ -2087,13 +2585,6 @@ func (m *RoleMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddCreatedBy(v)
-		return nil
-	case role.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddOwnedBy(v)
 		return nil
 	case role.FieldTenantID:
 		v, ok := value.(int)
@@ -2120,9 +2611,6 @@ func (m *RoleMutation) ClearedFields() []string {
 	if m.FieldCleared(role.FieldCreatedBy) {
 		fields = append(fields, role.FieldCreatedBy)
 	}
-	if m.FieldCleared(role.FieldOwnedBy) {
-		fields = append(fields, role.FieldOwnedBy)
-	}
 	if m.FieldCleared(role.FieldDescription) {
 		fields = append(fields, role.FieldDescription)
 	}
@@ -2143,9 +2631,6 @@ func (m *RoleMutation) ClearField(name string) error {
 	case role.FieldCreatedBy:
 		m.ClearCreatedBy()
 		return nil
-	case role.FieldOwnedBy:
-		m.ClearOwnedBy()
-		return nil
 	case role.FieldDescription:
 		m.ClearDescription()
 		return nil
@@ -2165,9 +2650,6 @@ func (m *RoleMutation) ResetField(name string) error {
 		return nil
 	case role.FieldCreatedBy:
 		m.ResetCreatedBy()
-		return nil
-	case role.FieldOwnedBy:
-		m.ResetOwnedBy()
 		return nil
 	case role.FieldTenantID:
 		m.ResetTenantID()
@@ -2311,8 +2793,6 @@ type RolePermissionMutation struct {
 	updated_at        *time.Time
 	created_by        *int
 	addcreated_by     *int
-	owned_by          *int
-	addowned_by       *int
 	tenant_id         *int
 	addtenant_id      *int
 	can_read          *bool
@@ -2573,76 +3053,6 @@ func (m *RolePermissionMutation) ResetCreatedBy() {
 	m.created_by = nil
 	m.addcreated_by = nil
 	delete(m.clearedFields, rolepermission.FieldCreatedBy)
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (m *RolePermissionMutation) SetOwnedBy(i int) {
-	m.owned_by = &i
-	m.addowned_by = nil
-}
-
-// OwnedBy returns the value of the "owned_by" field in the mutation.
-func (m *RolePermissionMutation) OwnedBy() (r int, exists bool) {
-	v := m.owned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldOwnedBy returns the old "owned_by" field's value of the RolePermission entity.
-// If the RolePermission object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RolePermissionMutation) OldOwnedBy(ctx context.Context) (v *int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOwnedBy is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOwnedBy requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOwnedBy: %w", err)
-	}
-	return oldValue.OwnedBy, nil
-}
-
-// AddOwnedBy adds i to the "owned_by" field.
-func (m *RolePermissionMutation) AddOwnedBy(i int) {
-	if m.addowned_by != nil {
-		*m.addowned_by += i
-	} else {
-		m.addowned_by = &i
-	}
-}
-
-// AddedOwnedBy returns the value that was added to the "owned_by" field in this mutation.
-func (m *RolePermissionMutation) AddedOwnedBy() (r int, exists bool) {
-	v := m.addowned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (m *RolePermissionMutation) ClearOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	m.clearedFields[rolepermission.FieldOwnedBy] = struct{}{}
-}
-
-// OwnedByCleared returns if the "owned_by" field was cleared in this mutation.
-func (m *RolePermissionMutation) OwnedByCleared() bool {
-	_, ok := m.clearedFields[rolepermission.FieldOwnedBy]
-	return ok
-}
-
-// ResetOwnedBy resets all changes to the "owned_by" field.
-func (m *RolePermissionMutation) ResetOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	delete(m.clearedFields, rolepermission.FieldOwnedBy)
 }
 
 // SetTenantID sets the "tenant_id" field.
@@ -2957,7 +3367,7 @@ func (m *RolePermissionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RolePermissionMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, rolepermission.FieldCreatedAt)
 	}
@@ -2966,9 +3376,6 @@ func (m *RolePermissionMutation) Fields() []string {
 	}
 	if m.created_by != nil {
 		fields = append(fields, rolepermission.FieldCreatedBy)
-	}
-	if m.owned_by != nil {
-		fields = append(fields, rolepermission.FieldOwnedBy)
 	}
 	if m.tenant_id != nil {
 		fields = append(fields, rolepermission.FieldTenantID)
@@ -2999,8 +3406,6 @@ func (m *RolePermissionMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case rolepermission.FieldCreatedBy:
 		return m.CreatedBy()
-	case rolepermission.FieldOwnedBy:
-		return m.OwnedBy()
 	case rolepermission.FieldTenantID:
 		return m.TenantID()
 	case rolepermission.FieldCanRead:
@@ -3026,8 +3431,6 @@ func (m *RolePermissionMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldUpdatedAt(ctx)
 	case rolepermission.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
-	case rolepermission.FieldOwnedBy:
-		return m.OldOwnedBy(ctx)
 	case rolepermission.FieldTenantID:
 		return m.OldTenantID(ctx)
 	case rolepermission.FieldCanRead:
@@ -3067,13 +3470,6 @@ func (m *RolePermissionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedBy(v)
-		return nil
-	case rolepermission.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOwnedBy(v)
 		return nil
 	case rolepermission.FieldTenantID:
 		v, ok := value.(int)
@@ -3121,9 +3517,6 @@ func (m *RolePermissionMutation) AddedFields() []string {
 	if m.addcreated_by != nil {
 		fields = append(fields, rolepermission.FieldCreatedBy)
 	}
-	if m.addowned_by != nil {
-		fields = append(fields, rolepermission.FieldOwnedBy)
-	}
 	if m.addtenant_id != nil {
 		fields = append(fields, rolepermission.FieldTenantID)
 	}
@@ -3137,8 +3530,6 @@ func (m *RolePermissionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case rolepermission.FieldCreatedBy:
 		return m.AddedCreatedBy()
-	case rolepermission.FieldOwnedBy:
-		return m.AddedOwnedBy()
 	case rolepermission.FieldTenantID:
 		return m.AddedTenantID()
 	}
@@ -3156,13 +3547,6 @@ func (m *RolePermissionMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddCreatedBy(v)
-		return nil
-	case rolepermission.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddOwnedBy(v)
 		return nil
 	case rolepermission.FieldTenantID:
 		v, ok := value.(int)
@@ -3182,9 +3566,6 @@ func (m *RolePermissionMutation) ClearedFields() []string {
 	if m.FieldCleared(rolepermission.FieldCreatedBy) {
 		fields = append(fields, rolepermission.FieldCreatedBy)
 	}
-	if m.FieldCleared(rolepermission.FieldOwnedBy) {
-		fields = append(fields, rolepermission.FieldOwnedBy)
-	}
 	return fields
 }
 
@@ -3202,9 +3583,6 @@ func (m *RolePermissionMutation) ClearField(name string) error {
 	case rolepermission.FieldCreatedBy:
 		m.ClearCreatedBy()
 		return nil
-	case rolepermission.FieldOwnedBy:
-		m.ClearOwnedBy()
-		return nil
 	}
 	return fmt.Errorf("unknown RolePermission nullable field %s", name)
 }
@@ -3221,9 +3599,6 @@ func (m *RolePermissionMutation) ResetField(name string) error {
 		return nil
 	case rolepermission.FieldCreatedBy:
 		m.ResetCreatedBy()
-		return nil
-	case rolepermission.FieldOwnedBy:
-		m.ResetOwnedBy()
 		return nil
 	case rolepermission.FieldTenantID:
 		m.ResetTenantID()
@@ -3346,8 +3721,6 @@ type TenantMutation struct {
 	updated_at    *time.Time
 	created_by    *int
 	addcreated_by *int
-	owned_by      *int
-	addowned_by   *int
 	name          *string
 	slug          *string
 	domain        *string
@@ -3607,76 +3980,6 @@ func (m *TenantMutation) ResetCreatedBy() {
 	m.created_by = nil
 	m.addcreated_by = nil
 	delete(m.clearedFields, tenant.FieldCreatedBy)
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (m *TenantMutation) SetOwnedBy(i int) {
-	m.owned_by = &i
-	m.addowned_by = nil
-}
-
-// OwnedBy returns the value of the "owned_by" field in the mutation.
-func (m *TenantMutation) OwnedBy() (r int, exists bool) {
-	v := m.owned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldOwnedBy returns the old "owned_by" field's value of the Tenant entity.
-// If the Tenant object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *TenantMutation) OldOwnedBy(ctx context.Context) (v *int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOwnedBy is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOwnedBy requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOwnedBy: %w", err)
-	}
-	return oldValue.OwnedBy, nil
-}
-
-// AddOwnedBy adds i to the "owned_by" field.
-func (m *TenantMutation) AddOwnedBy(i int) {
-	if m.addowned_by != nil {
-		*m.addowned_by += i
-	} else {
-		m.addowned_by = &i
-	}
-}
-
-// AddedOwnedBy returns the value that was added to the "owned_by" field in this mutation.
-func (m *TenantMutation) AddedOwnedBy() (r int, exists bool) {
-	v := m.addowned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (m *TenantMutation) ClearOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	m.clearedFields[tenant.FieldOwnedBy] = struct{}{}
-}
-
-// OwnedByCleared returns if the "owned_by" field was cleared in this mutation.
-func (m *TenantMutation) OwnedByCleared() bool {
-	_, ok := m.clearedFields[tenant.FieldOwnedBy]
-	return ok
-}
-
-// ResetOwnedBy resets all changes to the "owned_by" field.
-func (m *TenantMutation) ResetOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	delete(m.clearedFields, tenant.FieldOwnedBy)
 }
 
 // SetName sets the "name" field.
@@ -4102,7 +4405,7 @@ func (m *TenantMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *TenantMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 12)
 	if m.created_at != nil {
 		fields = append(fields, tenant.FieldCreatedAt)
 	}
@@ -4111,9 +4414,6 @@ func (m *TenantMutation) Fields() []string {
 	}
 	if m.created_by != nil {
 		fields = append(fields, tenant.FieldCreatedBy)
-	}
-	if m.owned_by != nil {
-		fields = append(fields, tenant.FieldOwnedBy)
 	}
 	if m.name != nil {
 		fields = append(fields, tenant.FieldName)
@@ -4156,8 +4456,6 @@ func (m *TenantMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case tenant.FieldCreatedBy:
 		return m.CreatedBy()
-	case tenant.FieldOwnedBy:
-		return m.OwnedBy()
 	case tenant.FieldName:
 		return m.Name()
 	case tenant.FieldSlug:
@@ -4191,8 +4489,6 @@ func (m *TenantMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldUpdatedAt(ctx)
 	case tenant.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
-	case tenant.FieldOwnedBy:
-		return m.OldOwnedBy(ctx)
 	case tenant.FieldName:
 		return m.OldName(ctx)
 	case tenant.FieldSlug:
@@ -4240,13 +4536,6 @@ func (m *TenantMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedBy(v)
-		return nil
-	case tenant.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOwnedBy(v)
 		return nil
 	case tenant.FieldName:
 		v, ok := value.(string)
@@ -4322,9 +4611,6 @@ func (m *TenantMutation) AddedFields() []string {
 	if m.addcreated_by != nil {
 		fields = append(fields, tenant.FieldCreatedBy)
 	}
-	if m.addowned_by != nil {
-		fields = append(fields, tenant.FieldOwnedBy)
-	}
 	return fields
 }
 
@@ -4335,8 +4621,6 @@ func (m *TenantMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case tenant.FieldCreatedBy:
 		return m.AddedCreatedBy()
-	case tenant.FieldOwnedBy:
-		return m.AddedOwnedBy()
 	}
 	return nil, false
 }
@@ -4353,13 +4637,6 @@ func (m *TenantMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddCreatedBy(v)
 		return nil
-	case tenant.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddOwnedBy(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Tenant numeric field %s", name)
 }
@@ -4370,9 +4647,6 @@ func (m *TenantMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(tenant.FieldCreatedBy) {
 		fields = append(fields, tenant.FieldCreatedBy)
-	}
-	if m.FieldCleared(tenant.FieldOwnedBy) {
-		fields = append(fields, tenant.FieldOwnedBy)
 	}
 	if m.FieldCleared(tenant.FieldDomain) {
 		fields = append(fields, tenant.FieldDomain)
@@ -4406,9 +4680,6 @@ func (m *TenantMutation) ClearField(name string) error {
 	case tenant.FieldCreatedBy:
 		m.ClearCreatedBy()
 		return nil
-	case tenant.FieldOwnedBy:
-		m.ClearOwnedBy()
-		return nil
 	case tenant.FieldDomain:
 		m.ClearDomain()
 		return nil
@@ -4440,9 +4711,6 @@ func (m *TenantMutation) ResetField(name string) error {
 		return nil
 	case tenant.FieldCreatedBy:
 		m.ResetCreatedBy()
-		return nil
-	case tenant.FieldOwnedBy:
-		m.ResetOwnedBy()
 		return nil
 	case tenant.FieldName:
 		m.ResetName()
@@ -4533,8 +4801,6 @@ type UserMutation struct {
 	updated_at        *time.Time
 	created_by        *int
 	addcreated_by     *int
-	owned_by          *int
-	addowned_by       *int
 	tenant_id         *int
 	addtenant_id      *int
 	email             *string
@@ -4805,76 +5071,6 @@ func (m *UserMutation) ResetCreatedBy() {
 	m.created_by = nil
 	m.addcreated_by = nil
 	delete(m.clearedFields, user.FieldCreatedBy)
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (m *UserMutation) SetOwnedBy(i int) {
-	m.owned_by = &i
-	m.addowned_by = nil
-}
-
-// OwnedBy returns the value of the "owned_by" field in the mutation.
-func (m *UserMutation) OwnedBy() (r int, exists bool) {
-	v := m.owned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldOwnedBy returns the old "owned_by" field's value of the User entity.
-// If the User object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldOwnedBy(ctx context.Context) (v *int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldOwnedBy is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldOwnedBy requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldOwnedBy: %w", err)
-	}
-	return oldValue.OwnedBy, nil
-}
-
-// AddOwnedBy adds i to the "owned_by" field.
-func (m *UserMutation) AddOwnedBy(i int) {
-	if m.addowned_by != nil {
-		*m.addowned_by += i
-	} else {
-		m.addowned_by = &i
-	}
-}
-
-// AddedOwnedBy returns the value that was added to the "owned_by" field in this mutation.
-func (m *UserMutation) AddedOwnedBy() (r int, exists bool) {
-	v := m.addowned_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (m *UserMutation) ClearOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	m.clearedFields[user.FieldOwnedBy] = struct{}{}
-}
-
-// OwnedByCleared returns if the "owned_by" field was cleared in this mutation.
-func (m *UserMutation) OwnedByCleared() bool {
-	_, ok := m.clearedFields[user.FieldOwnedBy]
-	return ok
-}
-
-// ResetOwnedBy resets all changes to the "owned_by" field.
-func (m *UserMutation) ResetOwnedBy() {
-	m.owned_by = nil
-	m.addowned_by = nil
-	delete(m.clearedFields, user.FieldOwnedBy)
 }
 
 // SetTenantID sets the "tenant_id" field.
@@ -5671,7 +5867,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 20)
+	fields := make([]string, 0, 19)
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
 	}
@@ -5680,9 +5876,6 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.created_by != nil {
 		fields = append(fields, user.FieldCreatedBy)
-	}
-	if m.owned_by != nil {
-		fields = append(fields, user.FieldOwnedBy)
 	}
 	if m.tenant_id != nil {
 		fields = append(fields, user.FieldTenantID)
@@ -5746,8 +5939,6 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case user.FieldCreatedBy:
 		return m.CreatedBy()
-	case user.FieldOwnedBy:
-		return m.OwnedBy()
 	case user.FieldTenantID:
 		return m.TenantID()
 	case user.FieldEmail:
@@ -5795,8 +5986,6 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case user.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
-	case user.FieldOwnedBy:
-		return m.OldOwnedBy(ctx)
 	case user.FieldTenantID:
 		return m.OldTenantID(ctx)
 	case user.FieldEmail:
@@ -5858,13 +6047,6 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedBy(v)
-		return nil
-	case user.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetOwnedBy(v)
 		return nil
 	case user.FieldTenantID:
 		v, ok := value.(int)
@@ -5989,9 +6171,6 @@ func (m *UserMutation) AddedFields() []string {
 	if m.addcreated_by != nil {
 		fields = append(fields, user.FieldCreatedBy)
 	}
-	if m.addowned_by != nil {
-		fields = append(fields, user.FieldOwnedBy)
-	}
 	if m.addtenant_id != nil {
 		fields = append(fields, user.FieldTenantID)
 	}
@@ -6008,8 +6187,6 @@ func (m *UserMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case user.FieldCreatedBy:
 		return m.AddedCreatedBy()
-	case user.FieldOwnedBy:
-		return m.AddedOwnedBy()
 	case user.FieldTenantID:
 		return m.AddedTenantID()
 	case user.FieldPaymentTerms:
@@ -6029,13 +6206,6 @@ func (m *UserMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddCreatedBy(v)
-		return nil
-	case user.FieldOwnedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddOwnedBy(v)
 		return nil
 	case user.FieldTenantID:
 		v, ok := value.(int)
@@ -6061,9 +6231,6 @@ func (m *UserMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(user.FieldCreatedBy) {
 		fields = append(fields, user.FieldCreatedBy)
-	}
-	if m.FieldCleared(user.FieldOwnedBy) {
-		fields = append(fields, user.FieldOwnedBy)
 	}
 	if m.FieldCleared(user.FieldPhone) {
 		fields = append(fields, user.FieldPhone)
@@ -6106,9 +6273,6 @@ func (m *UserMutation) ClearField(name string) error {
 	case user.FieldCreatedBy:
 		m.ClearCreatedBy()
 		return nil
-	case user.FieldOwnedBy:
-		m.ClearOwnedBy()
-		return nil
 	case user.FieldPhone:
 		m.ClearPhone()
 		return nil
@@ -6149,9 +6313,6 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldCreatedBy:
 		m.ResetCreatedBy()
-		return nil
-	case user.FieldOwnedBy:
-		m.ResetOwnedBy()
 		return nil
 	case user.FieldTenantID:
 		m.ResetTenantID()

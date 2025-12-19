@@ -66,20 +66,6 @@ func (_c *RoleCreate) SetNillableCreatedBy(v *int) *RoleCreate {
 	return _c
 }
 
-// SetOwnedBy sets the "owned_by" field.
-func (_c *RoleCreate) SetOwnedBy(v int) *RoleCreate {
-	_c.mutation.SetOwnedBy(v)
-	return _c
-}
-
-// SetNillableOwnedBy sets the "owned_by" field if the given value is not nil.
-func (_c *RoleCreate) SetNillableOwnedBy(v *int) *RoleCreate {
-	if v != nil {
-		_c.SetOwnedBy(*v)
-	}
-	return _c
-}
-
 // SetTenantID sets the "tenant_id" field.
 func (_c *RoleCreate) SetTenantID(v int) *RoleCreate {
 	_c.mutation.SetTenantID(v)
@@ -331,10 +317,6 @@ func (_c *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec.SetField(role.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = &value
 	}
-	if value, ok := _c.mutation.OwnedBy(); ok {
-		_spec.SetField(role.FieldOwnedBy, field.TypeInt, value)
-		_node.OwnedBy = &value
-	}
 	if value, ok := _c.mutation.TenantID(); ok {
 		_spec.SetField(role.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
@@ -476,30 +458,6 @@ func (u *RoleUpsert) AddCreatedBy(v int) *RoleUpsert {
 // ClearCreatedBy clears the value of the "created_by" field.
 func (u *RoleUpsert) ClearCreatedBy() *RoleUpsert {
 	u.SetNull(role.FieldCreatedBy)
-	return u
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *RoleUpsert) SetOwnedBy(v int) *RoleUpsert {
-	u.Set(role.FieldOwnedBy, v)
-	return u
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateOwnedBy() *RoleUpsert {
-	u.SetExcluded(role.FieldOwnedBy)
-	return u
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *RoleUpsert) AddOwnedBy(v int) *RoleUpsert {
-	u.Add(role.FieldOwnedBy, v)
-	return u
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *RoleUpsert) ClearOwnedBy() *RoleUpsert {
-	u.SetNull(role.FieldOwnedBy)
 	return u
 }
 
@@ -683,34 +641,6 @@ func (u *RoleUpsertOne) UpdateCreatedBy() *RoleUpsertOne {
 func (u *RoleUpsertOne) ClearCreatedBy() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.ClearCreatedBy()
-	})
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *RoleUpsertOne) SetOwnedBy(v int) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetOwnedBy(v)
-	})
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *RoleUpsertOne) AddOwnedBy(v int) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.AddOwnedBy(v)
-	})
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateOwnedBy() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateOwnedBy()
-	})
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *RoleUpsertOne) ClearOwnedBy() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.ClearOwnedBy()
 	})
 }
 
@@ -1075,34 +1005,6 @@ func (u *RoleUpsertBulk) UpdateCreatedBy() *RoleUpsertBulk {
 func (u *RoleUpsertBulk) ClearCreatedBy() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.ClearCreatedBy()
-	})
-}
-
-// SetOwnedBy sets the "owned_by" field.
-func (u *RoleUpsertBulk) SetOwnedBy(v int) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetOwnedBy(v)
-	})
-}
-
-// AddOwnedBy adds v to the "owned_by" field.
-func (u *RoleUpsertBulk) AddOwnedBy(v int) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.AddOwnedBy(v)
-	})
-}
-
-// UpdateOwnedBy sets the "owned_by" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateOwnedBy() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateOwnedBy()
-	})
-}
-
-// ClearOwnedBy clears the value of the "owned_by" field.
-func (u *RoleUpsertBulk) ClearOwnedBy() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.ClearOwnedBy()
 	})
 }
 

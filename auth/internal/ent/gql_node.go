@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/hashicorp/go-multierror"
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/brand"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/permission"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/rolepermission"
@@ -26,6 +27,11 @@ import (
 type Noder interface {
 	IsNode()
 }
+
+var brandImplementors = []string{"Brand", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Brand) IsNode() {}
 
 var permissionImplementors = []string{"Permission", "Node"}
 
@@ -110,6 +116,15 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
+	case brand.Table:
+		query := c.Brand.Query().
+			Where(brand.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, brandImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
 	case permission.Table:
 		query := c.Permission.Query().
 			Where(permission.ID(id))
@@ -228,6 +243,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case brand.Table:
+		query := c.Brand.Query().
+			Where(brand.IDIn(ids...))
+		query, err := query.CollectFields(ctx, brandImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case permission.Table:
 		query := c.Permission.Query().
 			Where(permission.IDIn(ids...))

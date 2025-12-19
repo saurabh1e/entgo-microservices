@@ -24,8 +24,6 @@ type Role struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// User ID who created this record
 	CreatedBy *int `json:"created_by,omitempty"`
-	// User ID who owns this record
-	OwnedBy *int `json:"owned_by,omitempty"`
 	// Tenant ID for multi-tenancy isolation
 	TenantID int `json:"tenant_id,omitempty"`
 	// Role name (e.g., admin, user, moderator)
@@ -85,7 +83,7 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case role.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case role.FieldID, role.FieldCreatedBy, role.FieldOwnedBy, role.FieldTenantID, role.FieldPriority:
+		case role.FieldID, role.FieldCreatedBy, role.FieldTenantID, role.FieldPriority:
 			values[i] = new(sql.NullInt64)
 		case role.FieldName, role.FieldDisplayName, role.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -130,13 +128,6 @@ func (_m *Role) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.CreatedBy = new(int)
 				*_m.CreatedBy = int(value.Int64)
-			}
-		case role.FieldOwnedBy:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field owned_by", values[i])
-			} else if value.Valid {
-				_m.OwnedBy = new(int)
-				*_m.OwnedBy = int(value.Int64)
 			}
 		case role.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -228,11 +219,6 @@ func (_m *Role) String() string {
 	builder.WriteString(", ")
 	if v := _m.CreatedBy; v != nil {
 		builder.WriteString("created_by=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	if v := _m.OwnedBy; v != nil {
-		builder.WriteString("owned_by=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

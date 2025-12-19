@@ -25,8 +25,6 @@ type Tenant struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// User ID who created this record
 	CreatedBy *int `json:"created_by,omitempty"`
-	// User ID who owns this record
-	OwnedBy *int `json:"owned_by,omitempty"`
 	// Tenant name
 	Name string `json:"name,omitempty"`
 	// URL-friendly tenant identifier
@@ -57,7 +55,7 @@ func (*Tenant) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case tenant.FieldIsActive:
 			values[i] = new(sql.NullBool)
-		case tenant.FieldID, tenant.FieldCreatedBy, tenant.FieldOwnedBy:
+		case tenant.FieldID, tenant.FieldCreatedBy:
 			values[i] = new(sql.NullInt64)
 		case tenant.FieldName, tenant.FieldSlug, tenant.FieldDomain, tenant.FieldDescription, tenant.FieldStatus:
 			values[i] = new(sql.NullString)
@@ -102,13 +100,6 @@ func (_m *Tenant) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.CreatedBy = new(int)
 				*_m.CreatedBy = int(value.Int64)
-			}
-		case tenant.FieldOwnedBy:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field owned_by", values[i])
-			} else if value.Valid {
-				_m.OwnedBy = new(int)
-				*_m.OwnedBy = int(value.Int64)
 			}
 		case tenant.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -213,11 +204,6 @@ func (_m *Tenant) String() string {
 	builder.WriteString(", ")
 	if v := _m.CreatedBy; v != nil {
 		builder.WriteString("created_by=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	if v := _m.OwnedBy; v != nil {
-		builder.WriteString("owned_by=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

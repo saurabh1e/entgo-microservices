@@ -54,6 +54,27 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Brand struct {
+		Code      func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		CreatedBy func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Name      func(childComplexity int) int
+		TenantID  func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
+	}
+
+	BrandConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	BrandEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
 	LoginResponse struct {
 		AccessToken  func(childComplexity int) int
 		RefreshToken func(childComplexity int) int
@@ -65,6 +86,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CreateBrand              func(childComplexity int, input ent.CreateBrandInput) int
+		CreateBulkBrand          func(childComplexity int, input []*ent.CreateBrandInput) int
 		CreateBulkPermission     func(childComplexity int, input []*ent.CreatePermissionInput) int
 		CreateBulkRole           func(childComplexity int, input []*ent.CreateRoleInput) int
 		CreateBulkRolePermission func(childComplexity int, input []*ent.CreateRolePermissionInput) int
@@ -73,6 +96,7 @@ type ComplexityRoot struct {
 		CreateRole               func(childComplexity int, input ent.CreateRoleInput) int
 		CreateRolePermission     func(childComplexity int, input ent.CreateRolePermissionInput) int
 		CreateUser               func(childComplexity int, input ent.CreateUserInput) int
+		DeleteBrand              func(childComplexity int, id int) int
 		DeletePermission         func(childComplexity int, id int) int
 		DeleteRole               func(childComplexity int, id int) int
 		DeleteRolePermission     func(childComplexity int, id int) int
@@ -82,6 +106,7 @@ type ComplexityRoot struct {
 		Logout                   func(childComplexity int) int
 		RefreshToken             func(childComplexity int) int
 		Register                 func(childComplexity int, input model.RegisterInput) int
+		UpdateBrand              func(childComplexity int, id int, input ent.UpdateBrandInput) int
 		UpdatePermission         func(childComplexity int, id int, input ent.UpdatePermissionInput) int
 		UpdateRole               func(childComplexity int, id int, input ent.UpdateRoleInput) int
 		UpdateRolePermission     func(childComplexity int, id int, input ent.UpdateRolePermissionInput) int
@@ -103,7 +128,6 @@ type ComplexityRoot struct {
 		ID              func(childComplexity int) int
 		IsActive        func(childComplexity int) int
 		Name            func(childComplexity int) int
-		OwnedBy         func(childComplexity int) int
 		Resource        func(childComplexity int) int
 		RolePermissions func(childComplexity int) int
 		TenantID        func(childComplexity int) int
@@ -122,9 +146,11 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		BrandByID          func(childComplexity int, id int) int
+		Brands             func(childComplexity int, first *int, after *entgql.Cursor[int], last *int, before *entgql.Cursor[int], orderBy *ent.BrandOrder, where *ent.BrandWhereInput) int
 		Me                 func(childComplexity int) int
-		Node               func(childComplexity int, id string) int
-		Nodes              func(childComplexity int, ids []string) int
+		Node               func(childComplexity int, id int) int
+		Nodes              func(childComplexity int, ids []int) int
 		PermissionByID     func(childComplexity int, id int) int
 		Permissions        func(childComplexity int, first *int, after *entgql.Cursor[int], last *int, before *entgql.Cursor[int], orderBy *ent.PermissionOrder, where *ent.PermissionWhereInput) int
 		RoleByID           func(childComplexity int, id int) int
@@ -149,7 +175,6 @@ type ComplexityRoot struct {
 		ID              func(childComplexity int) int
 		IsActive        func(childComplexity int) int
 		Name            func(childComplexity int) int
-		OwnedBy         func(childComplexity int) int
 		Priority        func(childComplexity int) int
 		RolePermissions func(childComplexity int) int
 		TenantID        func(childComplexity int) int
@@ -176,7 +201,6 @@ type ComplexityRoot struct {
 		CreatedAt  func(childComplexity int) int
 		CreatedBy  func(childComplexity int) int
 		ID         func(childComplexity int) int
-		OwnedBy    func(childComplexity int) int
 		Permission func(childComplexity int) int
 		Role       func(childComplexity int) int
 		TenantID   func(childComplexity int) int
@@ -204,7 +228,6 @@ type ComplexityRoot struct {
 		IsActive    func(childComplexity int) int
 		Metadata    func(childComplexity int) int
 		Name        func(childComplexity int) int
-		OwnedBy     func(childComplexity int) int
 		Settings    func(childComplexity int) int
 		Slug        func(childComplexity int) int
 		Status      func(childComplexity int) int
@@ -240,7 +263,6 @@ type ComplexityRoot struct {
 		IsActive        func(childComplexity int) int
 		LastLogin       func(childComplexity int) int
 		Name            func(childComplexity int) int
-		OwnedBy         func(childComplexity int) int
 		PaymentTerms    func(childComplexity int) int
 		Phone           func(childComplexity int) int
 		Role            func(childComplexity int) int
@@ -269,6 +291,10 @@ type MutationResolver interface {
 	Register(ctx context.Context, input model.RegisterInput) (*model.RegisterResponse, error)
 	Logout(ctx context.Context) (*model.LogoutResponse, error)
 	RefreshToken(ctx context.Context) (*model.TokenResponse, error)
+	CreateBrand(ctx context.Context, input ent.CreateBrandInput) (*ent.Brand, error)
+	CreateBulkBrand(ctx context.Context, input []*ent.CreateBrandInput) ([]*ent.Brand, error)
+	UpdateBrand(ctx context.Context, id int, input ent.UpdateBrandInput) (*ent.Brand, error)
+	DeleteBrand(ctx context.Context, id int) (bool, error)
 	CreatePermission(ctx context.Context, input ent.CreatePermissionInput) (*ent.Permission, error)
 	CreateBulkPermission(ctx context.Context, input []*ent.CreatePermissionInput) ([]*ent.Permission, error)
 	UpdatePermission(ctx context.Context, id int, input ent.UpdatePermissionInput) (*ent.Permission, error)
@@ -287,9 +313,11 @@ type MutationResolver interface {
 	DeleteUser(ctx context.Context, id int) (bool, error)
 }
 type QueryResolver interface {
-	Node(ctx context.Context, id string) (ent.Noder, error)
-	Nodes(ctx context.Context, ids []string) ([]ent.Noder, error)
+	Node(ctx context.Context, id int) (ent.Noder, error)
+	Nodes(ctx context.Context, ids []int) ([]ent.Noder, error)
 	Me(ctx context.Context) (*ent.User, error)
+	BrandByID(ctx context.Context, id int) (*ent.Brand, error)
+	Brands(ctx context.Context, first *int, after *entgql.Cursor[int], last *int, before *entgql.Cursor[int], orderBy *ent.BrandOrder, where *ent.BrandWhereInput) (*ent.BrandConnection, error)
 	PermissionByID(ctx context.Context, id int) (*ent.Permission, error)
 	Permissions(ctx context.Context, first *int, after *entgql.Cursor[int], last *int, before *entgql.Cursor[int], orderBy *ent.PermissionOrder, where *ent.PermissionWhereInput) (*ent.PermissionConnection, error)
 	RoleByID(ctx context.Context, id int) (*ent.Role, error)
@@ -319,6 +347,81 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Brand.code":
+		if e.complexity.Brand.Code == nil {
+			break
+		}
+
+		return e.complexity.Brand.Code(childComplexity), true
+	case "Brand.createdAt":
+		if e.complexity.Brand.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Brand.CreatedAt(childComplexity), true
+	case "Brand.createdBy":
+		if e.complexity.Brand.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.Brand.CreatedBy(childComplexity), true
+	case "Brand.id":
+		if e.complexity.Brand.ID == nil {
+			break
+		}
+
+		return e.complexity.Brand.ID(childComplexity), true
+	case "Brand.name":
+		if e.complexity.Brand.Name == nil {
+			break
+		}
+
+		return e.complexity.Brand.Name(childComplexity), true
+	case "Brand.tenantID":
+		if e.complexity.Brand.TenantID == nil {
+			break
+		}
+
+		return e.complexity.Brand.TenantID(childComplexity), true
+	case "Brand.updatedAt":
+		if e.complexity.Brand.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Brand.UpdatedAt(childComplexity), true
+
+	case "BrandConnection.edges":
+		if e.complexity.BrandConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.BrandConnection.Edges(childComplexity), true
+	case "BrandConnection.pageInfo":
+		if e.complexity.BrandConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.BrandConnection.PageInfo(childComplexity), true
+	case "BrandConnection.totalCount":
+		if e.complexity.BrandConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.BrandConnection.TotalCount(childComplexity), true
+
+	case "BrandEdge.cursor":
+		if e.complexity.BrandEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.BrandEdge.Cursor(childComplexity), true
+	case "BrandEdge.node":
+		if e.complexity.BrandEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.BrandEdge.Node(childComplexity), true
+
 	case "LoginResponse.accessToken":
 		if e.complexity.LoginResponse.AccessToken == nil {
 			break
@@ -345,6 +448,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.LogoutResponse.Success(childComplexity), true
 
+	case "Mutation.createBrand":
+		if e.complexity.Mutation.CreateBrand == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createBrand_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateBrand(childComplexity, args["input"].(ent.CreateBrandInput)), true
+	case "Mutation.createBulkBrand":
+		if e.complexity.Mutation.CreateBulkBrand == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createBulkBrand_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateBulkBrand(childComplexity, args["input"].([]*ent.CreateBrandInput)), true
 	case "Mutation.createBulkPermission":
 		if e.complexity.Mutation.CreateBulkPermission == nil {
 			break
@@ -433,6 +558,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(ent.CreateUserInput)), true
+	case "Mutation.deleteBrand":
+		if e.complexity.Mutation.DeleteBrand == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteBrand_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteBrand(childComplexity, args["id"].(int)), true
 	case "Mutation.deletePermission":
 		if e.complexity.Mutation.DeletePermission == nil {
 			break
@@ -517,6 +653,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.Register(childComplexity, args["input"].(model.RegisterInput)), true
+	case "Mutation.updateBrand":
+		if e.complexity.Mutation.UpdateBrand == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateBrand_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateBrand(childComplexity, args["id"].(int), args["input"].(ent.UpdateBrandInput)), true
 	case "Mutation.updatePermission":
 		if e.complexity.Mutation.UpdatePermission == nil {
 			break
@@ -629,12 +776,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Permission.Name(childComplexity), true
-	case "Permission.ownedBy":
-		if e.complexity.Permission.OwnedBy == nil {
-			break
-		}
-
-		return e.complexity.Permission.OwnedBy(childComplexity), true
 	case "Permission.resource":
 		if e.complexity.Permission.Resource == nil {
 			break
@@ -692,6 +833,28 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.PermissionEdge.Node(childComplexity), true
 
+	case "Query.BrandByID":
+		if e.complexity.Query.BrandByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_BrandByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.BrandByID(childComplexity, args["id"].(int)), true
+	case "Query.Brands":
+		if e.complexity.Query.Brands == nil {
+			break
+		}
+
+		args, err := ec.field_Query_Brands_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Brands(childComplexity, args["first"].(*int), args["after"].(*entgql.Cursor[int]), args["last"].(*int), args["before"].(*entgql.Cursor[int]), args["orderBy"].(*ent.BrandOrder), args["where"].(*ent.BrandWhereInput)), true
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
 			break
@@ -708,7 +871,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Query.Node(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Node(childComplexity, args["id"].(int)), true
 	case "Query.nodes":
 		if e.complexity.Query.Nodes == nil {
 			break
@@ -719,7 +882,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Query.Nodes(childComplexity, args["ids"].([]string)), true
+		return e.complexity.Query.Nodes(childComplexity, args["ids"].([]int)), true
 	case "Query.PermissionByID":
 		if e.complexity.Query.PermissionByID == nil {
 			break
@@ -870,12 +1033,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Role.Name(childComplexity), true
-	case "Role.ownedBy":
-		if e.complexity.Role.OwnedBy == nil {
-			break
-		}
-
-		return e.complexity.Role.OwnedBy(childComplexity), true
 	case "Role.priority":
 		if e.complexity.Role.Priority == nil {
 			break
@@ -981,12 +1138,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.RolePermission.ID(childComplexity), true
-	case "RolePermission.ownedBy":
-		if e.complexity.RolePermission.OwnedBy == nil {
-			break
-		}
-
-		return e.complexity.RolePermission.OwnedBy(childComplexity), true
 	case "RolePermission.permission":
 		if e.complexity.RolePermission.Permission == nil {
 			break
@@ -1098,12 +1249,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Tenant.Name(childComplexity), true
-	case "Tenant.ownedBy":
-		if e.complexity.Tenant.OwnedBy == nil {
-			break
-		}
-
-		return e.complexity.Tenant.OwnedBy(childComplexity), true
 	case "Tenant.settings":
 		if e.complexity.Tenant.Settings == nil {
 			break
@@ -1246,12 +1391,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.Name(childComplexity), true
-	case "User.ownedBy":
-		if e.complexity.User.OwnedBy == nil {
-			break
-		}
-
-		return e.complexity.User.OwnedBy(childComplexity), true
 	case "User.paymentTerms":
 		if e.complexity.User.PaymentTerms == nil {
 			break
@@ -1341,6 +1480,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputBrandOrder,
+		ec.unmarshalInputBrandWhereInput,
+		ec.unmarshalInputCreateBrandInput,
 		ec.unmarshalInputCreatePermissionInput,
 		ec.unmarshalInputCreateRoleInput,
 		ec.unmarshalInputCreateRolePermissionInput,
@@ -1356,6 +1498,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputRoleWhereInput,
 		ec.unmarshalInputTenantOrder,
 		ec.unmarshalInputTenantWhereInput,
+		ec.unmarshalInputUpdateBrandInput,
 		ec.unmarshalInputUpdatePermissionInput,
 		ec.unmarshalInputUpdateRoleInput,
 		ec.unmarshalInputUpdateRolePermissionInput,
@@ -1459,7 +1602,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "auth.graphqls" "ent.graphqls" "schema.graphqls" "schemas/permission.graphqls" "schemas/role.graphqls" "schemas/rolepermission.graphqls" "schemas/user.graphqls"
+//go:embed "auth.graphqls" "ent.graphqls" "schema.graphqls" "schemas/brand.graphqls" "schemas/permission.graphqls" "schemas/role.graphqls" "schemas/rolepermission.graphqls" "schemas/user.graphqls"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1474,6 +1617,7 @@ var sources = []*ast.Source{
 	{Name: "auth.graphqls", Input: sourceData("auth.graphqls"), BuiltIn: false},
 	{Name: "ent.graphqls", Input: sourceData("ent.graphqls"), BuiltIn: false},
 	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
+	{Name: "schemas/brand.graphqls", Input: sourceData("schemas/brand.graphqls"), BuiltIn: false},
 	{Name: "schemas/permission.graphqls", Input: sourceData("schemas/permission.graphqls"), BuiltIn: false},
 	{Name: "schemas/role.graphqls", Input: sourceData("schemas/role.graphqls"), BuiltIn: false},
 	{Name: "schemas/rolepermission.graphqls", Input: sourceData("schemas/rolepermission.graphqls"), BuiltIn: false},
@@ -1504,6 +1648,28 @@ func (ec *executionContext) dir_hasRole_args(ctx context.Context, rawArgs map[st
 		return nil, err
 	}
 	args["role"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createBrand_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateBrandInput2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐCreateBrandInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createBulkBrand_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNCreateBrandInput2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐCreateBrandInputᚄ)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1595,6 +1761,17 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteBrand_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2int)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_deletePermission_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1661,6 +1838,22 @@ func (ec *executionContext) field_Mutation_register_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_updateBrand_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2int)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "input", ec.unmarshalNUpdateBrandInput2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUpdateBrandInput)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_updatePermission_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1722,6 +1915,53 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 		return nil, err
 	}
 	args["input"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_BrandByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2int)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_Brands_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "after", ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor)
+	if err != nil {
+		return nil, err
+	}
+	args["after"] = arg1
+	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
+	if err != nil {
+		return nil, err
+	}
+	args["last"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "before", ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor)
+	if err != nil {
+		return nil, err
+	}
+	args["before"] = arg3
+	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOBrandOrder2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandOrder)
+	if err != nil {
+		return nil, err
+	}
+	args["orderBy"] = arg4
+	arg5, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalOBrandWhereInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandWhereInput)
+	if err != nil {
+		return nil, err
+	}
+	args["where"] = arg5
 	return args, nil
 }
 
@@ -1927,7 +2167,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_node_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2int)
 	if err != nil {
 		return nil, err
 	}
@@ -1938,7 +2178,7 @@ func (ec *executionContext) field_Query_node_args(ctx context.Context, rawArgs m
 func (ec *executionContext) field_Query_nodes_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "ids", ec.unmarshalNID2ᚕstringᚄ)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "ids", ec.unmarshalNID2ᚕintᚄ)
 	if err != nil {
 		return nil, err
 	}
@@ -1998,6 +2238,386 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
+func (ec *executionContext) _Brand_id(ctx context.Context, field graphql.CollectedField, obj *ent.Brand) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Brand_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNID2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Brand_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Brand",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Brand_createdAt(ctx context.Context, field graphql.CollectedField, obj *ent.Brand) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Brand_createdAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Brand_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Brand",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Brand_updatedAt(ctx context.Context, field graphql.CollectedField, obj *ent.Brand) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Brand_updatedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalNTime2timeᚐTime,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Brand_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Brand",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Brand_createdBy(ctx context.Context, field graphql.CollectedField, obj *ent.Brand) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Brand_createdBy,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedBy, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Brand_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Brand",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Brand_tenantID(ctx context.Context, field graphql.CollectedField, obj *ent.Brand) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Brand_tenantID,
+		func(ctx context.Context) (any, error) {
+			return obj.TenantID, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Brand_tenantID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Brand",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Brand_code(ctx context.Context, field graphql.CollectedField, obj *ent.Brand) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Brand_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Brand_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Brand",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Brand_name(ctx context.Context, field graphql.CollectedField, obj *ent.Brand) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Brand_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Brand_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Brand",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BrandConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.BrandConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_BrandConnection_edges,
+		func(ctx context.Context) (any, error) {
+			return obj.Edges, nil
+		},
+		nil,
+		ec.marshalOBrandEdge2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandEdge,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_BrandConnection_edges(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BrandConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_BrandEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_BrandEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BrandEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BrandConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.BrandConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_BrandConnection_pageInfo,
+		func(ctx context.Context) (any, error) {
+			return obj.PageInfo, nil
+		},
+		nil,
+		ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_BrandConnection_pageInfo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BrandConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BrandConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.BrandConnection) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_BrandConnection_totalCount,
+		func(ctx context.Context) (any, error) {
+			return obj.TotalCount, nil
+		},
+		nil,
+		ec.marshalNInt2int,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_BrandConnection_totalCount(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BrandConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BrandEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.BrandEdge) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_BrandEdge_node,
+		func(ctx context.Context) (any, error) {
+			return obj.Node, nil
+		},
+		nil,
+		ec.marshalOBrand2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrand,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_BrandEdge_node(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BrandEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Brand_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Brand_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Brand_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Brand_createdBy(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_Brand_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Brand_code(ctx, field)
+			case "name":
+				return ec.fieldContext_Brand_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Brand", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _BrandEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.BrandEdge) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_BrandEdge_cursor,
+		func(ctx context.Context) (any, error) {
+			return obj.Cursor, nil
+		},
+		nil,
+		ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_BrandEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "BrandEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _LoginResponse_user(ctx context.Context, field graphql.CollectedField, obj *model.LoginResponse) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -2030,8 +2650,6 @@ func (ec *executionContext) fieldContext_LoginResponse_user(_ context.Context, f
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -2366,6 +2984,270 @@ func (ec *executionContext) fieldContext_Mutation_refreshToken(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createBrand(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createBrand,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateBrand(ctx, fc.Args["input"].(ent.CreateBrandInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.Auth == nil {
+					var zeroVal *ent.Brand
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNBrand2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrand,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createBrand(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Brand_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Brand_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Brand_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Brand_createdBy(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_Brand_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Brand_code(ctx, field)
+			case "name":
+				return ec.fieldContext_Brand_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Brand", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createBrand_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createBulkBrand(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createBulkBrand,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateBulkBrand(ctx, fc.Args["input"].([]*ent.CreateBrandInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.Auth == nil {
+					var zeroVal []*ent.Brand
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNBrand2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createBulkBrand(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Brand_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Brand_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Brand_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Brand_createdBy(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_Brand_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Brand_code(ctx, field)
+			case "name":
+				return ec.fieldContext_Brand_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Brand", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createBulkBrand_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateBrand(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_updateBrand,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().UpdateBrand(ctx, fc.Args["id"].(int), fc.Args["input"].(ent.UpdateBrandInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.Auth == nil {
+					var zeroVal *ent.Brand
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNBrand2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrand,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateBrand(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Brand_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Brand_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Brand_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Brand_createdBy(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_Brand_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Brand_code(ctx, field)
+			case "name":
+				return ec.fieldContext_Brand_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Brand", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateBrand_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteBrand(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteBrand,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteBrand(ctx, fc.Args["id"].(int))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.Auth == nil {
+					var zeroVal bool
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteBrand(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteBrand_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createPermission(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -2412,8 +3294,6 @@ func (ec *executionContext) fieldContext_Mutation_createPermission(ctx context.C
 				return ec.fieldContext_Permission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Permission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Permission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Permission_tenantID(ctx, field)
 			case "name":
@@ -2492,8 +3372,6 @@ func (ec *executionContext) fieldContext_Mutation_createBulkPermission(ctx conte
 				return ec.fieldContext_Permission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Permission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Permission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Permission_tenantID(ctx, field)
 			case "name":
@@ -2572,8 +3450,6 @@ func (ec *executionContext) fieldContext_Mutation_updatePermission(ctx context.C
 				return ec.fieldContext_Permission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Permission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Permission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Permission_tenantID(ctx, field)
 			case "name":
@@ -2706,8 +3582,6 @@ func (ec *executionContext) fieldContext_Mutation_createRole(ctx context.Context
 				return ec.fieldContext_Role_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Role_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Role_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
 			case "name":
@@ -2788,8 +3662,6 @@ func (ec *executionContext) fieldContext_Mutation_createBulkRole(ctx context.Con
 				return ec.fieldContext_Role_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Role_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Role_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
 			case "name":
@@ -2870,8 +3742,6 @@ func (ec *executionContext) fieldContext_Mutation_updateRole(ctx context.Context
 				return ec.fieldContext_Role_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Role_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Role_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
 			case "name":
@@ -3006,8 +3876,6 @@ func (ec *executionContext) fieldContext_Mutation_createRolePermission(ctx conte
 				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_RolePermission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_RolePermission_tenantID(ctx, field)
 			case "canRead":
@@ -3086,8 +3954,6 @@ func (ec *executionContext) fieldContext_Mutation_createBulkRolePermission(ctx c
 				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_RolePermission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_RolePermission_tenantID(ctx, field)
 			case "canRead":
@@ -3166,8 +4032,6 @@ func (ec *executionContext) fieldContext_Mutation_updateRolePermission(ctx conte
 				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_RolePermission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_RolePermission_tenantID(ctx, field)
 			case "canRead":
@@ -3300,8 +4164,6 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -3398,8 +4260,6 @@ func (ec *executionContext) fieldContext_Mutation_createBulkUser(ctx context.Con
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -3496,8 +4356,6 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -3834,35 +4692,6 @@ func (ec *executionContext) fieldContext_Permission_createdBy(_ context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Permission_ownedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Permission) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Permission_ownedBy,
-		func(ctx context.Context) (any, error) {
-			return obj.OwnedBy, nil
-		},
-		nil,
-		ec.marshalOInt2ᚖint,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Permission_ownedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Permission",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Permission_tenantID(ctx context.Context, field graphql.CollectedField, obj *ent.Permission) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -4069,8 +4898,6 @@ func (ec *executionContext) fieldContext_Permission_rolePermissions(_ context.Co
 				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_RolePermission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_RolePermission_tenantID(ctx, field)
 			case "canRead":
@@ -4227,8 +5054,6 @@ func (ec *executionContext) fieldContext_PermissionEdge_node(_ context.Context, 
 				return ec.fieldContext_Permission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Permission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Permission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Permission_tenantID(ctx, field)
 			case "name":
@@ -4287,7 +5112,7 @@ func (ec *executionContext) _Query_node(ctx context.Context, field graphql.Colle
 		ec.fieldContext_Query_node,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Query().Node(ctx, fc.Args["id"].(string))
+			return ec.resolvers.Query().Node(ctx, fc.Args["id"].(int))
 		},
 		nil,
 		ec.marshalONode2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐNoder,
@@ -4328,7 +5153,7 @@ func (ec *executionContext) _Query_nodes(ctx context.Context, field graphql.Coll
 		ec.fieldContext_Query_nodes,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Query().Nodes(ctx, fc.Args["ids"].([]string))
+			return ec.resolvers.Query().Nodes(ctx, fc.Args["ids"].([]int))
 		},
 		nil,
 		ec.marshalNNode2ᚕgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐNoder,
@@ -4406,8 +5231,6 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -4443,6 +5266,138 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_BrandByID(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_BrandByID,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().BrandByID(ctx, fc.Args["id"].(int))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.Auth == nil {
+					var zeroVal *ent.Brand
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalOBrand2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrand,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_BrandByID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Brand_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Brand_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_Brand_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_Brand_createdBy(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_Brand_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Brand_code(ctx, field)
+			case "name":
+				return ec.fieldContext_Brand_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Brand", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_BrandByID_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_Brands(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_Brands,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Brands(ctx, fc.Args["first"].(*int), fc.Args["after"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["orderBy"].(*ent.BrandOrder), fc.Args["where"].(*ent.BrandWhereInput))
+		},
+		func(ctx context.Context, next graphql.Resolver) graphql.Resolver {
+			directive0 := next
+
+			directive1 := func(ctx context.Context) (any, error) {
+				if ec.directives.Auth == nil {
+					var zeroVal *ent.BrandConnection
+					return zeroVal, errors.New("directive auth is not implemented")
+				}
+				return ec.directives.Auth(ctx, nil, directive0)
+			}
+
+			next = directive1
+			return next
+		},
+		ec.marshalNBrandConnection2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandConnection,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_Brands(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "edges":
+				return ec.fieldContext_BrandConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_BrandConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_BrandConnection_totalCount(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type BrandConnection", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_Brands_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -4493,8 +5448,6 @@ func (ec *executionContext) fieldContext_Query_PermissionByID(ctx context.Contex
 				return ec.fieldContext_Permission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Permission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Permission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Permission_tenantID(ctx, field)
 			case "name":
@@ -4635,8 +5588,6 @@ func (ec *executionContext) fieldContext_Query_RoleByID(ctx context.Context, fie
 				return ec.fieldContext_Role_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Role_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Role_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
 			case "name":
@@ -4779,8 +5730,6 @@ func (ec *executionContext) fieldContext_Query_RolePermissionByID(ctx context.Co
 				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_RolePermission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_RolePermission_tenantID(ctx, field)
 			case "canRead":
@@ -4921,8 +5870,6 @@ func (ec *executionContext) fieldContext_Query_UserByID(ctx context.Context, fie
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -5175,8 +6122,6 @@ func (ec *executionContext) fieldContext_RegisterResponse_user(_ context.Context
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -5378,35 +6323,6 @@ func (ec *executionContext) _Role_createdBy(ctx context.Context, field graphql.C
 }
 
 func (ec *executionContext) fieldContext_Role_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Role",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Role_ownedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Role) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Role_ownedBy,
-		func(ctx context.Context) (any, error) {
-			return obj.OwnedBy, nil
-		},
-		nil,
-		ec.marshalOInt2ᚖint,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Role_ownedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Role",
 		Field:      field,
@@ -5625,8 +6541,6 @@ func (ec *executionContext) fieldContext_Role_users(_ context.Context, field gra
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -5698,8 +6612,6 @@ func (ec *executionContext) fieldContext_Role_rolePermissions(_ context.Context,
 				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_RolePermission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_RolePermission_tenantID(ctx, field)
 			case "canRead":
@@ -5856,8 +6768,6 @@ func (ec *executionContext) fieldContext_RoleEdge_node(_ context.Context, field 
 				return ec.fieldContext_Role_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Role_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Role_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
 			case "name":
@@ -6014,35 +6924,6 @@ func (ec *executionContext) _RolePermission_createdBy(ctx context.Context, field
 }
 
 func (ec *executionContext) fieldContext_RolePermission_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "RolePermission",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _RolePermission_ownedBy(ctx context.Context, field graphql.CollectedField, obj *ent.RolePermission) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_RolePermission_ownedBy,
-		func(ctx context.Context) (any, error) {
-			return obj.OwnedBy, nil
-		},
-		nil,
-		ec.marshalOInt2ᚖint,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_RolePermission_ownedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "RolePermission",
 		Field:      field,
@@ -6232,8 +7113,6 @@ func (ec *executionContext) fieldContext_RolePermission_role(_ context.Context, 
 				return ec.fieldContext_Role_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Role_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Role_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
 			case "name":
@@ -6289,8 +7168,6 @@ func (ec *executionContext) fieldContext_RolePermission_permission(_ context.Con
 				return ec.fieldContext_Permission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Permission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Permission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Permission_tenantID(ctx, field)
 			case "name":
@@ -6447,8 +7324,6 @@ func (ec *executionContext) fieldContext_RolePermissionEdge_node(_ context.Conte
 				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_RolePermission_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_RolePermission_tenantID(ctx, field)
 			case "canRead":
@@ -6603,35 +7478,6 @@ func (ec *executionContext) _Tenant_createdBy(ctx context.Context, field graphql
 }
 
 func (ec *executionContext) fieldContext_Tenant_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Tenant",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Tenant_ownedBy(ctx context.Context, field graphql.CollectedField, obj *ent.Tenant) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Tenant_ownedBy,
-		func(ctx context.Context) (any, error) {
-			return obj.OwnedBy, nil
-		},
-		nil,
-		ec.marshalOInt2ᚖint,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_Tenant_ownedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Tenant",
 		Field:      field,
@@ -7040,8 +7886,6 @@ func (ec *executionContext) fieldContext_TenantEdge_node(_ context.Context, fiel
 				return ec.fieldContext_Tenant_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Tenant_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Tenant_ownedBy(ctx, field)
 			case "name":
 				return ec.fieldContext_Tenant_name(ctx, field)
 			case "slug":
@@ -7258,35 +8102,6 @@ func (ec *executionContext) _User_createdBy(ctx context.Context, field graphql.C
 }
 
 func (ec *executionContext) fieldContext_User_createdBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "User",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _User_ownedBy(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_User_ownedBy,
-		func(ctx context.Context) (any, error) {
-			return obj.OwnedBy, nil
-		},
-		nil,
-		ec.marshalOInt2ᚖint,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_User_ownedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -7766,8 +8581,6 @@ func (ec *executionContext) fieldContext_User_role(_ context.Context, field grap
 				return ec.fieldContext_Role_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_Role_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_Role_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
 			case "name":
@@ -7926,8 +8739,6 @@ func (ec *executionContext) fieldContext_UserEdge_node(_ context.Context, field 
 				return ec.fieldContext_User_updatedAt(ctx, field)
 			case "createdBy":
 				return ec.fieldContext_User_createdBy(ctx, field)
-			case "ownedBy":
-				return ec.fieldContext_User_ownedBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
 			case "email":
@@ -9442,6 +10253,539 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputBrandOrder(ctx context.Context, obj any) (ent.BrandOrder, error) {
+	var it ent.BrandOrder
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["direction"]; !present {
+		asMap["direction"] = "ASC"
+	}
+
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "direction":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("direction"))
+			data, err := ec.unmarshalNOrderDirection2entgoᚗioᚋcontribᚋentgqlᚐOrderDirection(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Direction = data
+		case "field":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
+			data, err := ec.unmarshalNBrandOrderField2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandOrderField(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Field = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputBrandWhereInput(ctx context.Context, obj any) (ent.BrandWhereInput, error) {
+	var it ent.BrandWhereInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "code", "codeNEQ", "codeIn", "codeNotIn", "codeGT", "codeGTE", "codeLT", "codeLTE", "codeContains", "codeHasPrefix", "codeHasSuffix", "codeEqualFold", "codeContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			data, err := ec.unmarshalOBrandWhereInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Not = data
+		case "and":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			data, err := ec.unmarshalOBrandWhereInput2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.And = data
+		case "or":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			data, err := ec.unmarshalOBrandWhereInput2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Or = data
+		case "id":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ID = data
+		case "idNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNEQ = data
+		case "idIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDIn = data
+		case "idNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDNotIn = data
+		case "idGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGT = data
+		case "idGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDGTE = data
+		case "idLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLT = data
+		case "idLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IDLTE = data
+		case "createdAt":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAt"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAt = data
+		case "createdAtNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNEQ"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNEQ = data
+		case "createdAtIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtIn = data
+		case "createdAtNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtNotIn"))
+			data, err := ec.unmarshalOTime2ᚕtimeᚐTimeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtNotIn = data
+		case "createdAtGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGT = data
+		case "createdAtGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtGTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtGTE = data
+		case "createdAtLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLT"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLT = data
+		case "createdAtLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdAtLTE"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedAtLTE = data
+		case "createdBy":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdBy"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedBy = data
+		case "createdByNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByNEQ"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByNEQ = data
+		case "createdByIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByIn = data
+		case "createdByNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByNotIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByNotIn = data
+		case "createdByGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByGT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByGT = data
+		case "createdByGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByGTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByGTE = data
+		case "createdByLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByLT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByLT = data
+		case "createdByLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByLTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByLTE = data
+		case "createdByIsNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByIsNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByIsNil = data
+		case "createdByNotNil":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createdByNotNil"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreatedByNotNil = data
+		case "tenantID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantID = data
+		case "tenantIDNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNEQ"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDNEQ = data
+		case "tenantIDIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDIn = data
+		case "tenantIDNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDNotIn"))
+			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDNotIn = data
+		case "tenantIDGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDGT = data
+		case "tenantIDGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDGTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDGTE = data
+		case "tenantIDLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLT"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDLT = data
+		case "tenantIDLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantIDLTE"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TenantIDLTE = data
+		case "code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Code = data
+		case "codeNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeNEQ = data
+		case "codeIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeIn = data
+		case "codeNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeNotIn = data
+		case "codeGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeGT = data
+		case "codeGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeGTE = data
+		case "codeLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeLT = data
+		case "codeLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeLTE = data
+		case "codeContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeContains = data
+		case "codeHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeHasPrefix = data
+		case "codeHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeHasSuffix = data
+		case "codeEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeEqualFold = data
+		case "codeContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeContainsFold = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "nameNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNEQ = data
+		case "nameIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameIn = data
+		case "nameNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameNotIn = data
+		case "nameGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGT = data
+		case "nameGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameGTE = data
+		case "nameLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLT = data
+		case "nameLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameLTE = data
+		case "nameContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContains = data
+		case "nameHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasPrefix = data
+		case "nameHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameHasSuffix = data
+		case "nameEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameEqualFold = data
+		case "nameContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.NameContainsFold = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateBrandInput(ctx context.Context, obj any) (ent.CreateBrandInput, error) {
+	var it ent.CreateBrandInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"code", "name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Code = data
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreatePermissionInput(ctx context.Context, obj any) (ent.CreatePermissionInput, error) {
 	var it ent.CreatePermissionInput
 	asMap := map[string]any{}
@@ -9929,7 +11273,7 @@ func (ec *executionContext) unmarshalInputPermissionWhereInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "displayName", "displayNameNEQ", "displayNameIn", "displayNameNotIn", "displayNameGT", "displayNameGTE", "displayNameLT", "displayNameLTE", "displayNameContains", "displayNameHasPrefix", "displayNameHasSuffix", "displayNameEqualFold", "displayNameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "resource", "resourceNEQ", "resourceIn", "resourceNotIn", "resourceGT", "resourceGTE", "resourceLT", "resourceLTE", "resourceContains", "resourceHasPrefix", "resourceHasSuffix", "resourceEqualFold", "resourceContainsFold", "isActive", "isActiveNEQ", "hasRolePermissions", "hasRolePermissionsWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "displayName", "displayNameNEQ", "displayNameIn", "displayNameNotIn", "displayNameGT", "displayNameGTE", "displayNameLT", "displayNameLTE", "displayNameContains", "displayNameHasPrefix", "displayNameHasSuffix", "displayNameEqualFold", "displayNameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "resource", "resourceNEQ", "resourceIn", "resourceNotIn", "resourceGT", "resourceGTE", "resourceLT", "resourceLTE", "resourceContains", "resourceHasPrefix", "resourceHasSuffix", "resourceEqualFold", "resourceContainsFold", "isActive", "isActiveNEQ", "hasRolePermissions", "hasRolePermissionsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10139,76 +11483,6 @@ func (ec *executionContext) unmarshalInputPermissionWhereInput(ctx context.Conte
 				return it, err
 			}
 			it.CreatedByNotNil = data
-		case "ownedBy":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedBy"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedBy = data
-		case "ownedByNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNEQ"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNEQ = data
-		case "ownedByIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIn = data
-		case "ownedByNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotIn = data
-		case "ownedByGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGT = data
-		case "ownedByGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGTE = data
-		case "ownedByLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLT = data
-		case "ownedByLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLTE = data
-		case "ownedByIsNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIsNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIsNil = data
-		case "ownedByNotNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotNil = data
 		case "tenantID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
@@ -10801,7 +12075,7 @@ func (ec *executionContext) unmarshalInputRolePermissionWhereInput(ctx context.C
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "canRead", "canReadNEQ", "canCreate", "canCreateNEQ", "canUpdate", "canUpdateNEQ", "canDelete", "canDeleteNEQ", "hasRole", "hasRoleWith", "hasPermission", "hasPermissionWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "canRead", "canReadNEQ", "canCreate", "canCreateNEQ", "canUpdate", "canUpdateNEQ", "canDelete", "canDeleteNEQ", "hasRole", "hasRoleWith", "hasPermission", "hasPermissionWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -11011,76 +12285,6 @@ func (ec *executionContext) unmarshalInputRolePermissionWhereInput(ctx context.C
 				return it, err
 			}
 			it.CreatedByNotNil = data
-		case "ownedBy":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedBy"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedBy = data
-		case "ownedByNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNEQ"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNEQ = data
-		case "ownedByIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIn = data
-		case "ownedByNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotIn = data
-		case "ownedByGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGT = data
-		case "ownedByGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGTE = data
-		case "ownedByLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLT = data
-		case "ownedByLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLTE = data
-		case "ownedByIsNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIsNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIsNil = data
-		case "ownedByNotNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotNil = data
 		case "tenantID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
@@ -11234,7 +12438,7 @@ func (ec *executionContext) unmarshalInputRoleWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "displayName", "displayNameNEQ", "displayNameIn", "displayNameNotIn", "displayNameGT", "displayNameGTE", "displayNameLT", "displayNameLTE", "displayNameContains", "displayNameHasPrefix", "displayNameHasSuffix", "displayNameEqualFold", "displayNameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "isActive", "isActiveNEQ", "priority", "priorityNEQ", "priorityIn", "priorityNotIn", "priorityGT", "priorityGTE", "priorityLT", "priorityLTE", "hasUsers", "hasUsersWith", "hasRolePermissions", "hasRolePermissionsWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "displayName", "displayNameNEQ", "displayNameIn", "displayNameNotIn", "displayNameGT", "displayNameGTE", "displayNameLT", "displayNameLTE", "displayNameContains", "displayNameHasPrefix", "displayNameHasSuffix", "displayNameEqualFold", "displayNameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "isActive", "isActiveNEQ", "priority", "priorityNEQ", "priorityIn", "priorityNotIn", "priorityGT", "priorityGTE", "priorityLT", "priorityLTE", "hasUsers", "hasUsersWith", "hasRolePermissions", "hasRolePermissionsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -11444,76 +12648,6 @@ func (ec *executionContext) unmarshalInputRoleWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.CreatedByNotNil = data
-		case "ownedBy":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedBy"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedBy = data
-		case "ownedByNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNEQ"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNEQ = data
-		case "ownedByIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIn = data
-		case "ownedByNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotIn = data
-		case "ownedByGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGT = data
-		case "ownedByGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGTE = data
-		case "ownedByLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLT = data
-		case "ownedByLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLTE = data
-		case "ownedByIsNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIsNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIsNil = data
-		case "ownedByNotNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotNil = data
 		case "tenantID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
@@ -12006,7 +13140,7 @@ func (ec *executionContext) unmarshalInputTenantWhereInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "slug", "slugNEQ", "slugIn", "slugNotIn", "slugGT", "slugGTE", "slugLT", "slugLTE", "slugContains", "slugHasPrefix", "slugHasSuffix", "slugEqualFold", "slugContainsFold", "domain", "domainNEQ", "domainIn", "domainNotIn", "domainGT", "domainGTE", "domainLT", "domainLTE", "domainContains", "domainHasPrefix", "domainHasSuffix", "domainIsNil", "domainNotNil", "domainEqualFold", "domainContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "expiresAt", "expiresAtNEQ", "expiresAtIn", "expiresAtNotIn", "expiresAtGT", "expiresAtGTE", "expiresAtLT", "expiresAtLTE", "expiresAtIsNil", "expiresAtNotNil", "isActive", "isActiveNEQ"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "slug", "slugNEQ", "slugIn", "slugNotIn", "slugGT", "slugGTE", "slugLT", "slugLTE", "slugContains", "slugHasPrefix", "slugHasSuffix", "slugEqualFold", "slugContainsFold", "domain", "domainNEQ", "domainIn", "domainNotIn", "domainGT", "domainGTE", "domainLT", "domainLTE", "domainContains", "domainHasPrefix", "domainHasSuffix", "domainIsNil", "domainNotNil", "domainEqualFold", "domainContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "status", "statusNEQ", "statusIn", "statusNotIn", "expiresAt", "expiresAtNEQ", "expiresAtIn", "expiresAtNotIn", "expiresAtGT", "expiresAtGTE", "expiresAtLT", "expiresAtLTE", "expiresAtIsNil", "expiresAtNotNil", "isActive", "isActiveNEQ"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12216,76 +13350,6 @@ func (ec *executionContext) unmarshalInputTenantWhereInput(ctx context.Context, 
 				return it, err
 			}
 			it.CreatedByNotNil = data
-		case "ownedBy":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedBy"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedBy = data
-		case "ownedByNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNEQ"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNEQ = data
-		case "ownedByIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIn = data
-		case "ownedByNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotIn = data
-		case "ownedByGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGT = data
-		case "ownedByGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGTE = data
-		case "ownedByLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLT = data
-		case "ownedByLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLTE = data
-		case "ownedByIsNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIsNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIsNil = data
-		case "ownedByNotNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotNil = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -12790,6 +13854,33 @@ func (ec *executionContext) unmarshalInputTenantWhereInput(ctx context.Context, 
 				return it, err
 			}
 			it.IsActiveNEQ = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateBrandInput(ctx context.Context, obj any) (ent.UpdateBrandInput, error) {
+	var it ent.UpdateBrandInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
 		}
 	}
 
@@ -13403,7 +14494,7 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "username", "usernameNEQ", "usernameIn", "usernameNotIn", "usernameGT", "usernameGTE", "usernameLT", "usernameLTE", "usernameContains", "usernameHasPrefix", "usernameHasSuffix", "usernameEqualFold", "usernameContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "phone", "phoneNEQ", "phoneIn", "phoneNotIn", "phoneGT", "phoneGTE", "phoneLT", "phoneLTE", "phoneContains", "phoneHasPrefix", "phoneHasSuffix", "phoneIsNil", "phoneNotNil", "phoneEqualFold", "phoneContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressIsNil", "addressNotNil", "addressEqualFold", "addressContainsFold", "userType", "userTypeNEQ", "userTypeIn", "userTypeNotIn", "userTypeGT", "userTypeGTE", "userTypeLT", "userTypeLTE", "userTypeContains", "userTypeHasPrefix", "userTypeHasSuffix", "userTypeEqualFold", "userTypeContainsFold", "userCode", "userCodeNEQ", "userCodeIn", "userCodeNotIn", "userCodeGT", "userCodeGTE", "userCodeLT", "userCodeLTE", "userCodeContains", "userCodeHasPrefix", "userCodeHasSuffix", "userCodeIsNil", "userCodeNotNil", "userCodeEqualFold", "userCodeContainsFold", "companyName", "companyNameNEQ", "companyNameIn", "companyNameNotIn", "companyNameGT", "companyNameGTE", "companyNameLT", "companyNameLTE", "companyNameContains", "companyNameHasPrefix", "companyNameHasSuffix", "companyNameIsNil", "companyNameNotNil", "companyNameEqualFold", "companyNameContainsFold", "customerType", "customerTypeNEQ", "customerTypeIn", "customerTypeNotIn", "customerTypeGT", "customerTypeGTE", "customerTypeLT", "customerTypeLTE", "customerTypeContains", "customerTypeHasPrefix", "customerTypeHasSuffix", "customerTypeIsNil", "customerTypeNotNil", "customerTypeEqualFold", "customerTypeContainsFold", "paymentTerms", "paymentTermsNEQ", "paymentTermsIn", "paymentTermsNotIn", "paymentTermsGT", "paymentTermsGTE", "paymentTermsLT", "paymentTermsLTE", "paymentTermsIsNil", "paymentTermsNotNil", "isActive", "isActiveNEQ", "emailVerified", "emailVerifiedNEQ", "emailVerifiedAt", "emailVerifiedAtNEQ", "emailVerifiedAtIn", "emailVerifiedAtNotIn", "emailVerifiedAtGT", "emailVerifiedAtGTE", "emailVerifiedAtLT", "emailVerifiedAtLTE", "emailVerifiedAtIsNil", "emailVerifiedAtNotNil", "lastLogin", "lastLoginNEQ", "lastLoginIn", "lastLoginNotIn", "lastLoginGT", "lastLoginGTE", "lastLoginLT", "lastLoginLTE", "lastLoginIsNil", "lastLoginNotNil", "hasRole", "hasRoleWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "username", "usernameNEQ", "usernameIn", "usernameNotIn", "usernameGT", "usernameGTE", "usernameLT", "usernameLTE", "usernameContains", "usernameHasPrefix", "usernameHasSuffix", "usernameEqualFold", "usernameContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "phone", "phoneNEQ", "phoneIn", "phoneNotIn", "phoneGT", "phoneGTE", "phoneLT", "phoneLTE", "phoneContains", "phoneHasPrefix", "phoneHasSuffix", "phoneIsNil", "phoneNotNil", "phoneEqualFold", "phoneContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressIsNil", "addressNotNil", "addressEqualFold", "addressContainsFold", "userType", "userTypeNEQ", "userTypeIn", "userTypeNotIn", "userTypeGT", "userTypeGTE", "userTypeLT", "userTypeLTE", "userTypeContains", "userTypeHasPrefix", "userTypeHasSuffix", "userTypeEqualFold", "userTypeContainsFold", "userCode", "userCodeNEQ", "userCodeIn", "userCodeNotIn", "userCodeGT", "userCodeGTE", "userCodeLT", "userCodeLTE", "userCodeContains", "userCodeHasPrefix", "userCodeHasSuffix", "userCodeIsNil", "userCodeNotNil", "userCodeEqualFold", "userCodeContainsFold", "companyName", "companyNameNEQ", "companyNameIn", "companyNameNotIn", "companyNameGT", "companyNameGTE", "companyNameLT", "companyNameLTE", "companyNameContains", "companyNameHasPrefix", "companyNameHasSuffix", "companyNameIsNil", "companyNameNotNil", "companyNameEqualFold", "companyNameContainsFold", "customerType", "customerTypeNEQ", "customerTypeIn", "customerTypeNotIn", "customerTypeGT", "customerTypeGTE", "customerTypeLT", "customerTypeLTE", "customerTypeContains", "customerTypeHasPrefix", "customerTypeHasSuffix", "customerTypeIsNil", "customerTypeNotNil", "customerTypeEqualFold", "customerTypeContainsFold", "paymentTerms", "paymentTermsNEQ", "paymentTermsIn", "paymentTermsNotIn", "paymentTermsGT", "paymentTermsGTE", "paymentTermsLT", "paymentTermsLTE", "paymentTermsIsNil", "paymentTermsNotNil", "isActive", "isActiveNEQ", "emailVerified", "emailVerifiedNEQ", "emailVerifiedAt", "emailVerifiedAtNEQ", "emailVerifiedAtIn", "emailVerifiedAtNotIn", "emailVerifiedAtGT", "emailVerifiedAtGTE", "emailVerifiedAtLT", "emailVerifiedAtLTE", "emailVerifiedAtIsNil", "emailVerifiedAtNotNil", "lastLogin", "lastLoginNEQ", "lastLoginIn", "lastLoginNotIn", "lastLoginGT", "lastLoginGTE", "lastLoginLT", "lastLoginLTE", "lastLoginIsNil", "lastLoginNotNil", "hasRole", "hasRoleWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13613,76 +14704,6 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.CreatedByNotNil = data
-		case "ownedBy":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedBy"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedBy = data
-		case "ownedByNEQ":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNEQ"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNEQ = data
-		case "ownedByIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIn = data
-		case "ownedByNotIn":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotIn"))
-			data, err := ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotIn = data
-		case "ownedByGT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGT = data
-		case "ownedByGTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByGTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByGTE = data
-		case "ownedByLT":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLT"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLT = data
-		case "ownedByLTE":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByLTE"))
-			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByLTE = data
-		case "ownedByIsNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByIsNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByIsNil = data
-		case "ownedByNotNil":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownedByNotNil"))
-			data, err := ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.OwnedByNotNil = data
 		case "tenantID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tenantID"))
 			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
@@ -14919,6 +15940,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Permission(ctx, sel, obj)
+	case *ent.Brand:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Brand(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -14927,6 +15953,159 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var brandImplementors = []string{"Brand", "Node"}
+
+func (ec *executionContext) _Brand(ctx context.Context, sel ast.SelectionSet, obj *ent.Brand) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, brandImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Brand")
+		case "id":
+			out.Values[i] = ec._Brand_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._Brand_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._Brand_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdBy":
+			out.Values[i] = ec._Brand_createdBy(ctx, field, obj)
+		case "tenantID":
+			out.Values[i] = ec._Brand_tenantID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "code":
+			out.Values[i] = ec._Brand_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._Brand_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var brandConnectionImplementors = []string{"BrandConnection"}
+
+func (ec *executionContext) _BrandConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.BrandConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, brandConnectionImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BrandConnection")
+		case "edges":
+			out.Values[i] = ec._BrandConnection_edges(ctx, field, obj)
+		case "pageInfo":
+			out.Values[i] = ec._BrandConnection_pageInfo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "totalCount":
+			out.Values[i] = ec._BrandConnection_totalCount(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var brandEdgeImplementors = []string{"BrandEdge"}
+
+func (ec *executionContext) _BrandEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.BrandEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, brandEdgeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("BrandEdge")
+		case "node":
+			out.Values[i] = ec._BrandEdge_node(ctx, field, obj)
+		case "cursor":
+			out.Values[i] = ec._BrandEdge_cursor(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
 
 var loginResponseImplementors = []string{"LoginResponse"}
 
@@ -15063,6 +16242,34 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "refreshToken":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_refreshToken(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createBrand":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createBrand(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createBulkBrand":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createBulkBrand(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updateBrand":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateBrand(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteBrand":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteBrand(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -15278,8 +16485,6 @@ func (ec *executionContext) _Permission(ctx context.Context, sel ast.SelectionSe
 			}
 		case "createdBy":
 			out.Values[i] = ec._Permission_createdBy(ctx, field, obj)
-		case "ownedBy":
-			out.Values[i] = ec._Permission_ownedBy(ctx, field, obj)
 		case "tenantID":
 			out.Values[i] = ec._Permission_tenantID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15520,6 +16725,47 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_me(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "BrandByID":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_BrandByID(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "Brands":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_Brands(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -15801,8 +17047,6 @@ func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "createdBy":
 			out.Values[i] = ec._Role_createdBy(ctx, field, obj)
-		case "ownedBy":
-			out.Values[i] = ec._Role_ownedBy(ctx, field, obj)
 		case "tenantID":
 			out.Values[i] = ec._Role_tenantID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16034,8 +17278,6 @@ func (ec *executionContext) _RolePermission(ctx context.Context, sel ast.Selecti
 			}
 		case "createdBy":
 			out.Values[i] = ec._RolePermission_createdBy(ctx, field, obj)
-		case "ownedBy":
-			out.Values[i] = ec._RolePermission_ownedBy(ctx, field, obj)
 		case "tenantID":
 			out.Values[i] = ec._RolePermission_tenantID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16271,8 +17513,6 @@ func (ec *executionContext) _Tenant(ctx context.Context, sel ast.SelectionSet, o
 			}
 		case "createdBy":
 			out.Values[i] = ec._Tenant_createdBy(ctx, field, obj)
-		case "ownedBy":
-			out.Values[i] = ec._Tenant_ownedBy(ctx, field, obj)
 		case "name":
 			out.Values[i] = ec._Tenant_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -16485,8 +17725,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "createdBy":
 			out.Values[i] = ec._User_createdBy(ctx, field, obj)
-		case "ownedBy":
-			out.Values[i] = ec._User_ownedBy(ctx, field, obj)
 		case "tenantID":
 			out.Values[i] = ec._User_tenantID(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -17032,6 +18270,124 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNBrand2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrand(ctx context.Context, sel ast.SelectionSet, v ent.Brand) graphql.Marshaler {
+	return ec._Brand(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNBrand2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Brand) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNBrand2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrand(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNBrand2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrand(ctx context.Context, sel ast.SelectionSet, v *ent.Brand) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Brand(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNBrandConnection2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandConnection(ctx context.Context, sel ast.SelectionSet, v ent.BrandConnection) graphql.Marshaler {
+	return ec._BrandConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNBrandConnection2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandConnection(ctx context.Context, sel ast.SelectionSet, v *ent.BrandConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._BrandConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNBrandOrderField2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandOrderField(ctx context.Context, v any) (*ent.BrandOrderField, error) {
+	var res = new(ent.BrandOrderField)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNBrandOrderField2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.BrandOrderField) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalNBrandWhereInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandWhereInput(ctx context.Context, v any) (*ent.BrandWhereInput, error) {
+	res, err := ec.unmarshalInputBrandWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateBrandInput2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐCreateBrandInput(ctx context.Context, v any) (ent.CreateBrandInput, error) {
+	res, err := ec.unmarshalInputCreateBrandInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNCreateBrandInput2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐCreateBrandInputᚄ(ctx context.Context, v any) ([]*ent.CreateBrandInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.CreateBrandInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCreateBrandInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐCreateBrandInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNCreateBrandInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐCreateBrandInput(ctx context.Context, v any) (*ent.CreateBrandInput, error) {
+	res, err := ec.unmarshalInputCreateBrandInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNCreatePermissionInput2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐCreatePermissionInput(ctx context.Context, v any) (ent.CreatePermissionInput, error) {
 	res, err := ec.unmarshalInputCreatePermissionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -17158,30 +18514,14 @@ func (ec *executionContext) marshalNID2int(ctx context.Context, sel ast.Selectio
 	return res
 }
 
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v any) (string, error) {
-	res, err := graphql.UnmarshalID(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	_ = sel
-	res := graphql.MarshalID(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNID2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+func (ec *executionContext) unmarshalNID2ᚕintᚄ(ctx context.Context, v any) ([]int, error) {
 	var vSlice []any
 	vSlice = graphql.CoerceList(v)
 	var err error
-	res := make([]string, len(vSlice))
+	res := make([]int, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNID2string(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNID2int(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -17189,10 +18529,10 @@ func (ec *executionContext) unmarshalNID2ᚕstringᚄ(ctx context.Context, v any
 	return res, nil
 }
 
-func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+func (ec *executionContext) marshalNID2ᚕintᚄ(ctx context.Context, sel ast.SelectionSet, v []int) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	for i := range v {
-		ret[i] = ec.marshalNID2string(ctx, sel, v[i])
+		ret[i] = ec.marshalNID2int(ctx, sel, v[i])
 	}
 
 	for _, e := range ret {
@@ -17680,6 +19020,11 @@ func (ec *executionContext) marshalNTokenResponse2ᚖgithubᚗcomᚋsaurabhᚋen
 	return ec._TokenResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNUpdateBrandInput2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUpdateBrandInput(ctx context.Context, v any) (ent.UpdateBrandInput, error) {
+	res, err := ec.unmarshalInputUpdateBrandInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNUpdatePermissionInput2githubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUpdatePermissionInput(ctx context.Context, v any) (ent.UpdatePermissionInput, error) {
 	res, err := ec.unmarshalInputUpdatePermissionInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -18074,6 +19419,95 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOBrand2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrand(ctx context.Context, sel ast.SelectionSet, v *ent.Brand) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Brand(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOBrandEdge2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.BrandEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOBrandEdge2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOBrandEdge2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandEdge(ctx context.Context, sel ast.SelectionSet, v *ent.BrandEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._BrandEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOBrandOrder2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandOrder(ctx context.Context, v any) (*ent.BrandOrder, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputBrandOrder(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOBrandWhereInput2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandWhereInputᚄ(ctx context.Context, v any) ([]*ent.BrandWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
+	var err error
+	res := make([]*ent.BrandWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNBrandWhereInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOBrandWhereInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐBrandWhereInput(ctx context.Context, v any) (*ent.BrandWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputBrandWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx context.Context, v any) (*entgql.Cursor[int], error) {
