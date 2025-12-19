@@ -4,6 +4,8 @@ package ent
 
 import (
 	"time"
+
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/tenant"
 )
 
 // CreatePermissionInput represents a mutation input for creating permissions.
@@ -274,6 +276,128 @@ func (c *RolePermissionUpdate) SetInput(i UpdateRolePermissionInput) *RolePermis
 
 // SetInput applies the change-set in the UpdateRolePermissionInput on the RolePermissionUpdateOne builder.
 func (c *RolePermissionUpdateOne) SetInput(i UpdateRolePermissionInput) *RolePermissionUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateTenantInput represents a mutation input for creating tenants.
+type CreateTenantInput struct {
+	Name        string
+	Slug        string
+	Domain      *string
+	Description *string
+	Status      *tenant.Status
+	Settings    map[string]interface{}
+	Metadata    map[string]interface{}
+	ExpiresAt   *time.Time
+	IsActive    *bool
+}
+
+// Mutate applies the CreateTenantInput on the TenantMutation builder.
+func (i *CreateTenantInput) Mutate(m *TenantMutation) {
+	m.SetName(i.Name)
+	m.SetSlug(i.Slug)
+	if v := i.Domain; v != nil {
+		m.SetDomain(*v)
+	}
+	if v := i.Description; v != nil {
+		m.SetDescription(*v)
+	}
+	if v := i.Status; v != nil {
+		m.SetStatus(*v)
+	}
+	if v := i.Settings; v != nil {
+		m.SetSettings(v)
+	}
+	if v := i.Metadata; v != nil {
+		m.SetMetadata(v)
+	}
+	if v := i.ExpiresAt; v != nil {
+		m.SetExpiresAt(*v)
+	}
+	if v := i.IsActive; v != nil {
+		m.SetIsActive(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateTenantInput on the TenantCreate builder.
+func (c *TenantCreate) SetInput(i CreateTenantInput) *TenantCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateTenantInput represents a mutation input for updating tenants.
+type UpdateTenantInput struct {
+	Name             *string
+	Slug             *string
+	ClearDomain      bool
+	Domain           *string
+	ClearDescription bool
+	Description      *string
+	Status           *tenant.Status
+	ClearSettings    bool
+	Settings         map[string]interface{}
+	ClearMetadata    bool
+	Metadata         map[string]interface{}
+	ClearExpiresAt   bool
+	ExpiresAt        *time.Time
+	IsActive         *bool
+}
+
+// Mutate applies the UpdateTenantInput on the TenantMutation builder.
+func (i *UpdateTenantInput) Mutate(m *TenantMutation) {
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.Slug; v != nil {
+		m.SetSlug(*v)
+	}
+	if i.ClearDomain {
+		m.ClearDomain()
+	}
+	if v := i.Domain; v != nil {
+		m.SetDomain(*v)
+	}
+	if i.ClearDescription {
+		m.ClearDescription()
+	}
+	if v := i.Description; v != nil {
+		m.SetDescription(*v)
+	}
+	if v := i.Status; v != nil {
+		m.SetStatus(*v)
+	}
+	if i.ClearSettings {
+		m.ClearSettings()
+	}
+	if v := i.Settings; v != nil {
+		m.SetSettings(v)
+	}
+	if i.ClearMetadata {
+		m.ClearMetadata()
+	}
+	if v := i.Metadata; v != nil {
+		m.SetMetadata(v)
+	}
+	if i.ClearExpiresAt {
+		m.ClearExpiresAt()
+	}
+	if v := i.ExpiresAt; v != nil {
+		m.SetExpiresAt(*v)
+	}
+	if v := i.IsActive; v != nil {
+		m.SetIsActive(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateTenantInput on the TenantUpdate builder.
+func (c *TenantUpdate) SetInput(i UpdateTenantInput) *TenantUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateTenantInput on the TenantUpdateOne builder.
+func (c *TenantUpdateOne) SetInput(i UpdateTenantInput) *TenantUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

@@ -23,12 +23,12 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Last update timestamp
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// Tenant ID for multi-tenancy isolation
-	TenantID *int `json:"tenant_id,omitempty"`
 	// User ID who created this record
 	CreatedBy *int `json:"created_by,omitempty"`
 	// User ID who owns this record
 	OwnedBy *int `json:"owned_by,omitempty"`
+	// Tenant ID for multi-tenancy isolation
+	TenantID int `json:"tenant_id,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Username holds the value of the "username" field.
@@ -95,7 +95,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case user.FieldIsActive, user.FieldEmailVerified:
 			values[i] = new(sql.NullBool)
-		case user.FieldID, user.FieldTenantID, user.FieldCreatedBy, user.FieldOwnedBy, user.FieldPaymentTerms:
+		case user.FieldID, user.FieldCreatedBy, user.FieldOwnedBy, user.FieldTenantID, user.FieldPaymentTerms:
 			values[i] = new(sql.NullInt64)
 		case user.FieldEmail, user.FieldUsername, user.FieldPasswordHash, user.FieldName, user.FieldPhone, user.FieldAddress, user.FieldUserType, user.FieldUserCode, user.FieldCompanyName, user.FieldCustomerType:
 			values[i] = new(sql.NullString)
@@ -136,13 +136,6 @@ func (_m *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
 			}
-		case user.FieldTenantID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
-			} else if value.Valid {
-				_m.TenantID = new(int)
-				*_m.TenantID = int(value.Int64)
-			}
 		case user.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
@@ -156,6 +149,12 @@ func (_m *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.OwnedBy = new(int)
 				*_m.OwnedBy = int(value.Int64)
+			}
+		case user.FieldTenantID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value.Valid {
+				_m.TenantID = int(value.Int64)
 			}
 		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -303,11 +302,6 @@ func (_m *User) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := _m.TenantID; v != nil {
-		builder.WriteString("tenant_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
 	if v := _m.CreatedBy; v != nil {
 		builder.WriteString("created_by=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
@@ -317,6 +311,9 @@ func (_m *User) String() string {
 		builder.WriteString("owned_by=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(_m.Email)

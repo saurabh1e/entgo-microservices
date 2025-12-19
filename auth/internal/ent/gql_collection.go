@@ -13,6 +13,7 @@ import (
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/permission"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/rolepermission"
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/tenant"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/user"
 )
 
@@ -136,11 +137,6 @@ func (_q *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx
 				selectedFields = append(selectedFields, permission.FieldUpdatedAt)
 				fieldSeen[permission.FieldUpdatedAt] = struct{}{}
 			}
-		case "tenantID":
-			if _, ok := fieldSeen[permission.FieldTenantID]; !ok {
-				selectedFields = append(selectedFields, permission.FieldTenantID)
-				fieldSeen[permission.FieldTenantID] = struct{}{}
-			}
 		case "createdBy":
 			if _, ok := fieldSeen[permission.FieldCreatedBy]; !ok {
 				selectedFields = append(selectedFields, permission.FieldCreatedBy)
@@ -150,6 +146,11 @@ func (_q *PermissionQuery) collectField(ctx context.Context, oneNode bool, opCtx
 			if _, ok := fieldSeen[permission.FieldOwnedBy]; !ok {
 				selectedFields = append(selectedFields, permission.FieldOwnedBy)
 				fieldSeen[permission.FieldOwnedBy] = struct{}{}
+			}
+		case "tenantID":
+			if _, ok := fieldSeen[permission.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, permission.FieldTenantID)
+				fieldSeen[permission.FieldTenantID] = struct{}{}
 			}
 		case "name":
 			if _, ok := fieldSeen[permission.FieldName]; !ok {
@@ -448,11 +449,6 @@ func (_q *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 				selectedFields = append(selectedFields, role.FieldUpdatedAt)
 				fieldSeen[role.FieldUpdatedAt] = struct{}{}
 			}
-		case "tenantID":
-			if _, ok := fieldSeen[role.FieldTenantID]; !ok {
-				selectedFields = append(selectedFields, role.FieldTenantID)
-				fieldSeen[role.FieldTenantID] = struct{}{}
-			}
 		case "createdBy":
 			if _, ok := fieldSeen[role.FieldCreatedBy]; !ok {
 				selectedFields = append(selectedFields, role.FieldCreatedBy)
@@ -462,6 +458,11 @@ func (_q *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 			if _, ok := fieldSeen[role.FieldOwnedBy]; !ok {
 				selectedFields = append(selectedFields, role.FieldOwnedBy)
 				fieldSeen[role.FieldOwnedBy] = struct{}{}
+			}
+		case "tenantID":
+			if _, ok := fieldSeen[role.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, role.FieldTenantID)
+				fieldSeen[role.FieldTenantID] = struct{}{}
 			}
 		case "name":
 			if _, ok := fieldSeen[role.FieldName]; !ok {
@@ -604,11 +605,6 @@ func (_q *RolePermissionQuery) collectField(ctx context.Context, oneNode bool, o
 				selectedFields = append(selectedFields, rolepermission.FieldUpdatedAt)
 				fieldSeen[rolepermission.FieldUpdatedAt] = struct{}{}
 			}
-		case "tenantID":
-			if _, ok := fieldSeen[rolepermission.FieldTenantID]; !ok {
-				selectedFields = append(selectedFields, rolepermission.FieldTenantID)
-				fieldSeen[rolepermission.FieldTenantID] = struct{}{}
-			}
 		case "createdBy":
 			if _, ok := fieldSeen[rolepermission.FieldCreatedBy]; !ok {
 				selectedFields = append(selectedFields, rolepermission.FieldCreatedBy)
@@ -618,6 +614,11 @@ func (_q *RolePermissionQuery) collectField(ctx context.Context, oneNode bool, o
 			if _, ok := fieldSeen[rolepermission.FieldOwnedBy]; !ok {
 				selectedFields = append(selectedFields, rolepermission.FieldOwnedBy)
 				fieldSeen[rolepermission.FieldOwnedBy] = struct{}{}
+			}
+		case "tenantID":
+			if _, ok := fieldSeen[rolepermission.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, rolepermission.FieldTenantID)
+				fieldSeen[rolepermission.FieldTenantID] = struct{}{}
 			}
 		case "canRead":
 			if _, ok := fieldSeen[rolepermission.FieldCanRead]; !ok {
@@ -703,6 +704,155 @@ func newRolePermissionPaginateArgs(rv map[string]any) *rolepermissionPaginateArg
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_q *TenantQuery) CollectFields(ctx context.Context, satisfies ...string) (*TenantQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return _q, nil
+	}
+	if err := _q.collectField(ctx, false, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return _q, nil
+}
+
+func (_q *TenantQuery) collectField(ctx context.Context, oneNode bool, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(tenant.Columns))
+		selectedFields = []string{tenant.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "createdAt":
+			if _, ok := fieldSeen[tenant.FieldCreatedAt]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldCreatedAt)
+				fieldSeen[tenant.FieldCreatedAt] = struct{}{}
+			}
+		case "updatedAt":
+			if _, ok := fieldSeen[tenant.FieldUpdatedAt]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldUpdatedAt)
+				fieldSeen[tenant.FieldUpdatedAt] = struct{}{}
+			}
+		case "createdBy":
+			if _, ok := fieldSeen[tenant.FieldCreatedBy]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldCreatedBy)
+				fieldSeen[tenant.FieldCreatedBy] = struct{}{}
+			}
+		case "ownedBy":
+			if _, ok := fieldSeen[tenant.FieldOwnedBy]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldOwnedBy)
+				fieldSeen[tenant.FieldOwnedBy] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[tenant.FieldName]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldName)
+				fieldSeen[tenant.FieldName] = struct{}{}
+			}
+		case "slug":
+			if _, ok := fieldSeen[tenant.FieldSlug]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldSlug)
+				fieldSeen[tenant.FieldSlug] = struct{}{}
+			}
+		case "domain":
+			if _, ok := fieldSeen[tenant.FieldDomain]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldDomain)
+				fieldSeen[tenant.FieldDomain] = struct{}{}
+			}
+		case "description":
+			if _, ok := fieldSeen[tenant.FieldDescription]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldDescription)
+				fieldSeen[tenant.FieldDescription] = struct{}{}
+			}
+		case "status":
+			if _, ok := fieldSeen[tenant.FieldStatus]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldStatus)
+				fieldSeen[tenant.FieldStatus] = struct{}{}
+			}
+		case "settings":
+			if _, ok := fieldSeen[tenant.FieldSettings]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldSettings)
+				fieldSeen[tenant.FieldSettings] = struct{}{}
+			}
+		case "metadata":
+			if _, ok := fieldSeen[tenant.FieldMetadata]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldMetadata)
+				fieldSeen[tenant.FieldMetadata] = struct{}{}
+			}
+		case "expiresAt":
+			if _, ok := fieldSeen[tenant.FieldExpiresAt]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldExpiresAt)
+				fieldSeen[tenant.FieldExpiresAt] = struct{}{}
+			}
+		case "isActive":
+			if _, ok := fieldSeen[tenant.FieldIsActive]; !ok {
+				selectedFields = append(selectedFields, tenant.FieldIsActive)
+				fieldSeen[tenant.FieldIsActive] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		_q.Select(selectedFields...)
+	}
+	return nil
+}
+
+type tenantPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []TenantPaginateOption
+}
+
+func newTenantPaginateArgs(rv map[string]any) *tenantPaginateArgs {
+	args := &tenantPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &TenantOrder{Field: &TenantOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithTenantOrder(order))
+			}
+		case *TenantOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithTenantOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*TenantWhereInput); ok {
+		args.opts = append(args.opts, WithTenantFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (_q *UserQuery) CollectFields(ctx context.Context, satisfies ...string) (*UserQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -744,11 +894,6 @@ func (_q *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 				selectedFields = append(selectedFields, user.FieldUpdatedAt)
 				fieldSeen[user.FieldUpdatedAt] = struct{}{}
 			}
-		case "tenantID":
-			if _, ok := fieldSeen[user.FieldTenantID]; !ok {
-				selectedFields = append(selectedFields, user.FieldTenantID)
-				fieldSeen[user.FieldTenantID] = struct{}{}
-			}
 		case "createdBy":
 			if _, ok := fieldSeen[user.FieldCreatedBy]; !ok {
 				selectedFields = append(selectedFields, user.FieldCreatedBy)
@@ -758,6 +903,11 @@ func (_q *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 			if _, ok := fieldSeen[user.FieldOwnedBy]; !ok {
 				selectedFields = append(selectedFields, user.FieldOwnedBy)
 				fieldSeen[user.FieldOwnedBy] = struct{}{}
+			}
+		case "tenantID":
+			if _, ok := fieldSeen[user.FieldTenantID]; !ok {
+				selectedFields = append(selectedFields, user.FieldTenantID)
+				fieldSeen[user.FieldTenantID] = struct{}{}
 			}
 		case "email":
 			if _, ok := fieldSeen[user.FieldEmail]; !ok {

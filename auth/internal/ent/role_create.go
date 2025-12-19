@@ -52,20 +52,6 @@ func (_c *RoleCreate) SetNillableUpdatedAt(v *time.Time) *RoleCreate {
 	return _c
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *RoleCreate) SetTenantID(v int) *RoleCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *RoleCreate) SetNillableTenantID(v *int) *RoleCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_c *RoleCreate) SetCreatedBy(v int) *RoleCreate {
 	_c.mutation.SetCreatedBy(v)
@@ -91,6 +77,12 @@ func (_c *RoleCreate) SetNillableOwnedBy(v *int) *RoleCreate {
 	if v != nil {
 		_c.SetOwnedBy(*v)
 	}
+	return _c
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_c *RoleCreate) SetTenantID(v int) *RoleCreate {
+	_c.mutation.SetTenantID(v)
 	return _c
 }
 
@@ -254,6 +246,14 @@ func (_c *RoleCreate) check() error {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Role.updated_at"`)}
 	}
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Role.tenant_id"`)}
+	}
+	if v, ok := _c.mutation.TenantID(); ok {
+		if err := role.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "Role.tenant_id": %w`, err)}
+		}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Role.name"`)}
 	}
@@ -327,10 +327,6 @@ func (_c *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(role.FieldTenantID, field.TypeInt, value)
-		_node.TenantID = &value
-	}
 	if value, ok := _c.mutation.CreatedBy(); ok {
 		_spec.SetField(role.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = &value
@@ -338,6 +334,10 @@ func (_c *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.OwnedBy(); ok {
 		_spec.SetField(role.FieldOwnedBy, field.TypeInt, value)
 		_node.OwnedBy = &value
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(role.FieldTenantID, field.TypeInt, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
@@ -455,30 +455,6 @@ func (u *RoleUpsert) UpdateUpdatedAt() *RoleUpsert {
 	return u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *RoleUpsert) SetTenantID(v int) *RoleUpsert {
-	u.Set(role.FieldTenantID, v)
-	return u
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *RoleUpsert) UpdateTenantID() *RoleUpsert {
-	u.SetExcluded(role.FieldTenantID)
-	return u
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *RoleUpsert) AddTenantID(v int) *RoleUpsert {
-	u.Add(role.FieldTenantID, v)
-	return u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *RoleUpsert) ClearTenantID() *RoleUpsert {
-	u.SetNull(role.FieldTenantID)
-	return u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *RoleUpsert) SetCreatedBy(v int) *RoleUpsert {
 	u.Set(role.FieldCreatedBy, v)
@@ -524,6 +500,24 @@ func (u *RoleUpsert) AddOwnedBy(v int) *RoleUpsert {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (u *RoleUpsert) ClearOwnedBy() *RoleUpsert {
 	u.SetNull(role.FieldOwnedBy)
+	return u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *RoleUpsert) SetTenantID(v int) *RoleUpsert {
+	u.Set(role.FieldTenantID, v)
+	return u
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *RoleUpsert) UpdateTenantID() *RoleUpsert {
+	u.SetExcluded(role.FieldTenantID)
+	return u
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *RoleUpsert) AddTenantID(v int) *RoleUpsert {
+	u.Add(role.FieldTenantID, v)
 	return u
 }
 
@@ -664,34 +658,6 @@ func (u *RoleUpsertOne) UpdateUpdatedAt() *RoleUpsertOne {
 	})
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *RoleUpsertOne) SetTenantID(v int) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetTenantID(v)
-	})
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *RoleUpsertOne) AddTenantID(v int) *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.AddTenantID(v)
-	})
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *RoleUpsertOne) UpdateTenantID() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateTenantID()
-	})
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *RoleUpsertOne) ClearTenantID() *RoleUpsertOne {
-	return u.Update(func(s *RoleUpsert) {
-		s.ClearTenantID()
-	})
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *RoleUpsertOne) SetCreatedBy(v int) *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
@@ -745,6 +711,27 @@ func (u *RoleUpsertOne) UpdateOwnedBy() *RoleUpsertOne {
 func (u *RoleUpsertOne) ClearOwnedBy() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.ClearOwnedBy()
+	})
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *RoleUpsertOne) SetTenantID(v int) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetTenantID(v)
+	})
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *RoleUpsertOne) AddTenantID(v int) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.AddTenantID(v)
+	})
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdateTenantID() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateTenantID()
 	})
 }
 
@@ -1063,34 +1050,6 @@ func (u *RoleUpsertBulk) UpdateUpdatedAt() *RoleUpsertBulk {
 	})
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *RoleUpsertBulk) SetTenantID(v int) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.SetTenantID(v)
-	})
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *RoleUpsertBulk) AddTenantID(v int) *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.AddTenantID(v)
-	})
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *RoleUpsertBulk) UpdateTenantID() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.UpdateTenantID()
-	})
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *RoleUpsertBulk) ClearTenantID() *RoleUpsertBulk {
-	return u.Update(func(s *RoleUpsert) {
-		s.ClearTenantID()
-	})
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *RoleUpsertBulk) SetCreatedBy(v int) *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
@@ -1144,6 +1103,27 @@ func (u *RoleUpsertBulk) UpdateOwnedBy() *RoleUpsertBulk {
 func (u *RoleUpsertBulk) ClearOwnedBy() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.ClearOwnedBy()
+	})
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *RoleUpsertBulk) SetTenantID(v int) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetTenantID(v)
+	})
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *RoleUpsertBulk) AddTenantID(v int) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.AddTenantID(v)
+	})
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdateTenantID() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateTenantID()
 	})
 }
 

@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/saurabh/entgo-microservices/pkg/ent/schema"
 )
 
 // Permission holds the schema definition for the Permission entity.
@@ -15,7 +16,8 @@ type Permission struct {
 
 func (Permission) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		BaseMixin{},
+		schema.BaseMixin{},
+		schema.TenantMixin{},
 	}
 }
 

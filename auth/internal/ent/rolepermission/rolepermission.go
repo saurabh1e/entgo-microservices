@@ -18,12 +18,12 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldCreatedBy holds the string denoting the created_by field in the database.
 	FieldCreatedBy = "created_by"
 	// FieldOwnedBy holds the string denoting the owned_by field in the database.
 	FieldOwnedBy = "owned_by"
+	// FieldTenantID holds the string denoting the tenant_id field in the database.
+	FieldTenantID = "tenant_id"
 	// FieldCanRead holds the string denoting the can_read field in the database.
 	FieldCanRead = "can_read"
 	// FieldCanCreate holds the string denoting the can_create field in the database.
@@ -59,9 +59,9 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
-	FieldTenantID,
 	FieldCreatedBy,
 	FieldOwnedBy,
+	FieldTenantID,
 	FieldCanRead,
 	FieldCanCreate,
 	FieldCanUpdate,
@@ -97,6 +97,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// TenantIDValidator is a validator for the "tenant_id" field. It is called by the builders before save.
+	TenantIDValidator func(int) error
 	// DefaultCanRead holds the default value on creation for the "can_read" field.
 	DefaultCanRead bool
 	// DefaultCanCreate holds the default value on creation for the "can_create" field.
@@ -127,11 +129,6 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
-}
-
 // ByCreatedBy orders the results by the created_by field.
 func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
@@ -140,6 +137,11 @@ func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
 // ByOwnedBy orders the results by the owned_by field.
 func ByOwnedBy(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOwnedBy, opts...).ToFunc()
+}
+
+// ByTenantID orders the results by the tenant_id field.
+func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByCanRead orders the results by the can_read field.

@@ -24,12 +24,12 @@ type RolePermission struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Last update timestamp
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// Tenant ID for multi-tenancy isolation
-	TenantID *int `json:"tenant_id,omitempty"`
 	// User ID who created this record
 	CreatedBy *int `json:"created_by,omitempty"`
 	// User ID who owns this record
 	OwnedBy *int `json:"owned_by,omitempty"`
+	// Tenant ID for multi-tenancy isolation
+	TenantID int `json:"tenant_id,omitempty"`
 	// Can read the resource
 	CanRead bool `json:"can_read,omitempty"`
 	// Can create the resource
@@ -88,7 +88,7 @@ func (*RolePermission) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case rolepermission.FieldCanRead, rolepermission.FieldCanCreate, rolepermission.FieldCanUpdate, rolepermission.FieldCanDelete:
 			values[i] = new(sql.NullBool)
-		case rolepermission.FieldID, rolepermission.FieldTenantID, rolepermission.FieldCreatedBy, rolepermission.FieldOwnedBy:
+		case rolepermission.FieldID, rolepermission.FieldCreatedBy, rolepermission.FieldOwnedBy, rolepermission.FieldTenantID:
 			values[i] = new(sql.NullInt64)
 		case rolepermission.FieldCreatedAt, rolepermission.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -129,13 +129,6 @@ func (_m *RolePermission) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.UpdatedAt = value.Time
 			}
-		case rolepermission.FieldTenantID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
-			} else if value.Valid {
-				_m.TenantID = new(int)
-				*_m.TenantID = int(value.Int64)
-			}
 		case rolepermission.FieldCreatedBy:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field created_by", values[i])
@@ -149,6 +142,12 @@ func (_m *RolePermission) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.OwnedBy = new(int)
 				*_m.OwnedBy = int(value.Int64)
+			}
+		case rolepermission.FieldTenantID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value.Valid {
+				_m.TenantID = int(value.Int64)
 			}
 		case rolepermission.FieldCanRead:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -240,11 +239,6 @@ func (_m *RolePermission) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := _m.TenantID; v != nil {
-		builder.WriteString("tenant_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
 	if v := _m.CreatedBy; v != nil {
 		builder.WriteString("created_by=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
@@ -254,6 +248,9 @@ func (_m *RolePermission) String() string {
 		builder.WriteString("owned_by=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("can_read=")
 	builder.WriteString(fmt.Sprintf("%v", _m.CanRead))

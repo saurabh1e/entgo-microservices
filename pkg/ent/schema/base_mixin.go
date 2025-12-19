@@ -36,11 +36,6 @@ func (BaseMixin) Fields() []ent.Field {
 			UpdateDefault(time.Now).
 			Comment("Last update timestamp").
 			Annotations(entgql.Skip(entgql.SkipMutationCreateInput | entgql.SkipMutationUpdateInput | entgql.SkipWhereInput)),
-		field.Int("tenant_id").
-			Optional().
-			Nillable().
-			Comment("Tenant ID for multi-tenancy isolation").
-			Annotations(entgql.Skip(entgql.SkipMutationCreateInput | entgql.SkipMutationUpdateInput)),
 		field.Int("created_by").
 			Optional().
 			Nillable().

@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	privacy "github.com/saurabh/entgo-microservices/auth/ent/schema_privacy"
+	"github.com/saurabh/entgo-microservices/pkg/ent/schema"
 )
 
 // Role holds the schema definition for the Role entity.
@@ -16,7 +17,8 @@ type Role struct {
 
 func (Role) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		BaseMixin{},
+		schema.BaseMixin{},
+		schema.TenantMixin{},
 	}
 }
 

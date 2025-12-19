@@ -36,33 +36,6 @@ func (_u *PermissionUpdate) SetUpdatedAt(v time.Time) *PermissionUpdate {
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *PermissionUpdate) SetTenantID(v int) *PermissionUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *PermissionUpdate) SetNillableTenantID(v *int) *PermissionUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *PermissionUpdate) AddTenantID(v int) *PermissionUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (_u *PermissionUpdate) ClearTenantID() *PermissionUpdate {
-	_u.mutation.ClearTenantID()
-	return _u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_u *PermissionUpdate) SetCreatedBy(v int) *PermissionUpdate {
 	_u.mutation.ResetCreatedBy()
@@ -114,6 +87,27 @@ func (_u *PermissionUpdate) AddOwnedBy(v int) *PermissionUpdate {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (_u *PermissionUpdate) ClearOwnedBy() *PermissionUpdate {
 	_u.mutation.ClearOwnedBy()
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *PermissionUpdate) SetTenantID(v int) *PermissionUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *PermissionUpdate) SetNillableTenantID(v *int) *PermissionUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *PermissionUpdate) AddTenantID(v int) *PermissionUpdate {
+	_u.mutation.AddTenantID(v)
 	return _u
 }
 
@@ -272,6 +266,11 @@ func (_u *PermissionUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *PermissionUpdate) check() error {
+	if v, ok := _u.mutation.TenantID(); ok {
+		if err := permission.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "Permission.tenant_id": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Name(); ok {
 		if err := permission.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Permission.name": %w`, err)}
@@ -316,15 +315,6 @@ func (_u *PermissionUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(permission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(permission.FieldTenantID, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(permission.FieldTenantID, field.TypeInt, value)
-	}
-	if _u.mutation.TenantIDCleared() {
-		_spec.ClearField(permission.FieldTenantID, field.TypeInt)
-	}
 	if value, ok := _u.mutation.CreatedBy(); ok {
 		_spec.SetField(permission.FieldCreatedBy, field.TypeInt, value)
 	}
@@ -342,6 +332,12 @@ func (_u *PermissionUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	}
 	if _u.mutation.OwnedByCleared() {
 		_spec.ClearField(permission.FieldOwnedBy, field.TypeInt)
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(permission.FieldTenantID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(permission.FieldTenantID, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(permission.FieldName, field.TypeString, value)
@@ -434,33 +430,6 @@ func (_u *PermissionUpdateOne) SetUpdatedAt(v time.Time) *PermissionUpdateOne {
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *PermissionUpdateOne) SetTenantID(v int) *PermissionUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *PermissionUpdateOne) SetNillableTenantID(v *int) *PermissionUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *PermissionUpdateOne) AddTenantID(v int) *PermissionUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (_u *PermissionUpdateOne) ClearTenantID() *PermissionUpdateOne {
-	_u.mutation.ClearTenantID()
-	return _u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_u *PermissionUpdateOne) SetCreatedBy(v int) *PermissionUpdateOne {
 	_u.mutation.ResetCreatedBy()
@@ -512,6 +481,27 @@ func (_u *PermissionUpdateOne) AddOwnedBy(v int) *PermissionUpdateOne {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (_u *PermissionUpdateOne) ClearOwnedBy() *PermissionUpdateOne {
 	_u.mutation.ClearOwnedBy()
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *PermissionUpdateOne) SetTenantID(v int) *PermissionUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *PermissionUpdateOne) SetNillableTenantID(v *int) *PermissionUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *PermissionUpdateOne) AddTenantID(v int) *PermissionUpdateOne {
+	_u.mutation.AddTenantID(v)
 	return _u
 }
 
@@ -683,6 +673,11 @@ func (_u *PermissionUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *PermissionUpdateOne) check() error {
+	if v, ok := _u.mutation.TenantID(); ok {
+		if err := permission.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "Permission.tenant_id": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Name(); ok {
 		if err := permission.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Permission.name": %w`, err)}
@@ -744,15 +739,6 @@ func (_u *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission, 
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(permission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(permission.FieldTenantID, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(permission.FieldTenantID, field.TypeInt, value)
-	}
-	if _u.mutation.TenantIDCleared() {
-		_spec.ClearField(permission.FieldTenantID, field.TypeInt)
-	}
 	if value, ok := _u.mutation.CreatedBy(); ok {
 		_spec.SetField(permission.FieldCreatedBy, field.TypeInt, value)
 	}
@@ -770,6 +756,12 @@ func (_u *PermissionUpdateOne) sqlSave(ctx context.Context) (_node *Permission, 
 	}
 	if _u.mutation.OwnedByCleared() {
 		_spec.ClearField(permission.FieldOwnedBy, field.TypeInt)
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(permission.FieldTenantID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(permission.FieldTenantID, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(permission.FieldName, field.TypeString, value)

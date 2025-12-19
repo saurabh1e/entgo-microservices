@@ -51,20 +51,6 @@ func (_c *PermissionCreate) SetNillableUpdatedAt(v *time.Time) *PermissionCreate
 	return _c
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *PermissionCreate) SetTenantID(v int) *PermissionCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *PermissionCreate) SetNillableTenantID(v *int) *PermissionCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_c *PermissionCreate) SetCreatedBy(v int) *PermissionCreate {
 	_c.mutation.SetCreatedBy(v)
@@ -90,6 +76,12 @@ func (_c *PermissionCreate) SetNillableOwnedBy(v *int) *PermissionCreate {
 	if v != nil {
 		_c.SetOwnedBy(*v)
 	}
+	return _c
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_c *PermissionCreate) SetTenantID(v int) *PermissionCreate {
+	_c.mutation.SetTenantID(v)
 	return _c
 }
 
@@ -217,6 +209,14 @@ func (_c *PermissionCreate) check() error {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Permission.updated_at"`)}
 	}
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "Permission.tenant_id"`)}
+	}
+	if v, ok := _c.mutation.TenantID(); ok {
+		if err := permission.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "Permission.tenant_id": %w`, err)}
+		}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Permission.name"`)}
 	}
@@ -295,10 +295,6 @@ func (_c *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 		_spec.SetField(permission.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(permission.FieldTenantID, field.TypeInt, value)
-		_node.TenantID = &value
-	}
 	if value, ok := _c.mutation.CreatedBy(); ok {
 		_spec.SetField(permission.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = &value
@@ -306,6 +302,10 @@ func (_c *PermissionCreate) createSpec() (*Permission, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.OwnedBy(); ok {
 		_spec.SetField(permission.FieldOwnedBy, field.TypeInt, value)
 		_node.OwnedBy = &value
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(permission.FieldTenantID, field.TypeInt, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(permission.FieldName, field.TypeString, value)
@@ -407,30 +407,6 @@ func (u *PermissionUpsert) UpdateUpdatedAt() *PermissionUpsert {
 	return u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *PermissionUpsert) SetTenantID(v int) *PermissionUpsert {
-	u.Set(permission.FieldTenantID, v)
-	return u
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *PermissionUpsert) UpdateTenantID() *PermissionUpsert {
-	u.SetExcluded(permission.FieldTenantID)
-	return u
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *PermissionUpsert) AddTenantID(v int) *PermissionUpsert {
-	u.Add(permission.FieldTenantID, v)
-	return u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *PermissionUpsert) ClearTenantID() *PermissionUpsert {
-	u.SetNull(permission.FieldTenantID)
-	return u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *PermissionUpsert) SetCreatedBy(v int) *PermissionUpsert {
 	u.Set(permission.FieldCreatedBy, v)
@@ -476,6 +452,24 @@ func (u *PermissionUpsert) AddOwnedBy(v int) *PermissionUpsert {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (u *PermissionUpsert) ClearOwnedBy() *PermissionUpsert {
 	u.SetNull(permission.FieldOwnedBy)
+	return u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *PermissionUpsert) SetTenantID(v int) *PermissionUpsert {
+	u.Set(permission.FieldTenantID, v)
+	return u
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *PermissionUpsert) UpdateTenantID() *PermissionUpsert {
+	u.SetExcluded(permission.FieldTenantID)
+	return u
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *PermissionUpsert) AddTenantID(v int) *PermissionUpsert {
+	u.Add(permission.FieldTenantID, v)
 	return u
 }
 
@@ -610,34 +604,6 @@ func (u *PermissionUpsertOne) UpdateUpdatedAt() *PermissionUpsertOne {
 	})
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *PermissionUpsertOne) SetTenantID(v int) *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.SetTenantID(v)
-	})
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *PermissionUpsertOne) AddTenantID(v int) *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.AddTenantID(v)
-	})
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *PermissionUpsertOne) UpdateTenantID() *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.UpdateTenantID()
-	})
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *PermissionUpsertOne) ClearTenantID() *PermissionUpsertOne {
-	return u.Update(func(s *PermissionUpsert) {
-		s.ClearTenantID()
-	})
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *PermissionUpsertOne) SetCreatedBy(v int) *PermissionUpsertOne {
 	return u.Update(func(s *PermissionUpsert) {
@@ -691,6 +657,27 @@ func (u *PermissionUpsertOne) UpdateOwnedBy() *PermissionUpsertOne {
 func (u *PermissionUpsertOne) ClearOwnedBy() *PermissionUpsertOne {
 	return u.Update(func(s *PermissionUpsert) {
 		s.ClearOwnedBy()
+	})
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *PermissionUpsertOne) SetTenantID(v int) *PermissionUpsertOne {
+	return u.Update(func(s *PermissionUpsert) {
+		s.SetTenantID(v)
+	})
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *PermissionUpsertOne) AddTenantID(v int) *PermissionUpsertOne {
+	return u.Update(func(s *PermissionUpsert) {
+		s.AddTenantID(v)
+	})
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *PermissionUpsertOne) UpdateTenantID() *PermissionUpsertOne {
+	return u.Update(func(s *PermissionUpsert) {
+		s.UpdateTenantID()
 	})
 }
 
@@ -1002,34 +989,6 @@ func (u *PermissionUpsertBulk) UpdateUpdatedAt() *PermissionUpsertBulk {
 	})
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *PermissionUpsertBulk) SetTenantID(v int) *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.SetTenantID(v)
-	})
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *PermissionUpsertBulk) AddTenantID(v int) *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.AddTenantID(v)
-	})
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *PermissionUpsertBulk) UpdateTenantID() *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.UpdateTenantID()
-	})
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *PermissionUpsertBulk) ClearTenantID() *PermissionUpsertBulk {
-	return u.Update(func(s *PermissionUpsert) {
-		s.ClearTenantID()
-	})
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *PermissionUpsertBulk) SetCreatedBy(v int) *PermissionUpsertBulk {
 	return u.Update(func(s *PermissionUpsert) {
@@ -1083,6 +1042,27 @@ func (u *PermissionUpsertBulk) UpdateOwnedBy() *PermissionUpsertBulk {
 func (u *PermissionUpsertBulk) ClearOwnedBy() *PermissionUpsertBulk {
 	return u.Update(func(s *PermissionUpsert) {
 		s.ClearOwnedBy()
+	})
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *PermissionUpsertBulk) SetTenantID(v int) *PermissionUpsertBulk {
+	return u.Update(func(s *PermissionUpsert) {
+		s.SetTenantID(v)
+	})
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *PermissionUpsertBulk) AddTenantID(v int) *PermissionUpsertBulk {
+	return u.Update(func(s *PermissionUpsert) {
+		s.AddTenantID(v)
+	})
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *PermissionUpsertBulk) UpdateTenantID() *PermissionUpsertBulk {
+	return u.Update(func(s *PermissionUpsert) {
+		s.UpdateTenantID()
 	})
 }
 

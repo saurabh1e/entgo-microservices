@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/schema/field"
 	hook "github.com/saurabh/entgo-microservices/auth/ent/schema_hooks"
 	privacy "github.com/saurabh/entgo-microservices/auth/ent/schema_privacy"
+	"github.com/saurabh/entgo-microservices/pkg/ent/schema"
 )
 
 type User struct {
@@ -15,7 +16,8 @@ type User struct {
 
 func (User) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		BaseMixin{},
+		schema.BaseMixin{},
+		schema.TenantMixin{},
 	}
 }
 

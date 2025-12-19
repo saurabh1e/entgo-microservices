@@ -15,6 +15,7 @@ import (
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/permission"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/rolepermission"
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/tenant"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/user"
 )
 
@@ -79,6 +80,7 @@ func checkColumn(t, c string) error {
 			permission.Table:     permission.ValidColumn,
 			role.Table:           role.ValidColumn,
 			rolepermission.Table: rolepermission.ValidColumn,
+			tenant.Table:         tenant.ValidColumn,
 			user.Table:           user.ValidColumn,
 		})
 	})

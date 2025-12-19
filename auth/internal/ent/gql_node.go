@@ -17,6 +17,7 @@ import (
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/permission"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/rolepermission"
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/tenant"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/user"
 	"golang.org/x/sync/semaphore"
 )
@@ -40,6 +41,11 @@ var rolepermissionImplementors = []string{"RolePermission", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*RolePermission) IsNode() {}
+
+var tenantImplementors = []string{"Tenant", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Tenant) IsNode() {}
 
 var userImplementors = []string{"User", "Node"}
 
@@ -127,6 +133,15 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			Where(rolepermission.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
 			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, rolepermissionImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case tenant.Table:
+		query := c.Tenant.Query().
+			Where(tenant.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, tenantImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -249,6 +264,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.RolePermission.Query().
 			Where(rolepermission.IDIn(ids...))
 		query, err := query.CollectFields(ctx, rolepermissionImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case tenant.Table:
+		query := c.Tenant.Query().
+			Where(tenant.IDIn(ids...))
+		query, err := query.CollectFields(ctx, tenantImplementors...)
 		if err != nil {
 			return nil, err
 		}

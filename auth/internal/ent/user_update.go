@@ -36,33 +36,6 @@ func (_u *UserUpdate) SetUpdatedAt(v time.Time) *UserUpdate {
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *UserUpdate) SetTenantID(v int) *UserUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *UserUpdate) SetNillableTenantID(v *int) *UserUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *UserUpdate) AddTenantID(v int) *UserUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (_u *UserUpdate) ClearTenantID() *UserUpdate {
-	_u.mutation.ClearTenantID()
-	return _u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_u *UserUpdate) SetCreatedBy(v int) *UserUpdate {
 	_u.mutation.ResetCreatedBy()
@@ -114,6 +87,27 @@ func (_u *UserUpdate) AddOwnedBy(v int) *UserUpdate {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (_u *UserUpdate) ClearOwnedBy() *UserUpdate {
 	_u.mutation.ClearOwnedBy()
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *UserUpdate) SetTenantID(v int) *UserUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *UserUpdate) SetNillableTenantID(v *int) *UserUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *UserUpdate) AddTenantID(v int) *UserUpdate {
+	_u.mutation.AddTenantID(v)
 	return _u
 }
 
@@ -448,6 +442,11 @@ func (_u *UserUpdate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *UserUpdate) check() error {
+	if v, ok := _u.mutation.TenantID(); ok {
+		if err := user.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "User.tenant_id": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
@@ -520,15 +519,6 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(user.FieldTenantID, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(user.FieldTenantID, field.TypeInt, value)
-	}
-	if _u.mutation.TenantIDCleared() {
-		_spec.ClearField(user.FieldTenantID, field.TypeInt)
-	}
 	if value, ok := _u.mutation.CreatedBy(); ok {
 		_spec.SetField(user.FieldCreatedBy, field.TypeInt, value)
 	}
@@ -546,6 +536,12 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.OwnedByCleared() {
 		_spec.ClearField(user.FieldOwnedBy, field.TypeInt)
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(user.FieldTenantID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(user.FieldTenantID, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
@@ -676,33 +672,6 @@ func (_u *UserUpdateOne) SetUpdatedAt(v time.Time) *UserUpdateOne {
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *UserUpdateOne) SetTenantID(v int) *UserUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *UserUpdateOne) SetNillableTenantID(v *int) *UserUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *UserUpdateOne) AddTenantID(v int) *UserUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (_u *UserUpdateOne) ClearTenantID() *UserUpdateOne {
-	_u.mutation.ClearTenantID()
-	return _u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_u *UserUpdateOne) SetCreatedBy(v int) *UserUpdateOne {
 	_u.mutation.ResetCreatedBy()
@@ -754,6 +723,27 @@ func (_u *UserUpdateOne) AddOwnedBy(v int) *UserUpdateOne {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (_u *UserUpdateOne) ClearOwnedBy() *UserUpdateOne {
 	_u.mutation.ClearOwnedBy()
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *UserUpdateOne) SetTenantID(v int) *UserUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableTenantID(v *int) *UserUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *UserUpdateOne) AddTenantID(v int) *UserUpdateOne {
+	_u.mutation.AddTenantID(v)
 	return _u
 }
 
@@ -1101,6 +1091,11 @@ func (_u *UserUpdateOne) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *UserUpdateOne) check() error {
+	if v, ok := _u.mutation.TenantID(); ok {
+		if err := user.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "User.tenant_id": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Email(); ok {
 		if err := user.EmailValidator(v); err != nil {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "User.email": %w`, err)}
@@ -1190,15 +1185,6 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(user.FieldTenantID, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(user.FieldTenantID, field.TypeInt, value)
-	}
-	if _u.mutation.TenantIDCleared() {
-		_spec.ClearField(user.FieldTenantID, field.TypeInt)
-	}
 	if value, ok := _u.mutation.CreatedBy(); ok {
 		_spec.SetField(user.FieldCreatedBy, field.TypeInt, value)
 	}
@@ -1216,6 +1202,12 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	}
 	if _u.mutation.OwnedByCleared() {
 		_spec.ClearField(user.FieldOwnedBy, field.TypeInt)
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(user.FieldTenantID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(user.FieldTenantID, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)

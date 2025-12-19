@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/saurabh/entgo-microservices/pkg/ent/schema"
 )
 
 // RolePermission holds the schema definition for the RolePermission junction entity.
@@ -13,7 +14,8 @@ type RolePermission struct {
 
 func (RolePermission) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		BaseMixin{},
+		schema.BaseMixin{},
+		schema.TenantMixin{},
 	}
 }
 

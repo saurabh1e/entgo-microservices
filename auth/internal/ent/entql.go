@@ -7,6 +7,7 @@ import (
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/predicate"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/role"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/rolepermission"
+	"github.com/saurabh/entgo-microservices/auth/internal/ent/tenant"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/user"
 
 	"entgo.io/ent/dialect/sql"
@@ -17,7 +18,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 4)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 5)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   permission.Table,
@@ -31,9 +32,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			permission.FieldCreatedAt:   {Type: field.TypeTime, Column: permission.FieldCreatedAt},
 			permission.FieldUpdatedAt:   {Type: field.TypeTime, Column: permission.FieldUpdatedAt},
-			permission.FieldTenantID:    {Type: field.TypeInt, Column: permission.FieldTenantID},
 			permission.FieldCreatedBy:   {Type: field.TypeInt, Column: permission.FieldCreatedBy},
 			permission.FieldOwnedBy:     {Type: field.TypeInt, Column: permission.FieldOwnedBy},
+			permission.FieldTenantID:    {Type: field.TypeInt, Column: permission.FieldTenantID},
 			permission.FieldName:        {Type: field.TypeString, Column: permission.FieldName},
 			permission.FieldDisplayName: {Type: field.TypeString, Column: permission.FieldDisplayName},
 			permission.FieldDescription: {Type: field.TypeString, Column: permission.FieldDescription},
@@ -54,9 +55,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			role.FieldCreatedAt:   {Type: field.TypeTime, Column: role.FieldCreatedAt},
 			role.FieldUpdatedAt:   {Type: field.TypeTime, Column: role.FieldUpdatedAt},
-			role.FieldTenantID:    {Type: field.TypeInt, Column: role.FieldTenantID},
 			role.FieldCreatedBy:   {Type: field.TypeInt, Column: role.FieldCreatedBy},
 			role.FieldOwnedBy:     {Type: field.TypeInt, Column: role.FieldOwnedBy},
+			role.FieldTenantID:    {Type: field.TypeInt, Column: role.FieldTenantID},
 			role.FieldName:        {Type: field.TypeString, Column: role.FieldName},
 			role.FieldDisplayName: {Type: field.TypeString, Column: role.FieldDisplayName},
 			role.FieldDescription: {Type: field.TypeString, Column: role.FieldDescription},
@@ -77,9 +78,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			rolepermission.FieldCreatedAt: {Type: field.TypeTime, Column: rolepermission.FieldCreatedAt},
 			rolepermission.FieldUpdatedAt: {Type: field.TypeTime, Column: rolepermission.FieldUpdatedAt},
-			rolepermission.FieldTenantID:  {Type: field.TypeInt, Column: rolepermission.FieldTenantID},
 			rolepermission.FieldCreatedBy: {Type: field.TypeInt, Column: rolepermission.FieldCreatedBy},
 			rolepermission.FieldOwnedBy:   {Type: field.TypeInt, Column: rolepermission.FieldOwnedBy},
+			rolepermission.FieldTenantID:  {Type: field.TypeInt, Column: rolepermission.FieldTenantID},
 			rolepermission.FieldCanRead:   {Type: field.TypeBool, Column: rolepermission.FieldCanRead},
 			rolepermission.FieldCanCreate: {Type: field.TypeBool, Column: rolepermission.FieldCanCreate},
 			rolepermission.FieldCanUpdate: {Type: field.TypeBool, Column: rolepermission.FieldCanUpdate},
@@ -87,6 +88,32 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   tenant.Table,
+			Columns: tenant.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: tenant.FieldID,
+			},
+		},
+		Type: "Tenant",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			tenant.FieldCreatedAt:   {Type: field.TypeTime, Column: tenant.FieldCreatedAt},
+			tenant.FieldUpdatedAt:   {Type: field.TypeTime, Column: tenant.FieldUpdatedAt},
+			tenant.FieldCreatedBy:   {Type: field.TypeInt, Column: tenant.FieldCreatedBy},
+			tenant.FieldOwnedBy:     {Type: field.TypeInt, Column: tenant.FieldOwnedBy},
+			tenant.FieldName:        {Type: field.TypeString, Column: tenant.FieldName},
+			tenant.FieldSlug:        {Type: field.TypeString, Column: tenant.FieldSlug},
+			tenant.FieldDomain:      {Type: field.TypeString, Column: tenant.FieldDomain},
+			tenant.FieldDescription: {Type: field.TypeString, Column: tenant.FieldDescription},
+			tenant.FieldStatus:      {Type: field.TypeEnum, Column: tenant.FieldStatus},
+			tenant.FieldSettings:    {Type: field.TypeJSON, Column: tenant.FieldSettings},
+			tenant.FieldMetadata:    {Type: field.TypeJSON, Column: tenant.FieldMetadata},
+			tenant.FieldExpiresAt:   {Type: field.TypeTime, Column: tenant.FieldExpiresAt},
+			tenant.FieldIsActive:    {Type: field.TypeBool, Column: tenant.FieldIsActive},
+		},
+	}
+	graph.Nodes[4] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   user.Table,
 			Columns: user.Columns,
@@ -99,9 +126,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			user.FieldCreatedAt:       {Type: field.TypeTime, Column: user.FieldCreatedAt},
 			user.FieldUpdatedAt:       {Type: field.TypeTime, Column: user.FieldUpdatedAt},
-			user.FieldTenantID:        {Type: field.TypeInt, Column: user.FieldTenantID},
 			user.FieldCreatedBy:       {Type: field.TypeInt, Column: user.FieldCreatedBy},
 			user.FieldOwnedBy:         {Type: field.TypeInt, Column: user.FieldOwnedBy},
+			user.FieldTenantID:        {Type: field.TypeInt, Column: user.FieldTenantID},
 			user.FieldEmail:           {Type: field.TypeString, Column: user.FieldEmail},
 			user.FieldUsername:        {Type: field.TypeString, Column: user.FieldUsername},
 			user.FieldPasswordHash:    {Type: field.TypeString, Column: user.FieldPasswordHash},
@@ -250,11 +277,6 @@ func (f *PermissionFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(permission.FieldUpdatedAt))
 }
 
-// WhereTenantID applies the entql int predicate on the tenant_id field.
-func (f *PermissionFilter) WhereTenantID(p entql.IntP) {
-	f.Where(p.Field(permission.FieldTenantID))
-}
-
 // WhereCreatedBy applies the entql int predicate on the created_by field.
 func (f *PermissionFilter) WhereCreatedBy(p entql.IntP) {
 	f.Where(p.Field(permission.FieldCreatedBy))
@@ -263,6 +285,11 @@ func (f *PermissionFilter) WhereCreatedBy(p entql.IntP) {
 // WhereOwnedBy applies the entql int predicate on the owned_by field.
 func (f *PermissionFilter) WhereOwnedBy(p entql.IntP) {
 	f.Where(p.Field(permission.FieldOwnedBy))
+}
+
+// WhereTenantID applies the entql int predicate on the tenant_id field.
+func (f *PermissionFilter) WhereTenantID(p entql.IntP) {
+	f.Where(p.Field(permission.FieldTenantID))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -354,11 +381,6 @@ func (f *RoleFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(role.FieldUpdatedAt))
 }
 
-// WhereTenantID applies the entql int predicate on the tenant_id field.
-func (f *RoleFilter) WhereTenantID(p entql.IntP) {
-	f.Where(p.Field(role.FieldTenantID))
-}
-
 // WhereCreatedBy applies the entql int predicate on the created_by field.
 func (f *RoleFilter) WhereCreatedBy(p entql.IntP) {
 	f.Where(p.Field(role.FieldCreatedBy))
@@ -367,6 +389,11 @@ func (f *RoleFilter) WhereCreatedBy(p entql.IntP) {
 // WhereOwnedBy applies the entql int predicate on the owned_by field.
 func (f *RoleFilter) WhereOwnedBy(p entql.IntP) {
 	f.Where(p.Field(role.FieldOwnedBy))
+}
+
+// WhereTenantID applies the entql int predicate on the tenant_id field.
+func (f *RoleFilter) WhereTenantID(p entql.IntP) {
+	f.Where(p.Field(role.FieldTenantID))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -472,11 +499,6 @@ func (f *RolePermissionFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(rolepermission.FieldUpdatedAt))
 }
 
-// WhereTenantID applies the entql int predicate on the tenant_id field.
-func (f *RolePermissionFilter) WhereTenantID(p entql.IntP) {
-	f.Where(p.Field(rolepermission.FieldTenantID))
-}
-
 // WhereCreatedBy applies the entql int predicate on the created_by field.
 func (f *RolePermissionFilter) WhereCreatedBy(p entql.IntP) {
 	f.Where(p.Field(rolepermission.FieldCreatedBy))
@@ -485,6 +507,11 @@ func (f *RolePermissionFilter) WhereCreatedBy(p entql.IntP) {
 // WhereOwnedBy applies the entql int predicate on the owned_by field.
 func (f *RolePermissionFilter) WhereOwnedBy(p entql.IntP) {
 	f.Where(p.Field(rolepermission.FieldOwnedBy))
+}
+
+// WhereTenantID applies the entql int predicate on the tenant_id field.
+func (f *RolePermissionFilter) WhereTenantID(p entql.IntP) {
+	f.Where(p.Field(rolepermission.FieldTenantID))
 }
 
 // WhereCanRead applies the entql bool predicate on the can_read field.
@@ -536,6 +563,111 @@ func (f *RolePermissionFilter) WhereHasPermissionWith(preds ...predicate.Permiss
 }
 
 // addPredicate implements the predicateAdder interface.
+func (_q *TenantQuery) addPredicate(pred func(s *sql.Selector)) {
+	_q.predicates = append(_q.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the TenantQuery builder.
+func (_q *TenantQuery) Filter() *TenantFilter {
+	return &TenantFilter{config: _q.config, predicateAdder: _q}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *TenantMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the TenantMutation builder.
+func (m *TenantMutation) Filter() *TenantFilter {
+	return &TenantFilter{config: m.config, predicateAdder: m}
+}
+
+// TenantFilter provides a generic filtering capability at runtime for TenantQuery.
+type TenantFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *TenantFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *TenantFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(tenant.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *TenantFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(tenant.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *TenantFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(tenant.FieldUpdatedAt))
+}
+
+// WhereCreatedBy applies the entql int predicate on the created_by field.
+func (f *TenantFilter) WhereCreatedBy(p entql.IntP) {
+	f.Where(p.Field(tenant.FieldCreatedBy))
+}
+
+// WhereOwnedBy applies the entql int predicate on the owned_by field.
+func (f *TenantFilter) WhereOwnedBy(p entql.IntP) {
+	f.Where(p.Field(tenant.FieldOwnedBy))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *TenantFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(tenant.FieldName))
+}
+
+// WhereSlug applies the entql string predicate on the slug field.
+func (f *TenantFilter) WhereSlug(p entql.StringP) {
+	f.Where(p.Field(tenant.FieldSlug))
+}
+
+// WhereDomain applies the entql string predicate on the domain field.
+func (f *TenantFilter) WhereDomain(p entql.StringP) {
+	f.Where(p.Field(tenant.FieldDomain))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *TenantFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(tenant.FieldDescription))
+}
+
+// WhereStatus applies the entql string predicate on the status field.
+func (f *TenantFilter) WhereStatus(p entql.StringP) {
+	f.Where(p.Field(tenant.FieldStatus))
+}
+
+// WhereSettings applies the entql json.RawMessage predicate on the settings field.
+func (f *TenantFilter) WhereSettings(p entql.BytesP) {
+	f.Where(p.Field(tenant.FieldSettings))
+}
+
+// WhereMetadata applies the entql json.RawMessage predicate on the metadata field.
+func (f *TenantFilter) WhereMetadata(p entql.BytesP) {
+	f.Where(p.Field(tenant.FieldMetadata))
+}
+
+// WhereExpiresAt applies the entql time.Time predicate on the expires_at field.
+func (f *TenantFilter) WhereExpiresAt(p entql.TimeP) {
+	f.Where(p.Field(tenant.FieldExpiresAt))
+}
+
+// WhereIsActive applies the entql bool predicate on the is_active field.
+func (f *TenantFilter) WhereIsActive(p entql.BoolP) {
+	f.Where(p.Field(tenant.FieldIsActive))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (_q *UserQuery) addPredicate(pred func(s *sql.Selector)) {
 	_q.predicates = append(_q.predicates, pred)
 }
@@ -564,7 +696,7 @@ type UserFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *UserFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -585,11 +717,6 @@ func (f *UserFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(user.FieldUpdatedAt))
 }
 
-// WhereTenantID applies the entql int predicate on the tenant_id field.
-func (f *UserFilter) WhereTenantID(p entql.IntP) {
-	f.Where(p.Field(user.FieldTenantID))
-}
-
 // WhereCreatedBy applies the entql int predicate on the created_by field.
 func (f *UserFilter) WhereCreatedBy(p entql.IntP) {
 	f.Where(p.Field(user.FieldCreatedBy))
@@ -598,6 +725,11 @@ func (f *UserFilter) WhereCreatedBy(p entql.IntP) {
 // WhereOwnedBy applies the entql int predicate on the owned_by field.
 func (f *UserFilter) WhereOwnedBy(p entql.IntP) {
 	f.Where(p.Field(user.FieldOwnedBy))
+}
+
+// WhereTenantID applies the entql int predicate on the tenant_id field.
+func (f *UserFilter) WhereTenantID(p entql.IntP) {
+	f.Where(p.Field(user.FieldTenantID))
 }
 
 // WhereEmail applies the entql string predicate on the email field.

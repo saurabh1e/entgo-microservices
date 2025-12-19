@@ -13,9 +13,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "tenant_id", Type: field.TypeInt, Nullable: true},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
 		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Unique: true, Size: 100},
 		{Name: "display_name", Type: field.TypeString, Size: 150},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500},
@@ -50,9 +50,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "tenant_id", Type: field.TypeInt, Nullable: true},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
 		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "name", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "display_name", Type: field.TypeString, Size: 100},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500},
@@ -92,9 +92,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "tenant_id", Type: field.TypeInt, Nullable: true},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
 		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "can_read", Type: field.TypeBool, Default: false},
 		{Name: "can_create", Type: field.TypeBool, Default: false},
 		{Name: "can_update", Type: field.TypeBool, Default: false},
@@ -122,14 +122,64 @@ var (
 			},
 		},
 	}
+	// TenantsColumns holds the columns for the "tenants" table.
+	TenantsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "created_by", Type: field.TypeInt, Nullable: true},
+		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
+		{Name: "name", Type: field.TypeString, Size: 100},
+		{Name: "slug", Type: field.TypeString, Unique: true, Size: 50},
+		{Name: "domain", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"active", "inactive", "suspended", "pending"}, Default: "pending"},
+		{Name: "settings", Type: field.TypeJSON, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "expires_at", Type: field.TypeTime, Nullable: true},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
+	}
+	// TenantsTable holds the schema information for the "tenants" table.
+	TenantsTable = &schema.Table{
+		Name:       "tenants",
+		Columns:    TenantsColumns,
+		PrimaryKey: []*schema.Column{TenantsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "tenant_slug",
+				Unique:  true,
+				Columns: []*schema.Column{TenantsColumns[6]},
+			},
+			{
+				Name:    "tenant_domain",
+				Unique:  true,
+				Columns: []*schema.Column{TenantsColumns[7]},
+			},
+			{
+				Name:    "tenant_status",
+				Unique:  false,
+				Columns: []*schema.Column{TenantsColumns[9]},
+			},
+			{
+				Name:    "tenant_is_active",
+				Unique:  false,
+				Columns: []*schema.Column{TenantsColumns[13]},
+			},
+			{
+				Name:    "tenant_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{TenantsColumns[1]},
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "tenant_id", Type: field.TypeInt, Nullable: true},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
 		{Name: "owned_by", Type: field.TypeInt, Nullable: true},
+		{Name: "tenant_id", Type: field.TypeInt},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "username", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "password_hash", Type: field.TypeString},
@@ -166,6 +216,7 @@ var (
 		PermissionsTable,
 		RolesTable,
 		RolePermissionsTable,
+		TenantsTable,
 		UsersTable,
 	}
 )

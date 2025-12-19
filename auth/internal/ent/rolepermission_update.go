@@ -37,33 +37,6 @@ func (_u *RolePermissionUpdate) SetUpdatedAt(v time.Time) *RolePermissionUpdate 
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *RolePermissionUpdate) SetTenantID(v int) *RolePermissionUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *RolePermissionUpdate) SetNillableTenantID(v *int) *RolePermissionUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *RolePermissionUpdate) AddTenantID(v int) *RolePermissionUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (_u *RolePermissionUpdate) ClearTenantID() *RolePermissionUpdate {
-	_u.mutation.ClearTenantID()
-	return _u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_u *RolePermissionUpdate) SetCreatedBy(v int) *RolePermissionUpdate {
 	_u.mutation.ResetCreatedBy()
@@ -115,6 +88,27 @@ func (_u *RolePermissionUpdate) AddOwnedBy(v int) *RolePermissionUpdate {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (_u *RolePermissionUpdate) ClearOwnedBy() *RolePermissionUpdate {
 	_u.mutation.ClearOwnedBy()
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *RolePermissionUpdate) SetTenantID(v int) *RolePermissionUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *RolePermissionUpdate) SetNillableTenantID(v *int) *RolePermissionUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *RolePermissionUpdate) AddTenantID(v int) *RolePermissionUpdate {
+	_u.mutation.AddTenantID(v)
 	return _u
 }
 
@@ -251,6 +245,11 @@ func (_u *RolePermissionUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *RolePermissionUpdate) check() error {
+	if v, ok := _u.mutation.TenantID(); ok {
+		if err := rolepermission.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "RolePermission.tenant_id": %w`, err)}
+		}
+	}
 	if _u.mutation.RoleCleared() && len(_u.mutation.RoleIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RolePermission.role"`)
 	}
@@ -281,15 +280,6 @@ func (_u *RolePermissionUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(rolepermission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(rolepermission.FieldTenantID, field.TypeInt, value)
-	}
-	if _u.mutation.TenantIDCleared() {
-		_spec.ClearField(rolepermission.FieldTenantID, field.TypeInt)
-	}
 	if value, ok := _u.mutation.CreatedBy(); ok {
 		_spec.SetField(rolepermission.FieldCreatedBy, field.TypeInt, value)
 	}
@@ -307,6 +297,12 @@ func (_u *RolePermissionUpdate) sqlSave(ctx context.Context) (_node int, err err
 	}
 	if _u.mutation.OwnedByCleared() {
 		_spec.ClearField(rolepermission.FieldOwnedBy, field.TypeInt)
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(rolepermission.FieldTenantID, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.CanRead(); ok {
 		_spec.SetField(rolepermission.FieldCanRead, field.TypeBool, value)
@@ -406,33 +402,6 @@ func (_u *RolePermissionUpdateOne) SetUpdatedAt(v time.Time) *RolePermissionUpda
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *RolePermissionUpdateOne) SetTenantID(v int) *RolePermissionUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *RolePermissionUpdateOne) SetNillableTenantID(v *int) *RolePermissionUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *RolePermissionUpdateOne) AddTenantID(v int) *RolePermissionUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (_u *RolePermissionUpdateOne) ClearTenantID() *RolePermissionUpdateOne {
-	_u.mutation.ClearTenantID()
-	return _u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_u *RolePermissionUpdateOne) SetCreatedBy(v int) *RolePermissionUpdateOne {
 	_u.mutation.ResetCreatedBy()
@@ -484,6 +453,27 @@ func (_u *RolePermissionUpdateOne) AddOwnedBy(v int) *RolePermissionUpdateOne {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (_u *RolePermissionUpdateOne) ClearOwnedBy() *RolePermissionUpdateOne {
 	_u.mutation.ClearOwnedBy()
+	return _u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *RolePermissionUpdateOne) SetTenantID(v int) *RolePermissionUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *RolePermissionUpdateOne) SetNillableTenantID(v *int) *RolePermissionUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *RolePermissionUpdateOne) AddTenantID(v int) *RolePermissionUpdateOne {
+	_u.mutation.AddTenantID(v)
 	return _u
 }
 
@@ -633,6 +623,11 @@ func (_u *RolePermissionUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_u *RolePermissionUpdateOne) check() error {
+	if v, ok := _u.mutation.TenantID(); ok {
+		if err := rolepermission.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "RolePermission.tenant_id": %w`, err)}
+		}
+	}
 	if _u.mutation.RoleCleared() && len(_u.mutation.RoleIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "RolePermission.role"`)
 	}
@@ -680,15 +675,6 @@ func (_u *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePerm
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(rolepermission.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(rolepermission.FieldTenantID, field.TypeInt, value)
-	}
-	if _u.mutation.TenantIDCleared() {
-		_spec.ClearField(rolepermission.FieldTenantID, field.TypeInt)
-	}
 	if value, ok := _u.mutation.CreatedBy(); ok {
 		_spec.SetField(rolepermission.FieldCreatedBy, field.TypeInt, value)
 	}
@@ -706,6 +692,12 @@ func (_u *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePerm
 	}
 	if _u.mutation.OwnedByCleared() {
 		_spec.ClearField(rolepermission.FieldOwnedBy, field.TypeInt)
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(rolepermission.FieldTenantID, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(rolepermission.FieldTenantID, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.CanRead(); ok {
 		_spec.SetField(rolepermission.FieldCanRead, field.TypeBool, value)

@@ -51,20 +51,6 @@ func (_c *UserCreate) SetNillableUpdatedAt(v *time.Time) *UserCreate {
 	return _c
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *UserCreate) SetTenantID(v int) *UserCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *UserCreate) SetNillableTenantID(v *int) *UserCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (_c *UserCreate) SetCreatedBy(v int) *UserCreate {
 	_c.mutation.SetCreatedBy(v)
@@ -90,6 +76,12 @@ func (_c *UserCreate) SetNillableOwnedBy(v *int) *UserCreate {
 	if v != nil {
 		_c.SetOwnedBy(*v)
 	}
+	return _c
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_c *UserCreate) SetTenantID(v int) *UserCreate {
+	_c.mutation.SetTenantID(v)
 	return _c
 }
 
@@ -362,6 +354,14 @@ func (_c *UserCreate) check() error {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "User.updated_at"`)}
 	}
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "User.tenant_id"`)}
+	}
+	if v, ok := _c.mutation.TenantID(); ok {
+		if err := user.TenantIDValidator(v); err != nil {
+			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "User.tenant_id": %w`, err)}
+		}
+	}
 	if _, ok := _c.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
 	}
@@ -477,10 +477,6 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(user.FieldTenantID, field.TypeInt, value)
-		_node.TenantID = &value
-	}
 	if value, ok := _c.mutation.CreatedBy(); ok {
 		_spec.SetField(user.FieldCreatedBy, field.TypeInt, value)
 		_node.CreatedBy = &value
@@ -488,6 +484,10 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.OwnedBy(); ok {
 		_spec.SetField(user.FieldOwnedBy, field.TypeInt, value)
 		_node.OwnedBy = &value
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(user.FieldTenantID, field.TypeInt, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
@@ -630,30 +630,6 @@ func (u *UserUpsert) UpdateUpdatedAt() *UserUpsert {
 	return u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *UserUpsert) SetTenantID(v int) *UserUpsert {
-	u.Set(user.FieldTenantID, v)
-	return u
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *UserUpsert) UpdateTenantID() *UserUpsert {
-	u.SetExcluded(user.FieldTenantID)
-	return u
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *UserUpsert) AddTenantID(v int) *UserUpsert {
-	u.Add(user.FieldTenantID, v)
-	return u
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *UserUpsert) ClearTenantID() *UserUpsert {
-	u.SetNull(user.FieldTenantID)
-	return u
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *UserUpsert) SetCreatedBy(v int) *UserUpsert {
 	u.Set(user.FieldCreatedBy, v)
@@ -699,6 +675,24 @@ func (u *UserUpsert) AddOwnedBy(v int) *UserUpsert {
 // ClearOwnedBy clears the value of the "owned_by" field.
 func (u *UserUpsert) ClearOwnedBy() *UserUpsert {
 	u.SetNull(user.FieldOwnedBy)
+	return u
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *UserUpsert) SetTenantID(v int) *UserUpsert {
+	u.Set(user.FieldTenantID, v)
+	return u
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *UserUpsert) UpdateTenantID() *UserUpsert {
+	u.SetExcluded(user.FieldTenantID)
+	return u
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *UserUpsert) AddTenantID(v int) *UserUpsert {
+	u.Add(user.FieldTenantID, v)
 	return u
 }
 
@@ -1001,34 +995,6 @@ func (u *UserUpsertOne) UpdateUpdatedAt() *UserUpsertOne {
 	})
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *UserUpsertOne) SetTenantID(v int) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.SetTenantID(v)
-	})
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *UserUpsertOne) AddTenantID(v int) *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.AddTenantID(v)
-	})
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *UserUpsertOne) UpdateTenantID() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateTenantID()
-	})
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *UserUpsertOne) ClearTenantID() *UserUpsertOne {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearTenantID()
-	})
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *UserUpsertOne) SetCreatedBy(v int) *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
@@ -1082,6 +1048,27 @@ func (u *UserUpsertOne) UpdateOwnedBy() *UserUpsertOne {
 func (u *UserUpsertOne) ClearOwnedBy() *UserUpsertOne {
 	return u.Update(func(s *UserUpsert) {
 		s.ClearOwnedBy()
+	})
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *UserUpsertOne) SetTenantID(v int) *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.SetTenantID(v)
+	})
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *UserUpsertOne) AddTenantID(v int) *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.AddTenantID(v)
+	})
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *UserUpsertOne) UpdateTenantID() *UserUpsertOne {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateTenantID()
 	})
 }
 
@@ -1589,34 +1576,6 @@ func (u *UserUpsertBulk) UpdateUpdatedAt() *UserUpsertBulk {
 	})
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (u *UserUpsertBulk) SetTenantID(v int) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.SetTenantID(v)
-	})
-}
-
-// AddTenantID adds v to the "tenant_id" field.
-func (u *UserUpsertBulk) AddTenantID(v int) *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.AddTenantID(v)
-	})
-}
-
-// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
-func (u *UserUpsertBulk) UpdateTenantID() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.UpdateTenantID()
-	})
-}
-
-// ClearTenantID clears the value of the "tenant_id" field.
-func (u *UserUpsertBulk) ClearTenantID() *UserUpsertBulk {
-	return u.Update(func(s *UserUpsert) {
-		s.ClearTenantID()
-	})
-}
-
 // SetCreatedBy sets the "created_by" field.
 func (u *UserUpsertBulk) SetCreatedBy(v int) *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
@@ -1670,6 +1629,27 @@ func (u *UserUpsertBulk) UpdateOwnedBy() *UserUpsertBulk {
 func (u *UserUpsertBulk) ClearOwnedBy() *UserUpsertBulk {
 	return u.Update(func(s *UserUpsert) {
 		s.ClearOwnedBy()
+	})
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (u *UserUpsertBulk) SetTenantID(v int) *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.SetTenantID(v)
+	})
+}
+
+// AddTenantID adds v to the "tenant_id" field.
+func (u *UserUpsertBulk) AddTenantID(v int) *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.AddTenantID(v)
+	})
+}
+
+// UpdateTenantID sets the "tenant_id" field to the value that was provided on create.
+func (u *UserUpsertBulk) UpdateTenantID() *UserUpsertBulk {
+	return u.Update(func(s *UserUpsert) {
+		s.UpdateTenantID()
 	})
 }
 
