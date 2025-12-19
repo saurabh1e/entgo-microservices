@@ -99,8 +99,8 @@ var (
 		{Name: "can_create", Type: field.TypeBool, Default: false},
 		{Name: "can_update", Type: field.TypeBool, Default: false},
 		{Name: "can_delete", Type: field.TypeBool, Default: false},
-		{Name: "permission_role_permissions", Type: field.TypeInt},
-		{Name: "role_role_permissions", Type: field.TypeInt},
+		{Name: "role_permission_role", Type: field.TypeInt},
+		{Name: "role_permission_permission", Type: field.TypeInt},
 	}
 	// RolePermissionsTable holds the schema information for the "role_permissions" table.
 	RolePermissionsTable = &schema.Table{
@@ -109,15 +109,15 @@ var (
 		PrimaryKey: []*schema.Column{RolePermissionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "role_permissions_permissions_role_permissions",
+				Symbol:     "role_permissions_roles_role",
 				Columns:    []*schema.Column{RolePermissionsColumns[10]},
-				RefColumns: []*schema.Column{PermissionsColumns[0]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "role_permissions_roles_role_permissions",
+				Symbol:     "role_permissions_permissions_permission",
 				Columns:    []*schema.Column{RolePermissionsColumns[11]},
-				RefColumns: []*schema.Column{RolesColumns[0]},
+				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -195,7 +195,7 @@ var (
 		{Name: "email_verified", Type: field.TypeBool, Default: false},
 		{Name: "email_verified_at", Type: field.TypeTime, Nullable: true},
 		{Name: "last_login", Type: field.TypeTime, Nullable: true},
-		{Name: "role_users", Type: field.TypeInt},
+		{Name: "user_role", Type: field.TypeInt, Nullable: true},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
@@ -204,10 +204,10 @@ var (
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "users_roles_users",
+				Symbol:     "users_roles_role",
 				Columns:    []*schema.Column{UsersColumns[21]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -222,7 +222,7 @@ var (
 )
 
 func init() {
-	RolePermissionsTable.ForeignKeys[0].RefTable = PermissionsTable
-	RolePermissionsTable.ForeignKeys[1].RefTable = RolesTable
+	RolePermissionsTable.ForeignKeys[0].RefTable = RolesTable
+	RolePermissionsTable.ForeignKeys[1].RefTable = PermissionsTable
 	UsersTable.ForeignKeys[0].RefTable = RolesTable
 }

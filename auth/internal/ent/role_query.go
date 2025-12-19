@@ -83,7 +83,7 @@ func (_q *RoleQuery) QueryUsers() *UserQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, selector),
 			sqlgraph.To(user.Table, user.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, role.UsersTable, role.UsersColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, role.UsersTable, role.UsersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -105,7 +105,7 @@ func (_q *RoleQuery) QueryRolePermissions() *RolePermissionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(role.Table, role.FieldID, selector),
 			sqlgraph.To(rolepermission.Table, rolepermission.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, role.RolePermissionsTable, role.RolePermissionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, role.RolePermissionsTable, role.RolePermissionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -452,7 +452,7 @@ func (_q *RoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Role, e
 			func(n *Role, e *User) {
 				n.Edges.Users = append(n.Edges.Users, e)
 				if !e.Edges.loadedTypes[0] {
-					e.Edges.RoleRef = n
+					e.Edges.Role = n
 				}
 			}); err != nil {
 			return nil, err
@@ -476,7 +476,7 @@ func (_q *RoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Role, e
 			func(n *Role, e *User) {
 				n.appendNamedUsers(name, e)
 				if !e.Edges.loadedTypes[0] {
-					e.Edges.RoleRef = n
+					e.Edges.Role = n
 				}
 			}); err != nil {
 			return nil, err
@@ -521,13 +521,13 @@ func (_q *RoleQuery) loadUsers(ctx context.Context, query *UserQuery, nodes []*R
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.role_users
+		fk := n.user_role
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "role_users" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "user_role" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "role_users" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "user_role" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -552,13 +552,13 @@ func (_q *RoleQuery) loadRolePermissions(ctx context.Context, query *RolePermiss
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.role_role_permissions
+		fk := n.role_permission_role
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "role_role_permissions" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "role_permission_role" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "role_role_permissions" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "role_permission_role" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

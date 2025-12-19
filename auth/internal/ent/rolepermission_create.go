@@ -177,7 +177,9 @@ func (_c *RolePermissionCreate) Mutation() *RolePermissionMutation {
 
 // Save creates the RolePermission in the database.
 func (_c *RolePermissionCreate) Save(ctx context.Context) (*RolePermission, error) {
-	_c.defaults()
+	if err := _c.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -204,12 +206,18 @@ func (_c *RolePermissionCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_c *RolePermissionCreate) defaults() {
+func (_c *RolePermissionCreate) defaults() error {
 	if _, ok := _c.mutation.CreatedAt(); !ok {
+		if rolepermission.DefaultCreatedAt == nil {
+			return fmt.Errorf("ent: uninitialized rolepermission.DefaultCreatedAt (forgotten import ent/runtime?)")
+		}
 		v := rolepermission.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
 	}
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		if rolepermission.DefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized rolepermission.DefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := rolepermission.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
 	}
@@ -229,6 +237,7 @@ func (_c *RolePermissionCreate) defaults() {
 		v := rolepermission.DefaultCanDelete
 		_c.mutation.SetCanDelete(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -342,7 +351,7 @@ func (_c *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.CreateS
 	if nodes := _c.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.RoleTable,
 			Columns: []string{rolepermission.RoleColumn},
 			Bidi:    false,
@@ -353,13 +362,13 @@ func (_c *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.CreateS
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.role_role_permissions = &nodes[0]
+		_node.role_permission_role = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.PermissionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.PermissionTable,
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
@@ -370,7 +379,7 @@ func (_c *RolePermissionCreate) createSpec() (*RolePermission, *sqlgraph.CreateS
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.permission_role_permissions = &nodes[0]
+		_node.role_permission_permission = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

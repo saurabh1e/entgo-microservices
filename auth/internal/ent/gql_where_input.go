@@ -2250,9 +2250,9 @@ type UserWhereInput struct {
 	LastLoginIsNil  bool        `json:"lastLoginIsNil,omitempty"`
 	LastLoginNotNil bool        `json:"lastLoginNotNil,omitempty"`
 
-	// "role_ref" edge predicates.
-	HasRoleRef     *bool             `json:"hasRoleRef,omitempty"`
-	HasRoleRefWith []*RoleWhereInput `json:"hasRoleRefWith,omitempty"`
+	// "role" edge predicates.
+	HasRole     *bool             `json:"hasRole,omitempty"`
+	HasRoleWith []*RoleWhereInput `json:"hasRoleWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -2981,23 +2981,23 @@ func (i *UserWhereInput) P() (predicate.User, error) {
 		predicates = append(predicates, user.LastLoginNotNil())
 	}
 
-	if i.HasRoleRef != nil {
-		p := user.HasRoleRef()
-		if !*i.HasRoleRef {
+	if i.HasRole != nil {
+		p := user.HasRole()
+		if !*i.HasRole {
 			p = user.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasRoleRefWith) > 0 {
-		with := make([]predicate.Role, 0, len(i.HasRoleRefWith))
-		for _, w := range i.HasRoleRefWith {
+	if len(i.HasRoleWith) > 0 {
+		with := make([]predicate.Role, 0, len(i.HasRoleWith))
+		for _, w := range i.HasRoleWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasRoleRefWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasRoleWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, user.HasRoleRefWith(with...))
+		predicates = append(predicates, user.HasRoleWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

@@ -365,7 +365,7 @@ func HasRole() predicate.RolePermission {
 	return predicate.RolePermission(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, RoleTable, RoleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, RoleTable, RoleColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -388,7 +388,7 @@ func HasPermission() predicate.RolePermission {
 	return predicate.RolePermission(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, PermissionTable, PermissionColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, PermissionTable, PermissionColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

@@ -55,17 +55,17 @@ const (
 	FieldEmailVerifiedAt = "email_verified_at"
 	// FieldLastLogin holds the string denoting the last_login field in the database.
 	FieldLastLogin = "last_login"
-	// EdgeRoleRef holds the string denoting the role_ref edge name in mutations.
-	EdgeRoleRef = "role_ref"
+	// EdgeRole holds the string denoting the role edge name in mutations.
+	EdgeRole = "role"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// RoleRefTable is the table that holds the role_ref relation/edge.
-	RoleRefTable = "users"
-	// RoleRefInverseTable is the table name for the Role entity.
+	// RoleTable is the table that holds the role relation/edge.
+	RoleTable = "users"
+	// RoleInverseTable is the table name for the Role entity.
 	// It exists in this package in order to avoid circular dependency with the "role" package.
-	RoleRefInverseTable = "roles"
-	// RoleRefColumn is the table column denoting the role_ref relation/edge.
-	RoleRefColumn = "role_users"
+	RoleInverseTable = "roles"
+	// RoleColumn is the table column denoting the role relation/edge.
+	RoleColumn = "user_role"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -96,7 +96,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "users"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"role_users",
+	"user_role",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -266,16 +266,16 @@ func ByLastLogin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastLogin, opts...).ToFunc()
 }
 
-// ByRoleRefField orders the results by role_ref field.
-func ByRoleRefField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByRoleField orders the results by role field.
+func ByRoleField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRoleRefStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newRoleStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newRoleRefStep() *sqlgraph.Step {
+func newRoleStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RoleRefInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, RoleRefTable, RoleRefColumn),
+		sqlgraph.To(RoleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, RoleTable, RoleColumn),
 	)
 }

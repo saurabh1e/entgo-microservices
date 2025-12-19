@@ -62,14 +62,14 @@ type User struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
-	role_users   *int
+	user_role    *int
 	selectValues sql.SelectValues
 }
 
 // UserEdges holds the relations/edges for other nodes in the graph.
 type UserEdges struct {
-	// User role relationship
-	RoleRef *Role `json:"role_ref,omitempty"`
+	// Role holds the value of the role edge.
+	Role *Role `json:"role,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -77,15 +77,15 @@ type UserEdges struct {
 	totalCount [1]map[string]int
 }
 
-// RoleRefOrErr returns the RoleRef value or an error if the edge
+// RoleOrErr returns the Role value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e UserEdges) RoleRefOrErr() (*Role, error) {
-	if e.RoleRef != nil {
-		return e.RoleRef, nil
+func (e UserEdges) RoleOrErr() (*Role, error) {
+	if e.Role != nil {
+		return e.Role, nil
 	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: role.Label}
 	}
-	return nil, &NotLoadedError{edge: "role_ref"}
+	return nil, &NotLoadedError{edge: "role"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -101,7 +101,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldEmailVerifiedAt, user.FieldLastLogin:
 			values[i] = new(sql.NullTime)
-		case user.ForeignKeys[0]: // role_users
+		case user.ForeignKeys[0]: // user_role
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -250,10 +250,10 @@ func (_m *User) assignValues(columns []string, values []any) error {
 			}
 		case user.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field role_users", value)
+				return fmt.Errorf("unexpected type %T for edge-field user_role", value)
 			} else if value.Valid {
-				_m.role_users = new(int)
-				*_m.role_users = int(value.Int64)
+				_m.user_role = new(int)
+				*_m.user_role = int(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -268,9 +268,9 @@ func (_m *User) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
 }
 
-// QueryRoleRef queries the "role_ref" edge of the User entity.
-func (_m *User) QueryRoleRef() *RoleQuery {
-	return NewUserClient(_m.config).QueryRoleRef(_m)
+// QueryRole queries the "role" edge of the User entity.
+func (_m *User) QueryRole() *RoleQuery {
+	return NewUserClient(_m.config).QueryRole(_m)
 }
 
 // Update returns a builder for updating this User.

@@ -269,15 +269,23 @@ func (_c *UserCreate) SetID(v int) *UserCreate {
 	return _c
 }
 
-// SetRoleRefID sets the "role_ref" edge to the Role entity by ID.
-func (_c *UserCreate) SetRoleRefID(id int) *UserCreate {
-	_c.mutation.SetRoleRefID(id)
+// SetRoleID sets the "role" edge to the Role entity by ID.
+func (_c *UserCreate) SetRoleID(id int) *UserCreate {
+	_c.mutation.SetRoleID(id)
 	return _c
 }
 
-// SetRoleRef sets the "role_ref" edge to the Role entity.
-func (_c *UserCreate) SetRoleRef(v *Role) *UserCreate {
-	return _c.SetRoleRefID(v.ID)
+// SetNillableRoleID sets the "role" edge to the Role entity by ID if the given value is not nil.
+func (_c *UserCreate) SetNillableRoleID(id *int) *UserCreate {
+	if id != nil {
+		_c = _c.SetRoleID(*id)
+	}
+	return _c
+}
+
+// SetRole sets the "role" edge to the Role entity.
+func (_c *UserCreate) SetRole(v *Role) *UserCreate {
+	return _c.SetRoleID(v.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -433,9 +441,6 @@ func (_c *UserCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "User.id": %w`, err)}
 		}
 	}
-	if len(_c.mutation.RoleRefIDs()) == 0 {
-		return &ValidationError{Name: "role_ref", err: errors.New(`ent: missing required edge "User.role_ref"`)}
-	}
 	return nil
 }
 
@@ -549,12 +554,12 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldLastLogin, field.TypeTime, value)
 		_node.LastLogin = &value
 	}
-	if nodes := _c.mutation.RoleRefIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.RoleRefTable,
-			Columns: []string{user.RoleRefColumn},
+			Inverse: false,
+			Table:   user.RoleTable,
+			Columns: []string{user.RoleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt),
@@ -563,7 +568,7 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.role_users = &nodes[0]
+		_node.user_role = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

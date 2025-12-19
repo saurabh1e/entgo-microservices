@@ -21,14 +21,14 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx         *QueryContext
-	order       []user.OrderOption
-	inters      []Interceptor
-	predicates  []predicate.User
-	withRoleRef *RoleQuery
-	withFKs     bool
-	loadTotal   []func(context.Context, []*User) error
-	modifiers   []func(*sql.Selector)
+	ctx        *QueryContext
+	order      []user.OrderOption
+	inters     []Interceptor
+	predicates []predicate.User
+	withRole   *RoleQuery
+	withFKs    bool
+	loadTotal  []func(context.Context, []*User) error
+	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -65,8 +65,8 @@ func (_q *UserQuery) Order(o ...user.OrderOption) *UserQuery {
 	return _q
 }
 
-// QueryRoleRef chains the current query on the "role_ref" edge.
-func (_q *UserQuery) QueryRoleRef() *RoleQuery {
+// QueryRole chains the current query on the "role" edge.
+func (_q *UserQuery) QueryRole() *RoleQuery {
 	query := (&RoleClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := _q.prepareQuery(ctx); err != nil {
@@ -79,7 +79,7 @@ func (_q *UserQuery) QueryRoleRef() *RoleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(role.Table, role.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, user.RoleRefTable, user.RoleRefColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, user.RoleTable, user.RoleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -274,12 +274,12 @@ func (_q *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:      _q.config,
-		ctx:         _q.ctx.Clone(),
-		order:       append([]user.OrderOption{}, _q.order...),
-		inters:      append([]Interceptor{}, _q.inters...),
-		predicates:  append([]predicate.User{}, _q.predicates...),
-		withRoleRef: _q.withRoleRef.Clone(),
+		config:     _q.config,
+		ctx:        _q.ctx.Clone(),
+		order:      append([]user.OrderOption{}, _q.order...),
+		inters:     append([]Interceptor{}, _q.inters...),
+		predicates: append([]predicate.User{}, _q.predicates...),
+		withRole:   _q.withRole.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -287,14 +287,14 @@ func (_q *UserQuery) Clone() *UserQuery {
 	}
 }
 
-// WithRoleRef tells the query-builder to eager-load the nodes that are connected to
-// the "role_ref" edge. The optional arguments are used to configure the query builder of the edge.
-func (_q *UserQuery) WithRoleRef(opts ...func(*RoleQuery)) *UserQuery {
+// WithRole tells the query-builder to eager-load the nodes that are connected to
+// the "role" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *UserQuery) WithRole(opts ...func(*RoleQuery)) *UserQuery {
 	query := (&RoleClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	_q.withRoleRef = query
+	_q.withRole = query
 	return _q
 }
 
@@ -384,10 +384,10 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		withFKs     = _q.withFKs
 		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			_q.withRoleRef != nil,
+			_q.withRole != nil,
 		}
 	)
-	if _q.withRoleRef != nil {
+	if _q.withRole != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -414,9 +414,9 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := _q.withRoleRef; query != nil {
-		if err := _q.loadRoleRef(ctx, query, nodes, nil,
-			func(n *User, e *Role) { n.Edges.RoleRef = e }); err != nil {
+	if query := _q.withRole; query != nil {
+		if err := _q.loadRole(ctx, query, nodes, nil,
+			func(n *User, e *Role) { n.Edges.Role = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -428,14 +428,14 @@ func (_q *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	return nodes, nil
 }
 
-func (_q *UserQuery) loadRoleRef(ctx context.Context, query *RoleQuery, nodes []*User, init func(*User), assign func(*User, *Role)) error {
+func (_q *UserQuery) loadRole(ctx context.Context, query *RoleQuery, nodes []*User, init func(*User), assign func(*User, *Role)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*User)
 	for i := range nodes {
-		if nodes[i].role_users == nil {
+		if nodes[i].user_role == nil {
 			continue
 		}
-		fk := *nodes[i].role_users
+		fk := *nodes[i].user_role
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -452,7 +452,7 @@ func (_q *UserQuery) loadRoleRef(ctx context.Context, query *RoleQuery, nodes []
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "role_users" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "user_role" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

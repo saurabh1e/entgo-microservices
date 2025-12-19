@@ -79,7 +79,7 @@ func (_q *PermissionQuery) QueryRolePermissions() *RolePermissionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(permission.Table, permission.FieldID, selector),
 			sqlgraph.To(rolepermission.Table, rolepermission.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, permission.RolePermissionsTable, permission.RolePermissionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, permission.RolePermissionsTable, permission.RolePermissionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -452,13 +452,13 @@ func (_q *PermissionQuery) loadRolePermissions(ctx context.Context, query *RoleP
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.permission_role_permissions
+		fk := n.role_permission_permission
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "permission_role_permissions" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "role_permission_permission" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "permission_role_permissions" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "role_permission_permission" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -44,7 +44,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "rolepermission" package.
 	RolePermissionsInverseTable = "role_permissions"
 	// RolePermissionsColumn is the table column denoting the role_permissions relation/edge.
-	RolePermissionsColumn = "permission_role_permissions"
+	RolePermissionsColumn = "role_permission_permission"
 )
 
 // Columns holds all SQL columns for permission fields.
@@ -170,6 +170,6 @@ func newRolePermissionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RolePermissionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RolePermissionsTable, RolePermissionsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, RolePermissionsTable, RolePermissionsColumn),
 	)
 }

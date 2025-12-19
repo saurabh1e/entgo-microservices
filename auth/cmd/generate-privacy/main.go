@@ -49,11 +49,11 @@ func HasRoleOrPermission{{.Entity}}() entprivacy.QueryRule {
 		}
 
 		if authz.HasAnyRole(ctx, []string{ROLES_LIST_PLACEHOLDER}) {
-			return entprivacy.Allow
+			return entprivacy.Skip
 		}
 
 		if authz.HasPermission(ctx, "{{.PermissionLevel}}", "can_read") {
-			return entprivacy.Allow
+			return entprivacy.Skip
 		}
 
 		logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "role_permission"}).Warn("Insufficient privileges - denying access")
@@ -66,29 +66,30 @@ func FilterBy{{.Entity}}() entprivacy.{{.Entity}}QueryRuleFunc {
 		applied := false
 		{{if .TenantIsolated}}
 		// Tenant isolation: apply tenant filter if tenant info is available
-		tenantID, hasTenant := authz.GetTenantIDFromContext(ctx)
-		if hasTenant {
-			q.Where({{.EntPackageName}}.TenantIDEQ(tenantID))
-			applied = true
-			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "tenant", "tenant_id": tenantID}).Info("Applied tenant filter")
+		tenantID, err := pkgcontext.GetUserTenantID(ctx)
+		if err != nil {
+			logger.WithError(err).WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "tenant"}).Error("Failed to get tenant ID from context - denying access")
+			return entprivacy.Deny
 		}
+		
+		q.Where({{.EntPackageName}}.TenantIDEQ(tenantID))
+		applied = true
+		logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "tenant", "tenant_id": tenantID}).Info("Applied tenant filter")
 		{{end}}
 		{{if .UserOwned}}
 		// User ownership filtering
-		userID, hasUser := authz.GetUserIDFromContext(ctx)
-		if hasUser {
-			q.Where({{.EntPackageName}}.OwnedByEQ(userID))
+		if user, hasUser := pkgcontext.GetUser(ctx); hasUser && user != nil {
+			q.Where({{.EntPackageName}}.OwnedByEQ(user.ID))
 			applied = true
-			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "user_owned", "user_id": userID}).Info("Applied user ownership filter")
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "user_owned", "user_id": user.ID}).Info("Applied user ownership filter")
 		}
 		{{end}}
 		{{if .FilterByCreator}}
 		// Creator filtering
-		userID, hasUser := authz.GetUserIDFromContext(ctx)
-		if hasUser {
-			q.Where({{.EntPackageName}}.CreatedByEQ(userID))
+		if user, hasUser := pkgcontext.GetUser(ctx); hasUser && user != nil {
+			q.Where({{.EntPackageName}}.CreatedByEQ(user.ID))
 			applied = true
-			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "creator", "user_id": userID}).Info("Applied creator filter")
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "creator", "user_id": user.ID}).Info("Applied creator filter")
 		}
 		{{end}}
 
@@ -126,6 +127,30 @@ func HasRoleOrPermission{{.Entity}}Mutation() entprivacy.MutationRule {
 			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "role_permission_mutation"}).Warn("No user in context - denying mutation")
 			return entprivacy.Deny
 		}
+
+		{{if .TenantIsolated}}
+		// For update/delete operations, validate tenant ID matches context
+		if m.Op() == ent.OpUpdate || m.Op() == ent.OpUpdateOne || m.Op() == ent.OpDelete || m.Op() == ent.OpDeleteOne {
+			contextTenantID, err := pkgcontext.GetUserTenantID(ctx)
+			if err != nil {
+				logger.WithError(err).WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "tenant_validation", "operation": m.Op()}).Error("Failed to get tenant ID from context")
+				return entprivacy.Deny
+			}
+
+			if {{.NameLower}}Mutation, ok := m.(*ent.{{.Entity}}Mutation); ok {
+				if tenantID, exists := {{.NameLower}}Mutation.TenantID(); exists && tenantID != contextTenantID {
+					logger.WithFields(map[string]interface{}{
+						"entity": "{{.Entity}}",
+						"rule": "tenant_validation",
+						"operation": m.Op(),
+						"context_tenant_id": contextTenantID,
+						"record_tenant_id": tenantID,
+					}).Warn("Tenant ID mismatch - denying mutation")
+					return entprivacy.Deny
+				}
+			}
+		}
+		{{end}}
 
 		switch m.Op() {
 		case ent.OpCreate:
@@ -177,6 +202,7 @@ func {{.Entity}}Policy() ent.Policy {
 type EntityData struct {
 	Entity          string
 	EntityLower     string
+	NameLower       string // lowercase entity name for variable naming
 	EntPackageName  string
 	ModuleName      string
 	RolesList       string
@@ -305,6 +331,7 @@ func run() error {
 		data := EntityData{
 			Entity:          entity,
 			EntityLower:     entityLower,
+			NameLower:       strings.ToLower(entity),
 			EntPackageName:  common.ToEntPackageName(entity),
 			ModuleName:      moduleName,
 			RolesList:       rolesList,

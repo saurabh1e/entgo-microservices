@@ -191,6 +191,26 @@ func init() {
 	// role.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	role.IDValidator = roleDescID.Validators[0].(func(int) error)
 	rolepermissionMixin := schema.RolePermission{}.Mixin()
+	rolepermission.Policy = privacy.NewPolicies(schema.RolePermission{})
+	rolepermission.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := rolepermission.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	rolepermissionHooks := schema.RolePermission{}.Hooks()
+
+	rolepermission.Hooks[1] = rolepermissionHooks[0]
+
+	rolepermission.Hooks[2] = rolepermissionHooks[1]
+
+	rolepermission.Hooks[3] = rolepermissionHooks[2]
+
+	rolepermission.Hooks[4] = rolepermissionHooks[3]
+
+	rolepermission.Hooks[5] = rolepermissionHooks[4]
 	rolepermissionMixinFields0 := rolepermissionMixin[0].Fields()
 	_ = rolepermissionMixinFields0
 	rolepermissionMixinFields1 := rolepermissionMixin[1].Fields()

@@ -46,9 +46,9 @@ type Role struct {
 
 // RoleEdges holds the relations/edges for other nodes in the graph.
 type RoleEdges struct {
-	// Users with this role
+	// Users holds the value of the users edge.
 	Users []*User `json:"users,omitempty"`
-	// Role-Permission associations for this role
+	// RolePermissions holds the value of the role_permissions edge.
 	RolePermissions []*RolePermission `json:"role_permissions,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.

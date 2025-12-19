@@ -14,10 +14,11 @@ import (
 
 // EntityInfo holds information about an entity for template generation
 type EntityInfo struct {
-	Name       string // e.g., "Category"
-	NameLower  string // e.g., "category"
-	NameCamel  string // e.g., "category"
-	ModuleName string // e.g., "github.com/zyne-labs/syphoon_auth"
+	Name           string // e.g., "Category"
+	NameLower      string // e.g., "category"
+	NameCamel      string // e.g., "category"
+	ModuleName     string // e.g., "github.com/zyne-labs/syphoon_auth"
+	TenantIsolated bool   // Whether entity has @tenant-isolated: true
 }
 
 // hooksTemplate defines the template for generating hooks files
@@ -28,13 +29,28 @@ import (
 	"{{.ModuleName}}/internal/ent"
 	"{{.ModuleName}}/internal/ent/hook"
 	"github.com/saurabh/entgo-microservices/pkg/logger"
+	{{if .TenantIsolated}}pkgcontext "github.com/saurabh/entgo-microservices/pkg/context"{{end}}
 )
 
 func {{.Name}}CreateHook() ent.Hook {
 	return func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-			if _, ok := m.(*ent.{{.Name}}Mutation); ok {
+			if {{.NameLower}}Mutation, ok := m.(*ent.{{.Name}}Mutation); ok {
 				// Hook executing for create
+				{{if .TenantIsolated}}
+				// Set tenant ID from context for tenant-isolated entities
+				if _, exists := {{.NameLower}}Mutation.TenantID(); !exists {
+					tenantID, err := pkgcontext.GetUserTenantID(ctx)
+					if err != nil {
+						logger.WithError(err).WithFields(map[string]interface{}{
+							"entity": "{{.Name}}",
+							"operation": "create",
+						}).Error("Failed to get tenant ID from context")
+						return nil, err
+					}
+					{{.NameLower}}Mutation.SetTenantID(tenantID)
+				}
+				{{end}}
 
 				// Call the next mutator
 				result, err := next.Mutate(ctx, m)
@@ -202,14 +218,22 @@ func scanForHooksAnnotation() ([]EntityInfo, error) {
 				continue
 			}
 
+			// Check if entity is tenant-isolated
+			tenantIsolated, err := checkForTenantIsolatedAnnotation(file)
+			if err != nil {
+				log.Printf("Error checking for tenant-isolated annotation in %s: %v", file, err)
+				// Continue with tenantIsolated = false
+			}
+
 			// Extract filename without extension for file naming
 			fileBaseName := strings.TrimSuffix(basename, ".go")
 
 			entityInfo := EntityInfo{
-				Name:       entityName,                    // Actual struct name like "APIKey"
-				NameLower:  strings.ToLower(fileBaseName), // Filename like "api_key"
-				NameCamel:  toCamelCase(fileBaseName),     // camelCase like "apiKey"
-				ModuleName: moduleName,
+				Name:           entityName,                    // Actual struct name like "APIKey"
+				NameLower:      strings.ToLower(fileBaseName), // Filename like "api_key"
+				NameCamel:      toCamelCase(fileBaseName),     // camelCase like "apiKey"
+				ModuleName:     moduleName,
+				TenantIsolated: tenantIsolated,
 			}
 			entities = append(entities, entityInfo)
 		}
@@ -230,6 +254,25 @@ func checkForHooksAnnotation(filename string) (bool, error) {
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if strings.Contains(line, "// @generate-hooks: true") {
+			return true, nil
+		}
+	}
+
+	return false, scanner.Err()
+}
+
+// checkForTenantIsolatedAnnotation checks if a file contains @tenant-isolated: true
+func checkForTenantIsolatedAnnotation(filename string) (bool, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return false, err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.Contains(line, "// @tenant-isolated: true") {
 			return true, nil
 		}
 	}

@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/saurabh/entgo-microservices/auth/graph/model"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent"
@@ -23,16 +22,11 @@ import (
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*model.LoginResponse, error) {
-	// Find user by email or username
 	ctx = authz.SetBypass(ctx, true)
 
+	// Find user by email or username
 	userEntity, err := r.client.User.Query().
-		Where(
-			user.Or(
-				user.Email(input.Email),
-				user.Username(input.Email), // Allow login with username in email field
-			),
-		).
+		Where(user.Or(user.Email(input.Email), user.Username(input.Email))).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -42,119 +36,32 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 		return nil, fmt.Errorf("login failed")
 	}
 
-	// Check if user is active
 	if !userEntity.IsActive {
 		return nil, fmt.Errorf("account is deactivated")
 	}
 
-	// Check if password is already hashed
-	var passwordToCheck string
-	if strings.HasPrefix(userEntity.PasswordHash, "$2") { // bcrypt hash starts with $2
-		passwordToCheck = userEntity.PasswordHash
-	} else {
-		// Password is not hashed, hash it and update
-		hashedPassword, err := jwt.HashPassword(userEntity.PasswordHash)
-		if err != nil {
-			logger.WithError(err).Error("Failed to hash existing password")
-			return nil, fmt.Errorf("login failed")
-		}
-
-		// Update user with hashed password
-		_, err = r.client.User.UpdateOneID(userEntity.ID).
-			SetPasswordHash(hashedPassword).
-			Save(ctx)
-		if err != nil {
-			logger.WithError(err).Error("Failed to update user password hash")
-			return nil, fmt.Errorf("login failed")
-		}
-
-		passwordToCheck = hashedPassword
+	// Hash password if needed and verify
+	passwordHash, err := r.hashPasswordIfNeeded(ctx, userEntity)
+	if err != nil {
+		logger.WithError(err).Error("Password hash error")
+		return nil, fmt.Errorf("login failed")
 	}
 
-	// Verify password
-	if !jwt.CheckPassword(input.Password, passwordToCheck) {
+	if !jwt.CheckPassword(input.Password, passwordHash) {
 		return nil, fmt.Errorf("invalid credentials")
 	}
 
-	// Generate token pair with Redis tracking
-	accessToken, refreshToken, err := r.jwtService.GenerateTokenPair(
-		ctx,
-		userEntity.ID,
-		userEntity.Username,
-		userEntity.Email,
-	)
+	// Generate tokens
+	accessToken, refreshToken, err := r.jwtService.GenerateTokenPair(ctx, userEntity.ID, userEntity.Username, userEntity.Email)
 	if err != nil {
 		logger.WithError(err).Error("Failed to generate tokens")
 		return nil, fmt.Errorf("login failed")
 	}
 
-	// Cache user data in Redis for subsequent requests
-	go func() {
-		// Use background context to avoid cancellation
-		bgCtx := context.Background()
+	// Cache user data asynchronously
+	r.cacheUserData(userEntity)
 
-		// Convert to generic user format
-		user := &pkgcontext.User{
-			ID:       userEntity.ID,
-			Username: userEntity.Username,
-			Email:    userEntity.Email,
-			Name:     userEntity.Name,
-			IsActive: userEntity.IsActive,
-		}
-
-		cacheData := &pkgcontext.CachedUserData{
-			User: user,
-		}
-
-		// Load user's role and permissions
-		role, err := userEntity.QueryRoleRef().WithRolePermissions(func(q *ent.RolePermissionQuery) {
-			q.WithPermission()
-		}).Only(bgCtx)
-
-		if err == nil {
-			// User has a role
-			cacheData.Role = &pkgcontext.CachedRole{
-				ID:          role.ID,
-				Name:        role.Name,
-				DisplayName: role.DisplayName,
-				Priority:    role.Priority,
-			}
-
-			// Load permissions
-			rolePerms, err := role.QueryRolePermissions().WithPermission().All(bgCtx)
-			if err == nil {
-				cacheData.Permissions = make([]pkgcontext.CachedPermission, 0, len(rolePerms))
-				for _, rp := range rolePerms {
-					if rp.Edges.Permission == nil {
-						continue
-					}
-					cacheData.Permissions = append(cacheData.Permissions, pkgcontext.CachedPermission{
-						Name:      rp.Edges.Permission.Name,
-						CanRead:   rp.CanRead,
-						CanCreate: rp.CanCreate,
-						CanUpdate: rp.CanUpdate,
-						CanDelete: rp.CanDelete,
-					})
-				}
-			}
-		}
-
-		// Cache with 1 hour TTL (matching access token expiry)
-		if err := pkgcache.SetUserInCache(bgCtx, r.redisClient, "auth", cacheData, 1*time.Hour); err != nil {
-			logger.WithError(err).WithField("user_id", userEntity.ID).Warn("Failed to cache user data on login")
-		} else {
-			logger.WithFields(map[string]interface{}{
-				"user_id":           userEntity.ID,
-				"has_role":          cacheData.Role != nil,
-				"permissions_count": len(cacheData.Permissions),
-			}).Info("User data cached on login")
-		}
-	}()
-
-	logger.WithFields(map[string]interface{}{
-		"user_id": userEntity.ID,
-		"email":   userEntity.Email,
-	}).Info("User logged in successfully")
+	logger.WithFields(map[string]interface{}{"user_id": userEntity.ID, "email": userEntity.Email}).Info("User logged in")
 
 	return &model.LoginResponse{
 		User:         userEntity,
@@ -167,42 +74,35 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInput) (*model.RegisterResponse, error) {
 	// Check if user already exists
 	exists, err := r.client.User.Query().
-		Where(
-			user.Or(
-				user.Email(input.Email),
-				user.Username(input.Email), // In case email is used as username
-			),
-		).
+		Where(user.Or(user.Email(input.Email), user.Username(input.Email))).
 		Exist(ctx)
 	if err != nil {
 		logger.WithError(err).Error("Failed to check if user exists")
 		return nil, fmt.Errorf("registration failed")
 	}
-
 	if exists {
 		return nil, fmt.Errorf("user with this email already exists")
 	}
 
-	// Hash password
+	// Hash password and generate username
 	hashedPassword, err := jwt.HashPassword(input.Password)
 	if err != nil {
 		logger.WithError(err).Error("Failed to hash password")
 		return nil, fmt.Errorf("registration failed")
 	}
 
-	// Generate username from email if not provided
 	username := input.Email
 	if strings.Contains(username, "@") {
 		username = strings.Split(username, "@")[0]
 	}
 
 	// Create user
-	userCreateQuery := r.client.User.Create().
+	userEntity, err := r.client.User.Create().
 		SetEmail(input.Email).
 		SetUsername(username).
-		SetPasswordHash(hashedPassword).SetName(input.Name)
-
-	userEntity, err := userCreateQuery.Save(ctx)
+		SetPasswordHash(hashedPassword).
+		SetName(input.Name).
+		Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
 			return nil, fmt.Errorf("user with this email or username already exists")
@@ -211,74 +111,17 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 		return nil, fmt.Errorf("registration failed")
 	}
 
-	// Generate token pair with Redis tracking
-	accessToken, refreshToken, err := r.jwtService.GenerateTokenPair(
-		ctx,
-		userEntity.ID,
-		userEntity.Username,
-		userEntity.Email,
-	)
+	// Generate tokens
+	accessToken, refreshToken, err := r.jwtService.GenerateTokenPair(ctx, userEntity.ID, userEntity.Username, userEntity.Email)
 	if err != nil {
 		logger.WithError(err).Error("Failed to generate tokens for new user")
 		return nil, fmt.Errorf("registration failed")
 	}
 
-	// Cache user data in Redis for subsequent requests
-	go func() {
-		bgCtx := context.Background()
+	// Cache user data asynchronously
+	r.cacheUserData(userEntity)
 
-		user := &pkgcontext.User{
-			ID:       userEntity.ID,
-			Username: userEntity.Username,
-			Email:    userEntity.Email,
-			Name:     userEntity.Name,
-			IsActive: userEntity.IsActive,
-		}
-
-		cacheData := &pkgcontext.CachedUserData{
-			User: user,
-		}
-
-		// New users might not have a role yet, but cache anyway
-		role, err := userEntity.QueryRoleRef().WithRolePermissions(func(q *ent.RolePermissionQuery) {
-			q.WithPermission()
-		}).Only(bgCtx)
-
-		if err == nil {
-			cacheData.Role = &pkgcontext.CachedRole{
-				ID:          role.ID,
-				Name:        role.Name,
-				DisplayName: role.DisplayName,
-				Priority:    role.Priority,
-			}
-
-			rolePerms, err := role.QueryRolePermissions().WithPermission().All(bgCtx)
-			if err == nil {
-				cacheData.Permissions = make([]pkgcontext.CachedPermission, 0, len(rolePerms))
-				for _, rp := range rolePerms {
-					if rp.Edges.Permission == nil {
-						continue
-					}
-					cacheData.Permissions = append(cacheData.Permissions, pkgcontext.CachedPermission{
-						Name:      rp.Edges.Permission.Name,
-						CanRead:   rp.CanRead,
-						CanCreate: rp.CanCreate,
-						CanUpdate: rp.CanUpdate,
-						CanDelete: rp.CanDelete,
-					})
-				}
-			}
-		}
-
-		if err := pkgcache.SetUserInCache(bgCtx, r.redisClient, "auth", cacheData, 1*time.Hour); err != nil {
-			logger.WithError(err).WithField("user_id", userEntity.ID).Warn("Failed to cache user data on registration")
-		}
-	}()
-
-	logger.WithFields(map[string]interface{}{
-		"user_id": userEntity.ID,
-		"email":   userEntity.Email,
-	}).Info("User registered successfully")
+	logger.WithFields(map[string]interface{}{"user_id": userEntity.ID, "email": userEntity.Email}).Info("User registered")
 
 	return &model.RegisterResponse{
 		User:         userEntity,
@@ -289,63 +132,35 @@ func (r *mutationResolver) Register(ctx context.Context, input model.RegisterInp
 
 // Logout is the resolver for the logout field.
 func (r *mutationResolver) Logout(ctx context.Context) (*model.LogoutResponse, error) {
-	// Get authorization header
-	authHeader := ctx.Value("Authorization")
-	if authHeader == nil {
-		return nil, fmt.Errorf("no authorization token provided")
-	}
-
-	tokenString, ok := authHeader.(string)
-	if !ok {
-		return nil, fmt.Errorf("invalid authorization header")
-	}
-
-	// Remove "Bearer " prefix if present
-	if strings.HasPrefix(tokenString, "Bearer ") {
-		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+	tokenString, err := extractToken(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	// Validate token to get user ID for cache invalidation
-	claims, err := r.jwtService.ValidateToken(ctx, tokenString)
-	if err == nil && claims != nil {
+	if claims, err := r.jwtService.ValidateToken(ctx, tokenString); err == nil && claims != nil {
 		// Invalidate user cache
 		if err := pkgcache.InvalidateUserCache(ctx, r.redisClient, "auth", claims.UserID); err != nil {
-			logger.WithError(err).WithField("user_id", claims.UserID).Warn("Failed to invalidate user cache on logout")
-		} else {
-			logger.WithField("user_id", claims.UserID).Debug("User cache invalidated on logout")
+			logger.WithError(err).WithField("user_id", claims.UserID).Warn("Failed to invalidate user cache")
 		}
 	}
 
-	// Add token to blacklist using Redis
-	err = r.jwtService.RevokeToken(ctx, tokenString)
-	if err != nil {
+	// Add token to blacklist
+	if err := r.jwtService.RevokeToken(ctx, tokenString); err != nil {
 		logger.WithError(err).Error("Failed to revoke token during logout")
 		return nil, fmt.Errorf("logout failed")
 	}
 
-	logger.Info("User logged out successfully")
+	logger.Info("User logged out")
 
-	return &model.LogoutResponse{
-		Success: true,
-	}, nil
+	return &model.LogoutResponse{Success: true}, nil
 }
 
 // RefreshToken is the resolver for the refreshToken field.
 func (r *mutationResolver) RefreshToken(ctx context.Context) (*model.TokenResponse, error) {
-	// Get authorization header (should contain refresh token)
-	authHeader := ctx.Value("Authorization")
-	if authHeader == nil {
-		return nil, fmt.Errorf("no refresh token provided")
-	}
-
-	tokenString, ok := authHeader.(string)
-	if !ok {
-		return nil, fmt.Errorf("invalid authorization header")
-	}
-
-	// Remove "Bearer " prefix if present
-	if strings.HasPrefix(tokenString, "Bearer ") {
-		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+	tokenString, err := extractToken(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	// Validate refresh token to get user ID
@@ -355,76 +170,24 @@ func (r *mutationResolver) RefreshToken(ctx context.Context) (*model.TokenRespon
 		return nil, fmt.Errorf("token refresh failed: %v", err)
 	}
 
-	// Generate new token pair using refresh token with Redis tracking
+	// Generate new token pair
 	accessToken, refreshToken, err := r.jwtService.RefreshAccessToken(ctx, tokenString)
 	if err != nil {
 		logger.WithError(err).Error("Failed to refresh token")
 		return nil, fmt.Errorf("token refresh failed: %v", err)
 	}
 
-	// Cache user data in Redis for subsequent requests (similar to login)
+	// Refresh user cache asynchronously
 	go func() {
-		bgCtx := context.Background()
-		bgCtx = authz.SetBypass(bgCtx, true)
-
-		// Get user from database
-		userEntity, err := r.client.User.Get(bgCtx, claims.UserID)
-		if err != nil {
+		bgCtx := authz.SetBypass(context.Background(), true)
+		if userEntity, err := r.client.User.Get(bgCtx, claims.UserID); err == nil {
+			r.cacheUserData(userEntity)
+		} else {
 			logger.WithError(err).WithField("user_id", claims.UserID).Warn("Failed to get user for caching on token refresh")
-			return
-		}
-
-		// Convert to generic user format
-		user := &pkgcontext.User{
-			ID:       userEntity.ID,
-			Username: userEntity.Username,
-			Email:    userEntity.Email,
-			Name:     userEntity.Name,
-			IsActive: userEntity.IsActive,
-		}
-
-		cacheData := &pkgcontext.CachedUserData{
-			User: user,
-		}
-
-		// Load user's role and permissions
-		role, err := userEntity.QueryRoleRef().WithRolePermissions(func(q *ent.RolePermissionQuery) {
-			q.WithPermission()
-		}).Only(bgCtx)
-
-		if err == nil {
-			cacheData.Role = &pkgcontext.CachedRole{
-				ID:          role.ID,
-				Name:        role.Name,
-				DisplayName: role.DisplayName,
-				Priority:    role.Priority,
-			}
-
-			rolePerms, err := role.QueryRolePermissions().WithPermission().All(bgCtx)
-			if err == nil {
-				cacheData.Permissions = make([]pkgcontext.CachedPermission, 0, len(rolePerms))
-				for _, rp := range rolePerms {
-					if rp.Edges.Permission == nil {
-						continue
-					}
-					cacheData.Permissions = append(cacheData.Permissions, pkgcontext.CachedPermission{
-						Name:      rp.Edges.Permission.Name,
-						CanRead:   rp.CanRead,
-						CanCreate: rp.CanCreate,
-						CanUpdate: rp.CanUpdate,
-						CanDelete: rp.CanDelete,
-					})
-				}
-			}
-		}
-
-		// Cache with 1 hour TTL
-		if err := pkgcache.SetUserInCache(bgCtx, r.redisClient, "auth", cacheData, 1*time.Hour); err != nil {
-			logger.WithError(err).WithField("user_id", userEntity.ID).Warn("Failed to cache user data on token refresh")
 		}
 	}()
 
-	logger.Info("Token refreshed successfully")
+	logger.Info("Token refreshed")
 
 	return &model.TokenResponse{
 		AccessToken:  accessToken,

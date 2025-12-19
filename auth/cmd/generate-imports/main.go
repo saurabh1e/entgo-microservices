@@ -137,11 +137,22 @@ func addPolicyMethod(schema SchemaInfo) error {
 	privacyImportRegex := regexp.MustCompile(privacyImportPattern)
 
 	if !privacyImportRegex.MatchString(fileContent) {
-		// Add privacy import
-		importPattern := regexp.MustCompile(`(import\s*\(\s*\n)`)
-		if importPattern.MatchString(fileContent) {
-			fileContent = importPattern.ReplaceAllString(fileContent,
-				`${1}\tprivacy "`+schema.ModuleName+`/ent/schema_privacy"`+"\n")
+		// Add privacy import - find the closing paren of imports and add before it
+		importClosePattern := regexp.MustCompile(`(\n)(\s*\))(\s*\n)`)
+		if importClosePattern.MatchString(fileContent) {
+			fileContent = importClosePattern.ReplaceAllString(fileContent,
+				`${1}	privacy "`+schema.ModuleName+`/ent/schema_privacy"`+"\n${2}${3}")
+		} else {
+			// If no import block exists, create one
+			packagePattern := regexp.MustCompile(`(package\s+\w+\s*\n)`)
+			if packagePattern.MatchString(fileContent) {
+				fileContent = packagePattern.ReplaceAllString(fileContent,
+					`${1}
+import (
+	privacy "`+schema.ModuleName+`/ent/schema_privacy"
+)
+`)
+			}
 		}
 	}
 
@@ -180,11 +191,22 @@ func addHooksMethod(schema SchemaInfo) error {
 	hooksImportRegex := regexp.MustCompile(hooksImportPattern)
 
 	if !hooksImportRegex.MatchString(fileContent) {
-		// Add hooks import
-		importPattern := regexp.MustCompile(`(import\s*\(\s*\n)`)
-		if importPattern.MatchString(fileContent) {
-			fileContent = importPattern.ReplaceAllString(fileContent,
-				`${1}\thook "`+schema.ModuleName+`/ent/schema_hooks"`+"\n")
+		// Add hooks import - find the closing paren of imports and add before it
+		importClosePattern := regexp.MustCompile(`(\n)(\s*\))(\s*\n)`)
+		if importClosePattern.MatchString(fileContent) {
+			fileContent = importClosePattern.ReplaceAllString(fileContent,
+				`${1}	hook "`+schema.ModuleName+`/ent/schema_hooks"`+"\n${2}${3}")
+		} else {
+			// If no import block exists, create one
+			packagePattern := regexp.MustCompile(`(package\s+\w+\s*\n)`)
+			if packagePattern.MatchString(fileContent) {
+				fileContent = packagePattern.ReplaceAllString(fileContent,
+					`${1}
+import (
+	hook "`+schema.ModuleName+`/ent/schema_hooks"
+)
+`)
+			}
 		}
 	}
 

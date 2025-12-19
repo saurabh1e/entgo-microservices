@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 
@@ -80,7 +81,7 @@ func (_q *RolePermissionQuery) QueryRole() *RoleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rolepermission.Table, rolepermission.FieldID, selector),
 			sqlgraph.To(role.Table, role.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, rolepermission.RoleTable, rolepermission.RoleColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, rolepermission.RoleTable, rolepermission.RoleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -102,7 +103,7 @@ func (_q *RolePermissionQuery) QueryPermission() *PermissionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(rolepermission.Table, rolepermission.FieldID, selector),
 			sqlgraph.To(permission.Table, permission.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, rolepermission.PermissionTable, rolepermission.PermissionColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, rolepermission.PermissionTable, rolepermission.PermissionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -404,6 +405,12 @@ func (_q *RolePermissionQuery) prepareQuery(ctx context.Context) error {
 		}
 		_q.sql = prev
 	}
+	if rolepermission.Policy == nil {
+		return errors.New("ent: uninitialized rolepermission.Policy (forgotten import ent/runtime?)")
+	}
+	if err := rolepermission.Policy.EvalQuery(ctx, _q); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -468,10 +475,10 @@ func (_q *RolePermissionQuery) loadRole(ctx context.Context, query *RoleQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*RolePermission)
 	for i := range nodes {
-		if nodes[i].role_role_permissions == nil {
+		if nodes[i].role_permission_role == nil {
 			continue
 		}
-		fk := *nodes[i].role_role_permissions
+		fk := *nodes[i].role_permission_role
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -488,7 +495,7 @@ func (_q *RolePermissionQuery) loadRole(ctx context.Context, query *RoleQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "role_role_permissions" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "role_permission_role" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -500,10 +507,10 @@ func (_q *RolePermissionQuery) loadPermission(ctx context.Context, query *Permis
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*RolePermission)
 	for i := range nodes {
-		if nodes[i].permission_role_permissions == nil {
+		if nodes[i].role_permission_permission == nil {
 			continue
 		}
-		fk := *nodes[i].permission_role_permissions
+		fk := *nodes[i].role_permission_permission
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -520,7 +527,7 @@ func (_q *RolePermissionQuery) loadPermission(ctx context.Context, query *Permis
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "permission_role_permissions" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "role_permission_permission" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

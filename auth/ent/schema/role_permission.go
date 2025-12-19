@@ -4,6 +4,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	hook "github.com/saurabh/entgo-microservices/auth/ent/schema_hooks"
+	privacy "github.com/saurabh/entgo-microservices/auth/ent/schema_privacy"
 	"github.com/saurabh/entgo-microservices/pkg/ent/schema"
 )
 
@@ -20,9 +22,14 @@ func (RolePermission) Mixin() []ent.Mixin {
 }
 
 // Fields of the RolePermission.
-// @generate-mutation: true
 // @generate-resolver: true
+// @generate-mutation: true
+// @generate-hooks: true
+// @generate-privacy: true
 // @generate-grpc: true
+// @role-level: admin
+// @permission-level: user
+// @tenant-isolated: true
 func (RolePermission) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bool("can_read").Default(false).Comment("Can read the resource"),
@@ -35,24 +42,26 @@ func (RolePermission) Fields() []ent.Field {
 // Edges of the RolePermission.
 func (RolePermission) Edges() []ent.Edge {
 	return []ent.Edge{
-		// RolePermission belongs to one Role
-		edge.From("role", Role.Type).
-			Ref("role_permissions").
+		edge.To("role", Role.Type).
 			Unique().
-			Required().
-			Comment("Role that this permission association belongs to"),
-		// RolePermission belongs to one Permission
-		edge.From("permission", Permission.Type).
-			Ref("role_permissions").
+			Required(),
+		edge.To("permission", Permission.Type).
 			Unique().
-			Required().
-			Comment("Permission that this role association belongs to"),
+			Required(),
 	}
 }
 
 // Indexes of the RolePermission.
 func (RolePermission) Indexes() []ent.Index {
 	return []ent.Index{
-		// Ensure unique role-permission combination
+		// Unique constraint handled by edge configuration
 	}
+}
+
+func (RolePermission) Policy() ent.Policy {
+	return privacy.RolePermissionPolicy()
+}
+
+func (RolePermission) Hooks() []ent.Hook {
+	return hook.RolePermissionHooks()
 }

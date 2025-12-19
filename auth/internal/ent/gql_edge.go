@@ -8,67 +8,40 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func (_m *Permission) RolePermissions(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *RolePermissionOrder, where *RolePermissionWhereInput,
-) (*RolePermissionConnection, error) {
-	opts := []RolePermissionPaginateOption{
-		WithRolePermissionOrder(orderBy),
-		WithRolePermissionFilter(where.Filter),
+func (_m *Permission) RolePermissions(ctx context.Context) (result []*RolePermission, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = _m.NamedRolePermissions(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = _m.Edges.RolePermissionsOrErr()
 	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := _m.Edges.totalCount[0][alias]
-	if nodes, err := _m.NamedRolePermissions(alias); err == nil || hasTotalCount {
-		pager, err := newRolePermissionPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &RolePermissionConnection{Edges: []*RolePermissionEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
+	if IsNotLoaded(err) {
+		result, err = _m.QueryRolePermissions().All(ctx)
 	}
-	return _m.QueryRolePermissions().Paginate(ctx, after, first, before, last, opts...)
+	return result, err
 }
 
-func (_m *Role) Users(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *UserOrder, where *UserWhereInput,
-) (*UserConnection, error) {
-	opts := []UserPaginateOption{
-		WithUserOrder(orderBy),
-		WithUserFilter(where.Filter),
+func (_m *Role) Users(ctx context.Context) (result []*User, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = _m.NamedUsers(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = _m.Edges.UsersOrErr()
 	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := _m.Edges.totalCount[0][alias]
-	if nodes, err := _m.NamedUsers(alias); err == nil || hasTotalCount {
-		pager, err := newUserPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &UserConnection{Edges: []*UserEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
+	if IsNotLoaded(err) {
+		result, err = _m.QueryUsers().All(ctx)
 	}
-	return _m.QueryUsers().Paginate(ctx, after, first, before, last, opts...)
+	return result, err
 }
 
-func (_m *Role) RolePermissions(
-	ctx context.Context, after *Cursor, first *int, before *Cursor, last *int, orderBy *RolePermissionOrder, where *RolePermissionWhereInput,
-) (*RolePermissionConnection, error) {
-	opts := []RolePermissionPaginateOption{
-		WithRolePermissionOrder(orderBy),
-		WithRolePermissionFilter(where.Filter),
+func (_m *Role) RolePermissions(ctx context.Context) (result []*RolePermission, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = _m.NamedRolePermissions(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = _m.Edges.RolePermissionsOrErr()
 	}
-	alias := graphql.GetFieldContext(ctx).Field.Alias
-	totalCount, hasTotalCount := _m.Edges.totalCount[1][alias]
-	if nodes, err := _m.NamedRolePermissions(alias); err == nil || hasTotalCount {
-		pager, err := newRolePermissionPager(opts, last != nil)
-		if err != nil {
-			return nil, err
-		}
-		conn := &RolePermissionConnection{Edges: []*RolePermissionEdge{}, TotalCount: totalCount}
-		conn.build(nodes, pager, after, first, before, last)
-		return conn, nil
+	if IsNotLoaded(err) {
+		result, err = _m.QueryRolePermissions().All(ctx)
 	}
-	return _m.QueryRolePermissions().Paginate(ctx, after, first, before, last, opts...)
+	return result, err
 }
 
 func (_m *RolePermission) Role(ctx context.Context) (*Role, error) {
@@ -87,10 +60,10 @@ func (_m *RolePermission) Permission(ctx context.Context) (*Permission, error) {
 	return result, err
 }
 
-func (_m *User) RoleRef(ctx context.Context) (*Role, error) {
-	result, err := _m.Edges.RoleRefOrErr()
+func (_m *User) Role(ctx context.Context) (*Role, error) {
+	result, err := _m.Edges.RoleOrErr()
 	if IsNotLoaded(err) {
-		result, err = _m.QueryRoleRef().Only(ctx)
+		result, err = _m.QueryRole().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }

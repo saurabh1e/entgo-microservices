@@ -408,7 +408,7 @@ func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.UsersTable,
 			Columns: []string{role.UsersColumn},
 			Bidi:    false,
@@ -421,7 +421,7 @@ func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if nodes := _u.mutation.RemovedUsersIDs(); len(nodes) > 0 && !_u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.UsersTable,
 			Columns: []string{role.UsersColumn},
 			Bidi:    false,
@@ -437,7 +437,7 @@ func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if nodes := _u.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.UsersTable,
 			Columns: []string{role.UsersColumn},
 			Bidi:    false,
@@ -453,7 +453,7 @@ func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.RolePermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.RolePermissionsTable,
 			Columns: []string{role.RolePermissionsColumn},
 			Bidi:    false,
@@ -466,7 +466,7 @@ func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if nodes := _u.mutation.RemovedRolePermissionsIDs(); len(nodes) > 0 && !_u.mutation.RolePermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.RolePermissionsTable,
 			Columns: []string{role.RolePermissionsColumn},
 			Bidi:    false,
@@ -482,7 +482,7 @@ func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if nodes := _u.mutation.RolePermissionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.RolePermissionsTable,
 			Columns: []string{role.RolePermissionsColumn},
 			Bidi:    false,
@@ -924,7 +924,7 @@ func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 	if _u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.UsersTable,
 			Columns: []string{role.UsersColumn},
 			Bidi:    false,
@@ -937,7 +937,7 @@ func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 	if nodes := _u.mutation.RemovedUsersIDs(); len(nodes) > 0 && !_u.mutation.UsersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.UsersTable,
 			Columns: []string{role.UsersColumn},
 			Bidi:    false,
@@ -953,7 +953,7 @@ func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 	if nodes := _u.mutation.UsersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.UsersTable,
 			Columns: []string{role.UsersColumn},
 			Bidi:    false,
@@ -969,7 +969,7 @@ func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 	if _u.mutation.RolePermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.RolePermissionsTable,
 			Columns: []string{role.RolePermissionsColumn},
 			Bidi:    false,
@@ -982,7 +982,7 @@ func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 	if nodes := _u.mutation.RemovedRolePermissionsIDs(); len(nodes) > 0 && !_u.mutation.RolePermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.RolePermissionsTable,
 			Columns: []string{role.RolePermissionsColumn},
 			Bidi:    false,
@@ -998,7 +998,7 @@ func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 	if nodes := _u.mutation.RolePermissionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.RolePermissionsTable,
 			Columns: []string{role.RolePermissionsColumn},
 			Bidi:    false,

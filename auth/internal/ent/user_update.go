@@ -376,15 +376,23 @@ func (_u *UserUpdate) ClearLastLogin() *UserUpdate {
 	return _u
 }
 
-// SetRoleRefID sets the "role_ref" edge to the Role entity by ID.
-func (_u *UserUpdate) SetRoleRefID(id int) *UserUpdate {
-	_u.mutation.SetRoleRefID(id)
+// SetRoleID sets the "role" edge to the Role entity by ID.
+func (_u *UserUpdate) SetRoleID(id int) *UserUpdate {
+	_u.mutation.SetRoleID(id)
 	return _u
 }
 
-// SetRoleRef sets the "role_ref" edge to the Role entity.
-func (_u *UserUpdate) SetRoleRef(v *Role) *UserUpdate {
-	return _u.SetRoleRefID(v.ID)
+// SetNillableRoleID sets the "role" edge to the Role entity by ID if the given value is not nil.
+func (_u *UserUpdate) SetNillableRoleID(id *int) *UserUpdate {
+	if id != nil {
+		_u = _u.SetRoleID(*id)
+	}
+	return _u
+}
+
+// SetRole sets the "role" edge to the Role entity.
+func (_u *UserUpdate) SetRole(v *Role) *UserUpdate {
+	return _u.SetRoleID(v.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -392,9 +400,9 @@ func (_u *UserUpdate) Mutation() *UserMutation {
 	return _u.mutation
 }
 
-// ClearRoleRef clears the "role_ref" edge to the Role entity.
-func (_u *UserUpdate) ClearRoleRef() *UserUpdate {
-	_u.mutation.ClearRoleRef()
+// ClearRole clears the "role" edge to the Role entity.
+func (_u *UserUpdate) ClearRole() *UserUpdate {
+	_u.mutation.ClearRole()
 	return _u
 }
 
@@ -491,9 +499,6 @@ func (_u *UserUpdate) check() error {
 		if err := user.CustomerTypeValidator(v); err != nil {
 			return &ValidationError{Name: "customer_type", err: fmt.Errorf(`ent: validator failed for field "User.customer_type": %w`, err)}
 		}
-	}
-	if _u.mutation.RoleRefCleared() && len(_u.mutation.RoleRefIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "User.role_ref"`)
 	}
 	return nil
 }
@@ -615,12 +620,12 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.LastLoginCleared() {
 		_spec.ClearField(user.FieldLastLogin, field.TypeTime)
 	}
-	if _u.mutation.RoleRefCleared() {
+	if _u.mutation.RoleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.RoleRefTable,
-			Columns: []string{user.RoleRefColumn},
+			Inverse: false,
+			Table:   user.RoleTable,
+			Columns: []string{user.RoleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt),
@@ -628,12 +633,12 @@ func (_u *UserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.RoleRefIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.RoleRefTable,
-			Columns: []string{user.RoleRefColumn},
+			Inverse: false,
+			Table:   user.RoleTable,
+			Columns: []string{user.RoleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt),
@@ -1012,15 +1017,23 @@ func (_u *UserUpdateOne) ClearLastLogin() *UserUpdateOne {
 	return _u
 }
 
-// SetRoleRefID sets the "role_ref" edge to the Role entity by ID.
-func (_u *UserUpdateOne) SetRoleRefID(id int) *UserUpdateOne {
-	_u.mutation.SetRoleRefID(id)
+// SetRoleID sets the "role" edge to the Role entity by ID.
+func (_u *UserUpdateOne) SetRoleID(id int) *UserUpdateOne {
+	_u.mutation.SetRoleID(id)
 	return _u
 }
 
-// SetRoleRef sets the "role_ref" edge to the Role entity.
-func (_u *UserUpdateOne) SetRoleRef(v *Role) *UserUpdateOne {
-	return _u.SetRoleRefID(v.ID)
+// SetNillableRoleID sets the "role" edge to the Role entity by ID if the given value is not nil.
+func (_u *UserUpdateOne) SetNillableRoleID(id *int) *UserUpdateOne {
+	if id != nil {
+		_u = _u.SetRoleID(*id)
+	}
+	return _u
+}
+
+// SetRole sets the "role" edge to the Role entity.
+func (_u *UserUpdateOne) SetRole(v *Role) *UserUpdateOne {
+	return _u.SetRoleID(v.ID)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -1028,9 +1041,9 @@ func (_u *UserUpdateOne) Mutation() *UserMutation {
 	return _u.mutation
 }
 
-// ClearRoleRef clears the "role_ref" edge to the Role entity.
-func (_u *UserUpdateOne) ClearRoleRef() *UserUpdateOne {
-	_u.mutation.ClearRoleRef()
+// ClearRole clears the "role" edge to the Role entity.
+func (_u *UserUpdateOne) ClearRole() *UserUpdateOne {
+	_u.mutation.ClearRole()
 	return _u
 }
 
@@ -1140,9 +1153,6 @@ func (_u *UserUpdateOne) check() error {
 		if err := user.CustomerTypeValidator(v); err != nil {
 			return &ValidationError{Name: "customer_type", err: fmt.Errorf(`ent: validator failed for field "User.customer_type": %w`, err)}
 		}
-	}
-	if _u.mutation.RoleRefCleared() && len(_u.mutation.RoleRefIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "User.role_ref"`)
 	}
 	return nil
 }
@@ -1281,12 +1291,12 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 	if _u.mutation.LastLoginCleared() {
 		_spec.ClearField(user.FieldLastLogin, field.TypeTime)
 	}
-	if _u.mutation.RoleRefCleared() {
+	if _u.mutation.RoleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.RoleRefTable,
-			Columns: []string{user.RoleRefColumn},
+			Inverse: false,
+			Table:   user.RoleTable,
+			Columns: []string{user.RoleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt),
@@ -1294,12 +1304,12 @@ func (_u *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := _u.mutation.RoleRefIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.RoleRefTable,
-			Columns: []string{user.RoleRefColumn},
+			Inverse: false,
+			Table:   user.RoleTable,
+			Columns: []string{user.RoleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeInt),

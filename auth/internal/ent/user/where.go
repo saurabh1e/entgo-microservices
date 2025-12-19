@@ -1245,21 +1245,21 @@ func LastLoginNotNil() predicate.User {
 	return predicate.User(sql.FieldNotNull(FieldLastLogin))
 }
 
-// HasRoleRef applies the HasEdge predicate on the "role_ref" edge.
-func HasRoleRef() predicate.User {
+// HasRole applies the HasEdge predicate on the "role" edge.
+func HasRole() predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, RoleRefTable, RoleRefColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, RoleTable, RoleColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRoleRefWith applies the HasEdge predicate on the "role_ref" edge with a given conditions (other predicates).
-func HasRoleRefWith(preds ...predicate.Role) predicate.User {
+// HasRoleWith applies the HasEdge predicate on the "role" edge with a given conditions (other predicates).
+func HasRoleWith(preds ...predicate.Role) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
-		step := newRoleRefStep()
+		step := newRoleStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -209,7 +209,9 @@ func (_u *RolePermissionUpdate) ClearPermission() *RolePermissionUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *RolePermissionUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
+	if err := _u.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -236,11 +238,15 @@ func (_u *RolePermissionUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *RolePermissionUpdate) defaults() {
+func (_u *RolePermissionUpdate) defaults() error {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if rolepermission.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized rolepermission.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := rolepermission.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -319,7 +325,7 @@ func (_u *RolePermissionUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if _u.mutation.RoleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.RoleTable,
 			Columns: []string{rolepermission.RoleColumn},
 			Bidi:    false,
@@ -332,7 +338,7 @@ func (_u *RolePermissionUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if nodes := _u.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.RoleTable,
 			Columns: []string{rolepermission.RoleColumn},
 			Bidi:    false,
@@ -348,7 +354,7 @@ func (_u *RolePermissionUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if _u.mutation.PermissionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.PermissionTable,
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
@@ -361,7 +367,7 @@ func (_u *RolePermissionUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if nodes := _u.mutation.PermissionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.PermissionTable,
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
@@ -587,7 +593,9 @@ func (_u *RolePermissionUpdateOne) Select(field string, fields ...string) *RoleP
 
 // Save executes the query and returns the updated RolePermission entity.
 func (_u *RolePermissionUpdateOne) Save(ctx context.Context) (*RolePermission, error) {
-	_u.defaults()
+	if err := _u.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -614,11 +622,15 @@ func (_u *RolePermissionUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (_u *RolePermissionUpdateOne) defaults() {
+func (_u *RolePermissionUpdateOne) defaults() error {
 	if _, ok := _u.mutation.UpdatedAt(); !ok {
+		if rolepermission.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("ent: uninitialized rolepermission.UpdateDefaultUpdatedAt (forgotten import ent/runtime?)")
+		}
 		v := rolepermission.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -714,7 +726,7 @@ func (_u *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePerm
 	if _u.mutation.RoleCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.RoleTable,
 			Columns: []string{rolepermission.RoleColumn},
 			Bidi:    false,
@@ -727,7 +739,7 @@ func (_u *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePerm
 	if nodes := _u.mutation.RoleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.RoleTable,
 			Columns: []string{rolepermission.RoleColumn},
 			Bidi:    false,
@@ -743,7 +755,7 @@ func (_u *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePerm
 	if _u.mutation.PermissionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.PermissionTable,
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
@@ -756,7 +768,7 @@ func (_u *RolePermissionUpdateOne) sqlSave(ctx context.Context) (_node *RolePerm
 	if nodes := _u.mutation.PermissionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.PermissionTable,
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,

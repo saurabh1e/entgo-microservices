@@ -419,7 +419,7 @@ type CreateUserInput struct {
 	EmailVerified   *bool
 	EmailVerifiedAt *time.Time
 	LastLogin       *time.Time
-	RoleRefID       int
+	RoleID          *int
 }
 
 // Mutate applies the CreateUserInput on the UserMutation builder.
@@ -461,7 +461,9 @@ func (i *CreateUserInput) Mutate(m *UserMutation) {
 	if v := i.LastLogin; v != nil {
 		m.SetLastLogin(*v)
 	}
-	m.SetRoleRefID(i.RoleRefID)
+	if v := i.RoleID; v != nil {
+		m.SetRoleID(*v)
+	}
 }
 
 // SetInput applies the change-set in the CreateUserInput on the UserCreate builder.
@@ -495,7 +497,8 @@ type UpdateUserInput struct {
 	EmailVerifiedAt      *time.Time
 	ClearLastLogin       bool
 	LastLogin            *time.Time
-	RoleRefID            *int
+	ClearRole            bool
+	RoleID               *int
 }
 
 // Mutate applies the UpdateUserInput on the UserMutation builder.
@@ -569,8 +572,11 @@ func (i *UpdateUserInput) Mutate(m *UserMutation) {
 	if v := i.LastLogin; v != nil {
 		m.SetLastLogin(*v)
 	}
-	if v := i.RoleRefID; v != nil {
-		m.SetRoleRefID(*v)
+	if i.ClearRole {
+		m.ClearRole()
+	}
+	if v := i.RoleID; v != nil {
+		m.SetRoleID(*v)
 	}
 }
 

@@ -29,6 +29,7 @@ type User struct {
 	Email    string `json:"email"`
 	Name     string `json:"name,omitempty"`
 	IsActive bool   `json:"is_active"`
+	TenantID int    `json:"tenant_id"`
 }
 
 // CachedUserData represents the complete user data with role and permissions
@@ -83,6 +84,27 @@ func GetUserOrError(ctx context.Context) (*User, error) {
 		return nil, errors.New("user not found in context")
 	}
 	return user, nil
+}
+
+// GetUserTenantID retrieves the tenant ID from the user in context
+func GetUserTenantID(ctx context.Context) (int, error) {
+	user, ok := GetUser(ctx)
+	if !ok || user == nil {
+		return 0, errors.New("user not found in context")
+	}
+	if user.TenantID == 0 {
+		return 0, errors.New("tenant ID not set for user")
+	}
+	return user.TenantID, nil
+}
+
+// RequireTenantID ensures a valid tenant ID exists in context, returns error if not
+func RequireTenantID(ctx context.Context) error {
+	_, err := GetUserTenantID(ctx)
+	if err != nil {
+		return fmt.Errorf("tenant context required: %w", err)
+	}
+	return nil
 }
 
 // SetClaims sets JWT claims in the context

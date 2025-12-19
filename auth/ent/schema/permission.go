@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -22,7 +21,6 @@ func (Permission) Mixin() []ent.Mixin {
 }
 
 // Fields of the Permission.
-// @generate-mutation: true
 // @generate-resolver: true
 // @generate-grpc: true
 func (Permission) Fields() []ent.Field {
@@ -53,10 +51,8 @@ func (Permission) Fields() []ent.Field {
 // Edges of the Permission.
 func (Permission) Edges() []ent.Edge {
 	return []ent.Edge{
-		// Permission has many RolePermissions (junction table)
-		edge.To("role_permissions", RolePermission.Type).
-			Annotations(entgql.RelayConnection()).
-			Comment("Role-Permission associations for this permission"),
+		edge.From("role_permissions", RolePermission.Type).
+			Ref("permission"),
 	}
 }
 

@@ -29,6 +29,7 @@ func (Role) Mixin() []ent.Mixin {
 // @generate-grpc: true
 // @role-level: admin
 // @permission-level: user
+// @tenant-isolated: true
 func (Role) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
@@ -57,15 +58,10 @@ func (Role) Fields() []ent.Field {
 // Edges of the Role.
 func (Role) Edges() []ent.Edge {
 	return []ent.Edge{
-		// Role has many Users
-		edge.To("users", User.Type).
-			Comment("Users with this role").
-			Annotations(entgql.RelayConnection()),
-
-		// Role has many RolePermissions (junction table)
-		edge.To("role_permissions", RolePermission.Type).
-			Comment("Role-Permission associations for this role").
-			Annotations(entgql.RelayConnection()),
+		edge.From("users", User.Type).
+			Ref("role"),
+		edge.From("role_permissions", RolePermission.Type).
+			Ref("role"),
 	}
 }
 

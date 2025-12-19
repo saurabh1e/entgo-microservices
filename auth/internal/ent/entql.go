@@ -150,7 +150,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"role_permissions",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   permission.RolePermissionsTable,
 			Columns: []string{permission.RolePermissionsColumn},
 			Bidi:    false,
@@ -162,7 +162,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"users",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.UsersTable,
 			Columns: []string{role.UsersColumn},
 			Bidi:    false,
@@ -174,7 +174,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"role_permissions",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   role.RolePermissionsTable,
 			Columns: []string{role.RolePermissionsColumn},
 			Bidi:    false,
@@ -186,7 +186,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"role",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.RoleTable,
 			Columns: []string{rolepermission.RoleColumn},
 			Bidi:    false,
@@ -198,7 +198,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"permission",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   rolepermission.PermissionTable,
 			Columns: []string{rolepermission.PermissionColumn},
 			Bidi:    false,
@@ -207,12 +207,12 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Permission",
 	)
 	graph.MustAddE(
-		"role_ref",
+		"role",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   user.RoleRefTable,
-			Columns: []string{user.RoleRefColumn},
+			Inverse: false,
+			Table:   user.RoleTable,
+			Columns: []string{user.RoleColumn},
 			Bidi:    false,
 		},
 		"User",
@@ -807,14 +807,14 @@ func (f *UserFilter) WhereLastLogin(p entql.TimeP) {
 	f.Where(p.Field(user.FieldLastLogin))
 }
 
-// WhereHasRoleRef applies a predicate to check if query has an edge role_ref.
-func (f *UserFilter) WhereHasRoleRef() {
-	f.Where(entql.HasEdge("role_ref"))
+// WhereHasRole applies a predicate to check if query has an edge role.
+func (f *UserFilter) WhereHasRole() {
+	f.Where(entql.HasEdge("role"))
 }
 
-// WhereHasRoleRefWith applies a predicate to check if query has an edge role_ref with a given conditions (other predicates).
-func (f *UserFilter) WhereHasRoleRefWith(preds ...predicate.Role) {
-	f.Where(entql.HasEdgeWith("role_ref", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasRoleWith applies a predicate to check if query has an edge role with a given conditions (other predicates).
+func (f *UserFilter) WhereHasRoleWith(preds ...predicate.Role) {
+	f.Where(entql.HasEdgeWith("role", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}

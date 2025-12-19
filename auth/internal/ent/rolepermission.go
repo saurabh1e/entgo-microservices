@@ -40,17 +40,17 @@ type RolePermission struct {
 	CanDelete bool `json:"can_delete,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RolePermissionQuery when eager-loading is set.
-	Edges                       RolePermissionEdges `json:"edges"`
-	permission_role_permissions *int
-	role_role_permissions       *int
-	selectValues                sql.SelectValues
+	Edges                      RolePermissionEdges `json:"edges"`
+	role_permission_role       *int
+	role_permission_permission *int
+	selectValues               sql.SelectValues
 }
 
 // RolePermissionEdges holds the relations/edges for other nodes in the graph.
 type RolePermissionEdges struct {
-	// Role that this permission association belongs to
+	// Role holds the value of the role edge.
 	Role *Role `json:"role,omitempty"`
-	// Permission that this role association belongs to
+	// Permission holds the value of the permission edge.
 	Permission *Permission `json:"permission,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
@@ -92,9 +92,9 @@ func (*RolePermission) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case rolepermission.FieldCreatedAt, rolepermission.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case rolepermission.ForeignKeys[0]: // permission_role_permissions
+		case rolepermission.ForeignKeys[0]: // role_permission_role
 			values[i] = new(sql.NullInt64)
-		case rolepermission.ForeignKeys[1]: // role_role_permissions
+		case rolepermission.ForeignKeys[1]: // role_permission_permission
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -175,17 +175,17 @@ func (_m *RolePermission) assignValues(columns []string, values []any) error {
 			}
 		case rolepermission.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field permission_role_permissions", value)
+				return fmt.Errorf("unexpected type %T for edge-field role_permission_role", value)
 			} else if value.Valid {
-				_m.permission_role_permissions = new(int)
-				*_m.permission_role_permissions = int(value.Int64)
+				_m.role_permission_role = new(int)
+				*_m.role_permission_role = int(value.Int64)
 			}
 		case rolepermission.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field role_role_permissions", value)
+				return fmt.Errorf("unexpected type %T for edge-field role_permission_permission", value)
 			} else if value.Valid {
-				_m.role_role_permissions = new(int)
-				*_m.role_role_permissions = int(value.Int64)
+				_m.role_permission_permission = new(int)
+				*_m.role_permission_permission = int(value.Int64)
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])

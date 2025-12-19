@@ -29,6 +29,7 @@ func (User) Mixin() []ent.Mixin {
 // @generate-grpc: true
 // @role-level: admin
 // @permission-level: user
+// @tenant-isolated: true
 func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("email").
@@ -93,12 +94,8 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		// User belongs to one Role
-		edge.From("role_ref", Role.Type).
-			Ref("users").
-			Unique().
-			Required().
-			Comment("User role relationship"),
+		edge.To("role", Role.Type).
+			Unique(),
 	}
 }
 

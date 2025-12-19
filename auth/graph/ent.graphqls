@@ -159,7 +159,7 @@ input CreateUserInput {
   emailVerified: Boolean
   emailVerifiedAt: Time
   lastLogin: Time
-  roleRefID: ID!
+  roleID: ID
 }
 """
 Define a Relay Cursor type:
@@ -260,37 +260,7 @@ type Permission implements Node {
   Whether the permission is active
   """
   isActive: Boolean!
-  rolePermissions(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for RolePermissions returned from the connection.
-    """
-    orderBy: RolePermissionOrder
-
-    """
-    Filtering options for RolePermissions returned from the connection.
-    """
-    where: RolePermissionWhereInput
-  ): RolePermissionConnection!
+  rolePermissions: [RolePermission!]
 }
 """
 A connection to a list of items.
@@ -550,68 +520,8 @@ type Role implements Node {
   Role priority for hierarchy (higher number = higher priority)
   """
   priority: Int!
-  users(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Users returned from the connection.
-    """
-    orderBy: UserOrder
-
-    """
-    Filtering options for Users returned from the connection.
-    """
-    where: UserWhereInput
-  ): UserConnection!
-  rolePermissions(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for RolePermissions returned from the connection.
-    """
-    orderBy: RolePermissionOrder
-
-    """
-    Filtering options for RolePermissions returned from the connection.
-    """
-    where: RolePermissionWhereInput
-  ): RolePermissionConnection!
+  users: [User!]
+  rolePermissions: [RolePermission!]
 }
 """
 A connection to a list of items.
@@ -704,13 +614,7 @@ type RolePermission implements Node {
   Can delete the resource
   """
   canDelete: Boolean!
-  """
-  Role that this permission association belongs to
-  """
   role: Role!
-  """
-  Permission that this role association belongs to
-  """
   permission: Permission!
 }
 """
@@ -1460,7 +1364,8 @@ input UpdateUserInput {
   clearEmailVerifiedAt: Boolean
   lastLogin: Time
   clearLastLogin: Boolean
-  roleRefID: ID
+  roleID: ID
+  clearRole: Boolean
 }
 type User implements Node {
   """
@@ -1516,10 +1421,7 @@ type User implements Node {
   emailVerified: Boolean!
   emailVerifiedAt: Time
   lastLogin: Time
-  """
-  User role relationship
-  """
-  roleRef: Role!
+  role: Role
 }
 """
 A connection to a list of items.
@@ -1842,8 +1744,8 @@ input UserWhereInput {
   lastLoginIsNil: Boolean
   lastLoginNotNil: Boolean
   """
-  role_ref edge predicates
+  role edge predicates
   """
-  hasRoleRef: Boolean
-  hasRoleRefWith: [RoleWhereInput!]
+  hasRole: Boolean
+  hasRoleWith: [RoleWhereInput!]
 }

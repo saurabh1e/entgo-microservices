@@ -5,6 +5,7 @@ package rolepermission
 import (
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -44,14 +45,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "role" package.
 	RoleInverseTable = "roles"
 	// RoleColumn is the table column denoting the role relation/edge.
-	RoleColumn = "role_role_permissions"
+	RoleColumn = "role_permission_role"
 	// PermissionTable is the table that holds the permission relation/edge.
 	PermissionTable = "role_permissions"
 	// PermissionInverseTable is the table name for the Permission entity.
 	// It exists in this package in order to avoid circular dependency with the "permission" package.
 	PermissionInverseTable = "permissions"
 	// PermissionColumn is the table column denoting the permission relation/edge.
-	PermissionColumn = "permission_role_permissions"
+	PermissionColumn = "role_permission_permission"
 )
 
 // Columns holds all SQL columns for rolepermission fields.
@@ -71,8 +72,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "role_permissions"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"permission_role_permissions",
-	"role_role_permissions",
+	"role_permission_role",
+	"role_permission_permission",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -90,7 +91,14 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "github.com/saurabh/entgo-microservices/auth/internal/ent/runtime"
 var (
+	Hooks  [6]ent.Hook
+	Policy ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -181,13 +189,13 @@ func newRoleStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RoleInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, RoleTable, RoleColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, RoleTable, RoleColumn),
 	)
 }
 func newPermissionStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PermissionInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, PermissionTable, PermissionColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, PermissionTable, PermissionColumn),
 	)
 }

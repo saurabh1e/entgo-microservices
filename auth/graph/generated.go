@@ -105,7 +105,7 @@ type ComplexityRoot struct {
 		Name            func(childComplexity int) int
 		OwnedBy         func(childComplexity int) int
 		Resource        func(childComplexity int) int
-		RolePermissions func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RolePermissionOrder, where *ent.RolePermissionWhereInput) int
+		RolePermissions func(childComplexity int) int
 		TenantID        func(childComplexity int) int
 		UpdatedAt       func(childComplexity int) int
 	}
@@ -151,10 +151,10 @@ type ComplexityRoot struct {
 		Name            func(childComplexity int) int
 		OwnedBy         func(childComplexity int) int
 		Priority        func(childComplexity int) int
-		RolePermissions func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RolePermissionOrder, where *ent.RolePermissionWhereInput) int
+		RolePermissions func(childComplexity int) int
 		TenantID        func(childComplexity int) int
 		UpdatedAt       func(childComplexity int) int
-		Users           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.UserOrder, where *ent.UserWhereInput) int
+		Users           func(childComplexity int) int
 	}
 
 	RoleConnection struct {
@@ -243,7 +243,7 @@ type ComplexityRoot struct {
 		OwnedBy         func(childComplexity int) int
 		PaymentTerms    func(childComplexity int) int
 		Phone           func(childComplexity int) int
-		RoleRef         func(childComplexity int) int
+		Role            func(childComplexity int) int
 		TenantID        func(childComplexity int) int
 		UpdatedAt       func(childComplexity int) int
 		UserCode        func(childComplexity int) int
@@ -646,12 +646,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		args, err := ec.field_Permission_rolePermissions_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Permission.RolePermissions(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.RolePermissionOrder), args["where"].(*ent.RolePermissionWhereInput)), true
+		return e.complexity.Permission.RolePermissions(childComplexity), true
 	case "Permission.tenantID":
 		if e.complexity.Permission.TenantID == nil {
 			break
@@ -892,12 +887,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		args, err := ec.field_Role_rolePermissions_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Role.RolePermissions(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.RolePermissionOrder), args["where"].(*ent.RolePermissionWhereInput)), true
+		return e.complexity.Role.RolePermissions(childComplexity), true
 	case "Role.tenantID":
 		if e.complexity.Role.TenantID == nil {
 			break
@@ -915,12 +905,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		args, err := ec.field_Role_users_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Role.Users(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.UserOrder), args["where"].(*ent.UserWhereInput)), true
+		return e.complexity.Role.Users(childComplexity), true
 
 	case "RoleConnection.edges":
 		if e.complexity.RoleConnection.Edges == nil {
@@ -1279,12 +1264,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.Phone(childComplexity), true
-	case "User.roleRef":
-		if e.complexity.User.RoleRef == nil {
+	case "User.role":
+		if e.complexity.User.Role == nil {
 			break
 		}
 
-		return e.complexity.User.RoleRef(childComplexity), true
+		return e.complexity.User.Role(childComplexity), true
 	case "User.tenantID":
 		if e.complexity.User.TenantID == nil {
 			break
@@ -1740,42 +1725,6 @@ func (ec *executionContext) field_Mutation_updateUser_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Permission_rolePermissions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "after", ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor)
-	if err != nil {
-		return nil, err
-	}
-	args["after"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
-	if err != nil {
-		return nil, err
-	}
-	args["first"] = arg1
-	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "before", ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor)
-	if err != nil {
-		return nil, err
-	}
-	args["before"] = arg2
-	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
-	if err != nil {
-		return nil, err
-	}
-	args["last"] = arg3
-	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalORolePermissionOrder2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionOrder)
-	if err != nil {
-		return nil, err
-	}
-	args["orderBy"] = arg4
-	arg5, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalORolePermissionWhereInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionWhereInput)
-	if err != nil {
-		return nil, err
-	}
-	args["where"] = arg5
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_PermissionByID_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -1997,78 +1946,6 @@ func (ec *executionContext) field_Query_nodes_args(ctx context.Context, rawArgs 
 	return args, nil
 }
 
-func (ec *executionContext) field_Role_rolePermissions_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "after", ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor)
-	if err != nil {
-		return nil, err
-	}
-	args["after"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
-	if err != nil {
-		return nil, err
-	}
-	args["first"] = arg1
-	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "before", ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor)
-	if err != nil {
-		return nil, err
-	}
-	args["before"] = arg2
-	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
-	if err != nil {
-		return nil, err
-	}
-	args["last"] = arg3
-	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalORolePermissionOrder2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionOrder)
-	if err != nil {
-		return nil, err
-	}
-	args["orderBy"] = arg4
-	arg5, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalORolePermissionWhereInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionWhereInput)
-	if err != nil {
-		return nil, err
-	}
-	args["where"] = arg5
-	return args, nil
-}
-
-func (ec *executionContext) field_Role_users_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "after", ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor)
-	if err != nil {
-		return nil, err
-	}
-	args["after"] = arg0
-	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "first", ec.unmarshalOInt2ᚖint)
-	if err != nil {
-		return nil, err
-	}
-	args["first"] = arg1
-	arg2, err := graphql.ProcessArgField(ctx, rawArgs, "before", ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor)
-	if err != nil {
-		return nil, err
-	}
-	args["before"] = arg2
-	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "last", ec.unmarshalOInt2ᚖint)
-	if err != nil {
-		return nil, err
-	}
-	args["last"] = arg3
-	arg4, err := graphql.ProcessArgField(ctx, rawArgs, "orderBy", ec.unmarshalOUserOrder2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUserOrder)
-	if err != nil {
-		return nil, err
-	}
-	args["orderBy"] = arg4
-	arg5, err := graphql.ProcessArgField(ctx, rawArgs, "where", ec.unmarshalOUserWhereInput2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUserWhereInput)
-	if err != nil {
-		return nil, err
-	}
-	args["where"] = arg5
-	return args, nil
-}
-
 func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -2185,8 +2062,8 @@ func (ec *executionContext) fieldContext_LoginResponse_user(_ context.Context, f
 				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
 			case "lastLogin":
 				return ec.fieldContext_User_lastLogin(ctx, field)
-			case "roleRef":
-				return ec.fieldContext_User_roleRef(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -3455,8 +3332,8 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
 			case "lastLogin":
 				return ec.fieldContext_User_lastLogin(ctx, field)
-			case "roleRef":
-				return ec.fieldContext_User_roleRef(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -3553,8 +3430,8 @@ func (ec *executionContext) fieldContext_Mutation_createBulkUser(ctx context.Con
 				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
 			case "lastLogin":
 				return ec.fieldContext_User_lastLogin(ctx, field)
-			case "roleRef":
-				return ec.fieldContext_User_roleRef(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -3651,8 +3528,8 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
 			case "lastLogin":
 				return ec.fieldContext_User_lastLogin(ctx, field)
-			case "roleRef":
-				return ec.fieldContext_User_roleRef(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -4167,17 +4044,16 @@ func (ec *executionContext) _Permission_rolePermissions(ctx context.Context, fie
 		field,
 		ec.fieldContext_Permission_rolePermissions,
 		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return obj.RolePermissions(ctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.RolePermissionOrder), fc.Args["where"].(*ent.RolePermissionWhereInput))
+			return obj.RolePermissions(ctx)
 		},
 		nil,
-		ec.marshalNRolePermissionConnection2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionConnection,
+		ec.marshalORolePermission2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionᚄ,
 		true,
-		true,
+		false,
 	)
 }
 
-func (ec *executionContext) fieldContext_Permission_rolePermissions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Permission_rolePermissions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Permission",
 		Field:      field,
@@ -4185,26 +4061,33 @@ func (ec *executionContext) fieldContext_Permission_rolePermissions(ctx context.
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_RolePermissionConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_RolePermissionConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_RolePermissionConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_RolePermission_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_RolePermission_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_RolePermission_createdBy(ctx, field)
+			case "ownedBy":
+				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_RolePermission_tenantID(ctx, field)
+			case "canRead":
+				return ec.fieldContext_RolePermission_canRead(ctx, field)
+			case "canCreate":
+				return ec.fieldContext_RolePermission_canCreate(ctx, field)
+			case "canUpdate":
+				return ec.fieldContext_RolePermission_canUpdate(ctx, field)
+			case "canDelete":
+				return ec.fieldContext_RolePermission_canDelete(ctx, field)
+			case "role":
+				return ec.fieldContext_RolePermission_role(ctx, field)
+			case "permission":
+				return ec.fieldContext_RolePermission_permission(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type RolePermissionConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type RolePermission", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Permission_rolePermissions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -4555,8 +4438,8 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
 			case "lastLogin":
 				return ec.fieldContext_User_lastLogin(ctx, field)
-			case "roleRef":
-				return ec.fieldContext_User_roleRef(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -5070,8 +4953,8 @@ func (ec *executionContext) fieldContext_Query_UserByID(ctx context.Context, fie
 				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
 			case "lastLogin":
 				return ec.fieldContext_User_lastLogin(ctx, field)
-			case "roleRef":
-				return ec.fieldContext_User_roleRef(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -5324,8 +5207,8 @@ func (ec *executionContext) fieldContext_RegisterResponse_user(_ context.Context
 				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
 			case "lastLogin":
 				return ec.fieldContext_User_lastLogin(ctx, field)
-			case "roleRef":
-				return ec.fieldContext_User_roleRef(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -5717,17 +5600,16 @@ func (ec *executionContext) _Role_users(ctx context.Context, field graphql.Colle
 		field,
 		ec.fieldContext_Role_users,
 		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return obj.Users(ctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.UserOrder), fc.Args["where"].(*ent.UserWhereInput))
+			return obj.Users(ctx)
 		},
 		nil,
-		ec.marshalNUserConnection2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUserConnection,
+		ec.marshalOUser2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUserᚄ,
 		true,
-		true,
+		false,
 	)
 }
 
-func (ec *executionContext) fieldContext_Role_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Role_users(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Role",
 		Field:      field,
@@ -5735,26 +5617,51 @@ func (ec *executionContext) fieldContext_Role_users(ctx context.Context, field g
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_UserConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_UserConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_UserConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_User_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_User_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_User_createdBy(ctx, field)
+			case "ownedBy":
+				return ec.fieldContext_User_ownedBy(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_User_tenantID(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "username":
+				return ec.fieldContext_User_username(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			case "phone":
+				return ec.fieldContext_User_phone(ctx, field)
+			case "address":
+				return ec.fieldContext_User_address(ctx, field)
+			case "userType":
+				return ec.fieldContext_User_userType(ctx, field)
+			case "userCode":
+				return ec.fieldContext_User_userCode(ctx, field)
+			case "companyName":
+				return ec.fieldContext_User_companyName(ctx, field)
+			case "customerType":
+				return ec.fieldContext_User_customerType(ctx, field)
+			case "paymentTerms":
+				return ec.fieldContext_User_paymentTerms(ctx, field)
+			case "isActive":
+				return ec.fieldContext_User_isActive(ctx, field)
+			case "emailVerified":
+				return ec.fieldContext_User_emailVerified(ctx, field)
+			case "emailVerifiedAt":
+				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
+			case "lastLogin":
+				return ec.fieldContext_User_lastLogin(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type UserConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Role_users_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -5766,17 +5673,16 @@ func (ec *executionContext) _Role_rolePermissions(ctx context.Context, field gra
 		field,
 		ec.fieldContext_Role_rolePermissions,
 		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return obj.RolePermissions(ctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.RolePermissionOrder), fc.Args["where"].(*ent.RolePermissionWhereInput))
+			return obj.RolePermissions(ctx)
 		},
 		nil,
-		ec.marshalNRolePermissionConnection2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionConnection,
+		ec.marshalORolePermission2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionᚄ,
 		true,
-		true,
+		false,
 	)
 }
 
-func (ec *executionContext) fieldContext_Role_rolePermissions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Role_rolePermissions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Role",
 		Field:      field,
@@ -5784,26 +5690,33 @@ func (ec *executionContext) fieldContext_Role_rolePermissions(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_RolePermissionConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_RolePermissionConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_RolePermissionConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_RolePermission_id(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_RolePermission_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_RolePermission_updatedAt(ctx, field)
+			case "createdBy":
+				return ec.fieldContext_RolePermission_createdBy(ctx, field)
+			case "ownedBy":
+				return ec.fieldContext_RolePermission_ownedBy(ctx, field)
+			case "tenantID":
+				return ec.fieldContext_RolePermission_tenantID(ctx, field)
+			case "canRead":
+				return ec.fieldContext_RolePermission_canRead(ctx, field)
+			case "canCreate":
+				return ec.fieldContext_RolePermission_canCreate(ctx, field)
+			case "canUpdate":
+				return ec.fieldContext_RolePermission_canUpdate(ctx, field)
+			case "canDelete":
+				return ec.fieldContext_RolePermission_canDelete(ctx, field)
+			case "role":
+				return ec.fieldContext_RolePermission_role(ctx, field)
+			case "permission":
+				return ec.fieldContext_RolePermission_permission(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type RolePermissionConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type RolePermission", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Role_rolePermissions_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -7821,23 +7734,23 @@ func (ec *executionContext) fieldContext_User_lastLogin(_ context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _User_roleRef(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_role(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_User_roleRef,
+		ec.fieldContext_User_role,
 		func(ctx context.Context) (any, error) {
-			return obj.RoleRef(ctx)
+			return obj.Role(ctx)
 		},
 		nil,
-		ec.marshalNRole2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRole,
+		ec.marshalORole2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRole,
 		true,
-		true,
+		false,
 	)
 }
 
-func (ec *executionContext) fieldContext_User_roleRef(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_User_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -8045,8 +7958,8 @@ func (ec *executionContext) fieldContext_UserEdge_node(_ context.Context, field 
 				return ec.fieldContext_User_emailVerifiedAt(ctx, field)
 			case "lastLogin":
 				return ec.fieldContext_User_lastLogin(ctx, field)
-			case "roleRef":
-				return ec.fieldContext_User_roleRef(ctx, field)
+			case "role":
+				return ec.fieldContext_User_role(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
@@ -9812,7 +9725,7 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "username", "passwordHash", "name", "phone", "address", "userType", "userCode", "companyName", "customerType", "paymentTerms", "isActive", "emailVerified", "emailVerifiedAt", "lastLogin", "roleRefID"}
+	fieldsInOrder := [...]string{"email", "username", "passwordHash", "name", "phone", "address", "userType", "userCode", "companyName", "customerType", "paymentTerms", "isActive", "emailVerified", "emailVerifiedAt", "lastLogin", "roleID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -9924,13 +9837,13 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.LastLogin = data
-		case "roleRefID":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roleRefID"))
-			data, err := ec.unmarshalNID2int(ctx, v)
+		case "roleID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roleID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.RoleRefID = data
+			it.RoleID = data
 		}
 	}
 
@@ -13257,7 +13170,7 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "username", "passwordHash", "name", "phone", "clearPhone", "address", "clearAddress", "userType", "userCode", "clearUserCode", "companyName", "clearCompanyName", "customerType", "clearCustomerType", "paymentTerms", "clearPaymentTerms", "isActive", "emailVerified", "emailVerifiedAt", "clearEmailVerifiedAt", "lastLogin", "clearLastLogin", "roleRefID"}
+	fieldsInOrder := [...]string{"email", "username", "passwordHash", "name", "phone", "clearPhone", "address", "clearAddress", "userType", "userCode", "clearUserCode", "companyName", "clearCompanyName", "customerType", "clearCustomerType", "paymentTerms", "clearPaymentTerms", "isActive", "emailVerified", "emailVerifiedAt", "clearEmailVerifiedAt", "lastLogin", "clearLastLogin", "roleID", "clearRole"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13425,13 +13338,20 @@ func (ec *executionContext) unmarshalInputUpdateUserInput(ctx context.Context, o
 				return it, err
 			}
 			it.ClearLastLogin = data
-		case "roleRefID":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roleRefID"))
+		case "roleID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roleID"))
 			data, err := ec.unmarshalOID2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.RoleRefID = data
+			it.RoleID = data
+		case "clearRole":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearRole"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearRole = data
 		}
 	}
 
@@ -13483,7 +13403,7 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "username", "usernameNEQ", "usernameIn", "usernameNotIn", "usernameGT", "usernameGTE", "usernameLT", "usernameLTE", "usernameContains", "usernameHasPrefix", "usernameHasSuffix", "usernameEqualFold", "usernameContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "phone", "phoneNEQ", "phoneIn", "phoneNotIn", "phoneGT", "phoneGTE", "phoneLT", "phoneLTE", "phoneContains", "phoneHasPrefix", "phoneHasSuffix", "phoneIsNil", "phoneNotNil", "phoneEqualFold", "phoneContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressIsNil", "addressNotNil", "addressEqualFold", "addressContainsFold", "userType", "userTypeNEQ", "userTypeIn", "userTypeNotIn", "userTypeGT", "userTypeGTE", "userTypeLT", "userTypeLTE", "userTypeContains", "userTypeHasPrefix", "userTypeHasSuffix", "userTypeEqualFold", "userTypeContainsFold", "userCode", "userCodeNEQ", "userCodeIn", "userCodeNotIn", "userCodeGT", "userCodeGTE", "userCodeLT", "userCodeLTE", "userCodeContains", "userCodeHasPrefix", "userCodeHasSuffix", "userCodeIsNil", "userCodeNotNil", "userCodeEqualFold", "userCodeContainsFold", "companyName", "companyNameNEQ", "companyNameIn", "companyNameNotIn", "companyNameGT", "companyNameGTE", "companyNameLT", "companyNameLTE", "companyNameContains", "companyNameHasPrefix", "companyNameHasSuffix", "companyNameIsNil", "companyNameNotNil", "companyNameEqualFold", "companyNameContainsFold", "customerType", "customerTypeNEQ", "customerTypeIn", "customerTypeNotIn", "customerTypeGT", "customerTypeGTE", "customerTypeLT", "customerTypeLTE", "customerTypeContains", "customerTypeHasPrefix", "customerTypeHasSuffix", "customerTypeIsNil", "customerTypeNotNil", "customerTypeEqualFold", "customerTypeContainsFold", "paymentTerms", "paymentTermsNEQ", "paymentTermsIn", "paymentTermsNotIn", "paymentTermsGT", "paymentTermsGTE", "paymentTermsLT", "paymentTermsLTE", "paymentTermsIsNil", "paymentTermsNotNil", "isActive", "isActiveNEQ", "emailVerified", "emailVerifiedNEQ", "emailVerifiedAt", "emailVerifiedAtNEQ", "emailVerifiedAtIn", "emailVerifiedAtNotIn", "emailVerifiedAtGT", "emailVerifiedAtGTE", "emailVerifiedAtLT", "emailVerifiedAtLTE", "emailVerifiedAtIsNil", "emailVerifiedAtNotNil", "lastLogin", "lastLoginNEQ", "lastLoginIn", "lastLoginNotIn", "lastLoginGT", "lastLoginGTE", "lastLoginLT", "lastLoginLTE", "lastLoginIsNil", "lastLoginNotNil", "hasRoleRef", "hasRoleRefWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "ownedBy", "ownedByNEQ", "ownedByIn", "ownedByNotIn", "ownedByGT", "ownedByGTE", "ownedByLT", "ownedByLTE", "ownedByIsNil", "ownedByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "username", "usernameNEQ", "usernameIn", "usernameNotIn", "usernameGT", "usernameGTE", "usernameLT", "usernameLTE", "usernameContains", "usernameHasPrefix", "usernameHasSuffix", "usernameEqualFold", "usernameContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "phone", "phoneNEQ", "phoneIn", "phoneNotIn", "phoneGT", "phoneGTE", "phoneLT", "phoneLTE", "phoneContains", "phoneHasPrefix", "phoneHasSuffix", "phoneIsNil", "phoneNotNil", "phoneEqualFold", "phoneContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressIsNil", "addressNotNil", "addressEqualFold", "addressContainsFold", "userType", "userTypeNEQ", "userTypeIn", "userTypeNotIn", "userTypeGT", "userTypeGTE", "userTypeLT", "userTypeLTE", "userTypeContains", "userTypeHasPrefix", "userTypeHasSuffix", "userTypeEqualFold", "userTypeContainsFold", "userCode", "userCodeNEQ", "userCodeIn", "userCodeNotIn", "userCodeGT", "userCodeGTE", "userCodeLT", "userCodeLTE", "userCodeContains", "userCodeHasPrefix", "userCodeHasSuffix", "userCodeIsNil", "userCodeNotNil", "userCodeEqualFold", "userCodeContainsFold", "companyName", "companyNameNEQ", "companyNameIn", "companyNameNotIn", "companyNameGT", "companyNameGTE", "companyNameLT", "companyNameLTE", "companyNameContains", "companyNameHasPrefix", "companyNameHasSuffix", "companyNameIsNil", "companyNameNotNil", "companyNameEqualFold", "companyNameContainsFold", "customerType", "customerTypeNEQ", "customerTypeIn", "customerTypeNotIn", "customerTypeGT", "customerTypeGTE", "customerTypeLT", "customerTypeLTE", "customerTypeContains", "customerTypeHasPrefix", "customerTypeHasSuffix", "customerTypeIsNil", "customerTypeNotNil", "customerTypeEqualFold", "customerTypeContainsFold", "paymentTerms", "paymentTermsNEQ", "paymentTermsIn", "paymentTermsNotIn", "paymentTermsGT", "paymentTermsGTE", "paymentTermsLT", "paymentTermsLTE", "paymentTermsIsNil", "paymentTermsNotNil", "isActive", "isActiveNEQ", "emailVerified", "emailVerifiedNEQ", "emailVerifiedAt", "emailVerifiedAtNEQ", "emailVerifiedAtIn", "emailVerifiedAtNotIn", "emailVerifiedAtGT", "emailVerifiedAtGTE", "emailVerifiedAtLT", "emailVerifiedAtLTE", "emailVerifiedAtIsNil", "emailVerifiedAtNotNil", "lastLogin", "lastLoginNEQ", "lastLoginIn", "lastLoginNotIn", "lastLoginGT", "lastLoginGTE", "lastLoginLT", "lastLoginLTE", "lastLoginIsNil", "lastLoginNotNil", "hasRole", "hasRoleWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14946,20 +14866,20 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.LastLoginNotNil = data
-		case "hasRoleRef":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRoleRef"))
+		case "hasRole":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRole"))
 			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.HasRoleRef = data
-		case "hasRoleRefWith":
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRoleRefWith"))
+			it.HasRole = data
+		case "hasRoleWith":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRoleWith"))
 			data, err := ec.unmarshalORoleWhereInput2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRoleWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.HasRoleRefWith = data
+			it.HasRoleWith = data
 		}
 	}
 
@@ -15390,16 +15310,13 @@ func (ec *executionContext) _Permission(ctx context.Context, sel ast.SelectionSe
 		case "rolePermissions":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
 				res = ec._Permission_rolePermissions(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 
@@ -15916,16 +15833,13 @@ func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj
 		case "users":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
 				res = ec._Role_users(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 
@@ -15952,16 +15866,13 @@ func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj
 		case "rolePermissions":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
 				res = ec._Role_rolePermissions(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
 				return res
 			}
 
@@ -16627,19 +16538,16 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_emailVerifiedAt(ctx, field, obj)
 		case "lastLogin":
 			out.Values[i] = ec._User_lastLogin(ctx, field, obj)
-		case "roleRef":
+		case "role":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._User_roleRef(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
+				res = ec._User_role(ctx, field, obj)
 				return res
 			}
 
@@ -18481,6 +18389,53 @@ func (ec *executionContext) unmarshalORoleOrder2ᚖgithubᚗcomᚋsaurabhᚋentg
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalORolePermission2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermissionᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.RolePermission) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNRolePermission2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermission(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalORolePermission2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐRolePermission(ctx context.Context, sel ast.SelectionSet, v *ent.RolePermission) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -18876,6 +18831,53 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	_ = ctx
 	res := graphql.MarshalTime(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOUser2ᚕᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.User) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNUser2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOUser2ᚖgithubᚗcomᚋsaurabhᚋentgoᚑmicroservicesᚋauthᚋinternalᚋentᚐUser(ctx context.Context, sel ast.SelectionSet, v *ent.User) graphql.Marshaler {
