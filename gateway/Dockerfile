@@ -17,11 +17,13 @@ ENV PATH=$GOPATH/bin:/usr/local/go/bin:$PATH
 # Install air for hot-reload
 RUN go install github.com/cosmtrek/air@latest || go install github.com/air-verse/air@latest
 
-# Cache go modules
-COPY go.mod go.sum ./
+# Copy module files and the local pkg module so `replace ../pkg` resolves during go mod download
+COPY gateway/go.mod gateway/go.sum ./
+COPY pkg /pkg
 RUN go env -w GOPROXY=https://proxy.golang.org && go mod download
 
-COPY . .
+# Copy the rest of the source for the dev environment (mounted in compose for live edits)
+COPY gateway .
 EXPOSE 8080
 CMD ["air", "-c", ".air.toml"]
 
@@ -31,9 +33,11 @@ CMD ["air", "-c", ".air.toml"]
 FROM golang:1.25.5-alpine AS builder
 RUN apk add --no-cache git ca-certificates
 WORKDIR /src
-COPY go.mod go.sum ./
+# Copy module files and local pkg module for build
+COPY gateway/go.mod gateway/go.sum ./
+COPY pkg /pkg
 RUN go env -w GOPROXY=https://proxy.golang.org && go mod download
-COPY . .
+COPY gateway .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./tmp/main ./
 
 # --------------------

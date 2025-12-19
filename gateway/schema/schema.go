@@ -98,8 +98,15 @@ func (m *Manager) CollectSchema(name, url string) bool {
 		"query": "query IntrospectionQuery { __schema { queryType { name } mutationType { name } subscriptionType { name } types { ...FullType } directives { name description locations args { ...InputValue } } } } fragment FullType on __Type { kind name description fields(includeDeprecated: true) { name description args { ...InputValue } type { ...TypeRef } isDeprecated deprecationReason } inputFields { ...InputValue } interfaces { ...TypeRef } enumValues(includeDeprecated: true) { name description isDeprecated deprecationReason } possibleTypes { ...TypeRef } } fragment InputValue on __InputValue { name description type { ...TypeRef } defaultValue } fragment TypeRef on __Type { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name ofType { kind name } } } } } } } }"
 	}`
 
-	// Send request with timeout
-	client := &http.Client{Timeout: 10 * time.Second}
+	// Send request with extended timeout and transport settings to handle large responses
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			MaxResponseHeaderBytes: 10 * 1024 * 1024, // 10MB for headers
+			ResponseHeaderTimeout:  30 * time.Second,
+			ExpectContinueTimeout:  5 * time.Second,
+		},
+	}
 	resp, err := client.Post(url, "application/json", bytes.NewBuffer([]byte(query)))
 	if err != nil {
 		log.Printf("Failed to connect to %s: %v", name, err)
@@ -113,19 +120,15 @@ func (m *Manager) CollectSchema(name, url string) bool {
 		return false
 	}
 
-	// Read and parse response
+	// Read and parse response with no size limit
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to read response from %s: %v", name, err)
 		return false
 	}
 
-	// Log raw response for debugging
-	if len(respBody) < 1000 {
-		log.Printf("Raw response from %s: %s", name, string(respBody))
-	} else {
-		log.Printf("Raw response from %s: %s... (truncated)", name, string(respBody[:1000]))
-	}
+	// Log response size for debugging
+	log.Printf("Received response from %s: %d bytes", name, len(respBody))
 
 	var schemaResp SchemaResponse
 	if err := json.Unmarshal(respBody, &schemaResp); err != nil {
@@ -152,6 +155,8 @@ func (m *Manager) UpdateRoutes(url string, schema *SchemaResponse) {
 	m.RouteLock.Lock()
 	defer m.RouteLock.Unlock()
 
+	operationsAdded := 0
+
 	// Find Query, Mutation, and Subscription types
 	for _, typeObj := range schema.Data.Schema.Types {
 		if typeObj.Name == "Query" || typeObj.Name == "Mutation" || typeObj.Name == "Subscription" {
@@ -161,6 +166,7 @@ func (m *Manager) UpdateRoutes(url string, schema *SchemaResponse) {
 					if fieldObj, ok := field.(map[string]interface{}); ok {
 						if fieldName, ok := fieldObj["name"].(string); ok {
 							m.Routes[fieldName] = url
+							operationsAdded++
 						}
 					}
 				}
@@ -168,7 +174,7 @@ func (m *Manager) UpdateRoutes(url string, schema *SchemaResponse) {
 		}
 	}
 
-	log.Printf("Mapped %d operations to service %s", len(m.Routes), url)
+	log.Printf("Mapped %d operations from this service (total: %d) to %s", operationsAdded, len(m.Routes), url)
 }
 
 // MergeSchemas combines all service schemas into a single schema
@@ -228,8 +234,11 @@ func (m *Manager) MergeSchemas() {
 					serviceStats[name] = stats
 
 					// Add fields to the collection
+					beforeCount := len(queryFields)
 					queryFields = append(queryFields, fields...)
-					log.Printf("Service %s provides %d queries", name, len(fields))
+					afterCount := len(queryFields)
+					log.Printf("Service %s provides %d queries (total queries now: %d, added: %d)",
+						name, len(fields), afterCount, afterCount-beforeCount)
 				}
 				continue
 			}
@@ -242,8 +251,11 @@ func (m *Manager) MergeSchemas() {
 					serviceStats[name] = stats
 
 					// Add fields to the collection
+					beforeCount := len(mutationFields)
 					mutationFields = append(mutationFields, fields...)
-					log.Printf("Service %s provides %d mutations", name, len(fields))
+					afterCount := len(mutationFields)
+					log.Printf("Service %s provides %d mutations (total mutations now: %d, added: %d)",
+						name, len(fields), afterCount, afterCount-beforeCount)
 				}
 				continue
 			}
@@ -279,10 +291,11 @@ func (m *Manager) MergeSchemas() {
 	for name, stats := range serviceStats {
 		fmt.Printf("  • %s: %d queries, %d mutations\n", name, stats.QueryCount, stats.MutationCount)
 	}
-	fmt.Printf("  • Total: %d queries, %d mutations\n", len(queryFields), len(mutationFields))
+	fmt.Printf("  • Total collected: %d queries, %d mutations\n", len(queryFields), len(mutationFields))
 
 	// Add Query type with all fields
 	if len(queryFields) > 0 || m.MergedSchema.Data.Schema.QueryType != nil {
+		log.Printf("Creating merged Query type with %d fields", len(queryFields))
 		m.MergedSchema.Data.Schema.Types = append(m.MergedSchema.Data.Schema.Types, SchemaType{
 			Kind:       "OBJECT",
 			Name:       "Query",
@@ -293,6 +306,7 @@ func (m *Manager) MergeSchemas() {
 
 	// Add Mutation type with all fields
 	if len(mutationFields) > 0 || m.MergedSchema.Data.Schema.MutationType != nil {
+		log.Printf("Creating merged Mutation type with %d fields", len(mutationFields))
 		m.MergedSchema.Data.Schema.Types = append(m.MergedSchema.Data.Schema.Types, SchemaType{
 			Kind:       "OBJECT",
 			Name:       "Mutation",
@@ -349,6 +363,7 @@ func (m *Manager) GetMergedSchema() interface{} {
 		if typeObj.Name == "Query" || typeObj.Name == "Mutation" {
 			// Validate and enhance field structure
 			if fields, ok := typeObj.Fields.([]interface{}); ok {
+				log.Printf("Processing %s type with %d fields", typeObj.Name, len(fields))
 				// Ensure each field has the required properties
 				for j, field := range fields {
 					if fieldObj, ok := field.(map[string]interface{}); ok {

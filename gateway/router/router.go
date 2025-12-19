@@ -164,8 +164,14 @@ func (r *Router) forwardRequest(w http.ResponseWriter, originalReq *http.Request
 	req.Header.Set("Content-Type", "application/json")
 	copyHeaders(originalReq.Header, req.Header)
 
-	// Send the request
-	client := &http.Client{Timeout: 10 * time.Second}
+	// Send the request with extended timeout and transport settings
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			MaxResponseHeaderBytes: 10 * 1024 * 1024, // 10MB for headers
+			ResponseHeaderTimeout:  30 * time.Second,
+		},
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Error forwarding to service %s: %v", serviceURL, err)

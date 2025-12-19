@@ -15,10 +15,6 @@ type ServiceClients struct {
 	// Auth microservice client
 	authClient     *AuthServiceClient
 	authClientOnce sync.Once
-
-	// Microservice microservice client
-	microserviceClient     *MicroserviceServiceClient
-	microserviceClientOnce sync.Once
 }
 
 // NewServiceClients creates a new service clients instance
@@ -34,14 +30,6 @@ func (s *ServiceClients) Auth() *AuthServiceClient {
 		s.authClient = NewAuthServiceClient(s.gatewayClient)
 	})
 	return s.authClient
-}
-
-// Microservice returns the Microservice microservice client (handles all microservice models)
-func (s *ServiceClients) Microservice() *MicroserviceServiceClient {
-	s.microserviceClientOnce.Do(func() {
-		s.microserviceClient = NewMicroserviceServiceClient(s.gatewayClient)
-	})
-	return s.microserviceClient
 }
 
 // Legacy compatibility - will be deprecated

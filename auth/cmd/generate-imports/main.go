@@ -26,18 +26,17 @@ func main() {
 	if err := run(); err != nil {
 		log.Fatalf("Generation failed: %v", err)
 	}
-	log.Println("✅ Successfully processed all schemas!")
+	log.Println("Successfully processed schemas")
 }
 
 func run() error {
-	log.Println("🔗 Auto-generating imports and methods for schemas...")
+	log.Println("Auto-generating imports and methods...")
 
 	// Get module name using common utility
 	moduleName, err := common.GetModuleName()
 	if err != nil {
 		return fmt.Errorf("getting module name: %w", err)
 	}
-	log.Printf("Detected module name: %s", moduleName)
 
 	// Get all schema files
 	schemas, err := getSchemaFiles("./ent/schema", moduleName)
@@ -49,20 +48,20 @@ func run() error {
 
 	for _, schema := range schemas {
 		if schema.HasPrivacy {
-			log.Printf("Adding Policy() method to %s", schema.Name)
+			log.Printf("Processing privacy: %s", schema.Name)
 			if err := addPolicyMethod(schema); err != nil {
-				log.Printf("Error adding Policy method to %s: %v", schema.Name, err)
+				log.Printf("Error adding Policy to %s: %v", schema.Name, err)
 			} else {
-				log.Printf("✅ Added Policy() method to %s", schema.Name)
+				log.Printf("Added Policy to %s", schema.Name)
 			}
 		}
 
 		if schema.HasHooks {
-			log.Printf("Adding Hooks() method to %s", schema.Name)
+			log.Printf("Processing hooks: %s", schema.Name)
 			if err := addHooksMethod(schema); err != nil {
-				log.Printf("Error adding Hooks method to %s: %v", schema.Name, err)
+				log.Printf("Error adding Hooks to %s: %v", schema.Name, err)
 			} else {
-				log.Printf("✅ Added Hooks() method to %s", schema.Name)
+				log.Printf("Added Hooks to %s", schema.Name)
 			}
 		}
 	}
@@ -83,7 +82,7 @@ func getSchemaFiles(schemaDir, moduleName string) ([]SchemaInfo, error) {
 		// Extract schema name using common utility
 		schemaName, err := common.ExtractEntityName(filePath)
 		if err != nil {
-			log.Printf("Warning: Could not extract schema name from %s: %v", filePath, err)
+			log.Printf("Warning: could not extract schema name from %s: %v", filePath, err)
 			continue
 		}
 
@@ -94,7 +93,7 @@ func getSchemaFiles(schemaDir, moduleName string) ([]SchemaInfo, error) {
 		// Parse annotations using common utility
 		annotations, err := common.ParseAnnotations(filePath)
 		if err != nil {
-			log.Printf("Warning: Could not parse annotations from %s: %v", filePath, err)
+			log.Printf("Warning: could not parse annotations from %s: %v", filePath, err)
 			continue
 		}
 
@@ -109,17 +108,6 @@ func getSchemaFiles(schemaDir, moduleName string) ([]SchemaInfo, error) {
 			ModuleName:      moduleName,
 		}
 
-		// Log what we found
-		privacyStatus := "❌"
-		if schema.HasPrivacy {
-			privacyStatus = "✅"
-		}
-		hooksStatus := "❌"
-		if schema.HasHooks {
-			hooksStatus = "✅"
-		}
-
-		log.Printf("🔐 %s: Privacy %s, Hooks %s", schema.Name, privacyStatus, hooksStatus)
 		schemas = append(schemas, schema)
 	}
 
@@ -133,7 +121,7 @@ func addPolicyMethod(schema SchemaInfo) error {
 		return fmt.Errorf("checking for existing Policy method: %w", err)
 	}
 	if hasPolicy {
-		log.Printf("Policy method already exists in %s, skipping", schema.Name)
+		log.Printf("Policy exists in %s, skipping", schema.Name)
 		return nil
 	}
 
@@ -153,7 +141,7 @@ func addPolicyMethod(schema SchemaInfo) error {
 		importPattern := regexp.MustCompile(`(import\s*\(\s*\n)`)
 		if importPattern.MatchString(fileContent) {
 			fileContent = importPattern.ReplaceAllString(fileContent,
-				`${1}	privacy "`+schema.ModuleName+`/ent/schema_privacy"`+"\n")
+				`${1}\tprivacy "`+schema.ModuleName+`/ent/schema_privacy"`+"\n")
 		}
 	}
 
@@ -176,7 +164,7 @@ func addHooksMethod(schema SchemaInfo) error {
 		return fmt.Errorf("checking for existing Hooks method: %w", err)
 	}
 	if hasHooks {
-		log.Printf("Hooks method already exists in %s, skipping", schema.Name)
+		log.Printf("Hooks exists in %s, skipping", schema.Name)
 		return nil
 	}
 
@@ -196,7 +184,7 @@ func addHooksMethod(schema SchemaInfo) error {
 		importPattern := regexp.MustCompile(`(import\s*\(\s*\n)`)
 		if importPattern.MatchString(fileContent) {
 			fileContent = importPattern.ReplaceAllString(fileContent,
-				`${1}	hook "`+schema.ModuleName+`/ent/schema_hooks"`+"\n")
+				`${1}\thook "`+schema.ModuleName+`/ent/schema_hooks"`+"\n")
 		}
 	}
 

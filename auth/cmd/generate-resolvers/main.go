@@ -27,7 +27,7 @@ type EntityInfo struct {
 
 // queryOnlyGraphQLTemplate defines the template for generating only queries in GraphQL schema
 const queryOnlyGraphQLTemplate = `extend type Query {
-	{{.Name}}ByID(id: Int!): {{.Name}} @auth
+	{{.Name}}ByID(id: ID!): {{.Name}} @auth
 	{{.NamePlural}}(
 		first: Int
 		after: Cursor
@@ -43,14 +43,14 @@ const queryOnlyGraphQLTemplate = `extend type Query {
 const mutationOnlyGraphQLTemplate = `extend type Mutation {
 	create{{.Name}}(input: Create{{.Name}}Input!): {{.Name}}! @auth
 	createBulk{{.Name}}(input: [Create{{.Name}}Input!]!): [{{.Name}}!]! @auth
-	update{{.Name}}(id: Int!, input: Update{{.Name}}Input!): {{.Name}}! @auth
-	delete{{.Name}}(id: Int!): Boolean! @auth
+	update{{.Name}}(id: ID!, input: Update{{.Name}}Input!): {{.Name}}! @auth
+	delete{{.Name}}(id: ID!): Boolean! @auth
 }
 `
 
 // combinedGraphQLTemplate defines the template for generating both queries and mutations in one GraphQL schema file
 const combinedGraphQLTemplate = `extend type Query {
-	{{.Name}}ByID(id: Int!): {{.Name}} @auth
+	{{.Name}}ByID(id: ID!): {{.Name}} @auth
 	{{.NamePlural}}(
 		first: Int
 		after: Cursor
@@ -64,8 +64,8 @@ const combinedGraphQLTemplate = `extend type Query {
 extend type Mutation {
 	create{{.Name}}(input: Create{{.Name}}Input!): {{.Name}}! @auth
 	createBulk{{.Name}}(input: [Create{{.Name}}Input!]!): [{{.Name}}!]! @auth
-	update{{.Name}}(id: Int!, input: Update{{.Name}}Input!): {{.Name}}! @auth
-	delete{{.Name}}(id: Int!): Boolean! @auth
+	update{{.Name}}(id: ID!, input: Update{{.Name}}Input!): {{.Name}}! @auth
+	delete{{.Name}}(id: ID!): Boolean! @auth
 }
 `
 
@@ -80,12 +80,12 @@ import (
 )
 
 // {{.Name}}ByID is the resolver for the {{.Name}}ByID field.
-func (r *queryResolver) {{.Name}}ByID(ctx context.Context, id int) (*ent.{{.Name}}, error) {
+func (r *queryResolver) {{.Name}}ByID(ctx context.Context, id int64) (*ent.{{.Name}}, error) {
 	return r.Resolver.client.{{.Name}}.Get(ctx, id)
 }
 
 // {{.NamePlural}} is the resolver for the {{.NamePlural}} field.
-func (r *queryResolver) {{.NamePlural}}(ctx context.Context, first *int, after *entgql.Cursor[int], last *int, before *entgql.Cursor[int], orderBy *ent.{{.Name}}Order, where *ent.{{.Name}}WhereInput) (*ent.{{.Name}}Connection, error) {
+func (r *queryResolver) {{.NamePlural}}(ctx context.Context, first *int, after *entgql.Cursor[int64], last *int, before *entgql.Cursor[int64], orderBy *ent.{{.Name}}Order, where *ent.{{.Name}}WhereInput) (*ent.{{.Name}}Connection, error) {
 	return r.Resolver.client.{{.Name}}.Query().Paginate(ctx, after, first, before, last, ent.With{{.Name}}Filter(where.Filter), ent.With{{.Name}}Order(orderBy))
 }
 `
@@ -113,12 +113,12 @@ func (r *mutationResolver) CreateBulk{{.Name}}(ctx context.Context, input []ent.
 }
 
 // Update{{.Name}} is the resolver for the update{{.Name}} mutation.
-func (r *mutationResolver) Update{{.Name}}(ctx context.Context, id int, input ent.Update{{.Name}}Input) (*ent.{{.Name}}, error) {
+func (r *mutationResolver) Update{{.Name}}(ctx context.Context, id int64, input ent.Update{{.Name}}Input) (*ent.{{.Name}}, error) {
 	return r.Resolver.client.{{.Name}}.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
 // Delete{{.Name}} is the resolver for the delete{{.Name}} mutation.
-func (r *mutationResolver) Delete{{.Name}}(ctx context.Context, id int) (bool, error) {
+func (r *mutationResolver) Delete{{.Name}}(ctx context.Context, id int64) (bool, error) {
 	err := r.Resolver.client.{{.Name}}.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return false, err
@@ -138,12 +138,12 @@ import (
 )
 
 // {{.Name}}ByID is the resolver for the {{.Name}}ByID field.
-func (r *queryResolver) {{.Name}}ByID(ctx context.Context, id int) (*ent.{{.Name}}, error) {
+func (r *queryResolver) {{.Name}}ByID(ctx context.Context, id int64) (*ent.{{.Name}}, error) {
 	return r.Resolver.client.{{.Name}}.Get(ctx, id)
 }
 
 // {{.NamePlural}} is the resolver for the {{.NamePlural}} field.
-func (r *queryResolver) {{.NamePlural}}(ctx context.Context, first *int, after *entgql.Cursor[int], last *int, before *entgql.Cursor[int], orderBy *ent.{{.Name}}Order, where *ent.{{.Name}}WhereInput) (*ent.{{.Name}}Connection, error) {
+func (r *queryResolver) {{.NamePlural}}(ctx context.Context, first *int, after *entgql.Cursor[int64], last *int, before *entgql.Cursor[int64], orderBy *ent.{{.Name}}Order, where *ent.{{.Name}}WhereInput) (*ent.{{.Name}}Connection, error) {
 	return r.Resolver.client.{{.Name}}.Query().Paginate(ctx, after, first, before, last, ent.With{{.Name}}Filter(where.Filter), ent.With{{.Name}}Order(orderBy))
 }
 
@@ -162,12 +162,12 @@ func (r *mutationResolver) CreateBulk{{.Name}}(ctx context.Context, input []*ent
 }
 
 // Update{{.Name}} is the resolver for the update{{.Name}} mutation.
-func (r *mutationResolver) Update{{.Name}}(ctx context.Context, id int, input ent.Update{{.Name}}Input) (*ent.{{.Name}}, error) {
+func (r *mutationResolver) Update{{.Name}}(ctx context.Context, id int64, input ent.Update{{.Name}}Input) (*ent.{{.Name}}, error) {
 	return r.Resolver.client.{{.Name}}.UpdateOneID(id).SetInput(input).Save(ctx)
 }
 
 // Delete{{.Name}} is the resolver for the delete{{.Name}} mutation.
-func (r *mutationResolver) Delete{{.Name}}(ctx context.Context, id int) (bool, error) {
+func (r *mutationResolver) Delete{{.Name}}(ctx context.Context, id int64) (bool, error) {
 	err := r.Resolver.client.{{.Name}}.DeleteOneID(id).Exec(ctx)
 	if err != nil {
 		return false, err
@@ -189,27 +189,31 @@ func main() {
 		log.Fatalf("Error reading entities: %v", err)
 	}
 
+	if len(entities) == 0 {
+		log.Println("No entities found for resolver generation")
+		return
+	}
+
+	log.Printf("Found %d entities; starting resolver generation", len(entities))
+
 	for _, entity := range entities {
 		entity.ModuleName = moduleName
-		log.Printf("Processing entity: %s (Resolver: %t, Mutation: %t)\n",
-			entity.Name, entity.GenerateResolver, entity.GenerateMutation)
+		log.Printf("Processing: %s (resolver=%t, mutation=%t)", entity.Name, entity.GenerateResolver, entity.GenerateMutation)
 
 		// Generate resolver files based on flags
-		err = generateResolvers(entity)
-		if err != nil {
+		if err := generateResolvers(entity); err != nil {
 			log.Printf("Error generating resolvers for %s: %v", entity.Name, err)
 			continue
 		}
 
 		// Generate GraphQL schema files based on flags
-		err = generateGraphQLSchemas(entity)
-		if err != nil {
-			log.Printf("Error generating GraphQL schemas for %s: %v", entity.Name, err)
+		if err := generateGraphQLSchemas(entity); err != nil {
+			log.Printf("Error generating GraphQL schema for %s: %v", entity.Name, err)
 			continue
 		}
 	}
 
-	log.Println("Resolver generation completed!")
+	log.Println("Resolver generation completed")
 }
 
 func getModuleName() (string, error) {
@@ -308,15 +312,12 @@ func getEntitiesWithGeneration() ([]EntityInfo, error) {
 }
 
 func generateGraphQLSchemas(entity EntityInfo) error {
-	// Generate a single schema file based on what flags are set
 	fileName := fmt.Sprintf("graph/schemas/%s.graphqls", entity.NameLower)
 
-	// Determine which template and expected fields to use based on flags
 	var templateToUse string
 	var expectedFields []string
 
 	if entity.GenerateResolver && entity.GenerateMutation {
-		// Both flags set - generate everything
 		templateToUse = combinedGraphQLTemplate
 		expectedFields = []string{
 			entity.Name + "ByID",
@@ -326,17 +327,13 @@ func generateGraphQLSchemas(entity EntityInfo) error {
 			"update" + entity.Name,
 			"delete" + entity.Name,
 		}
-		log.Printf("  GraphQL: Generating both queries and mutations\n")
 	} else if entity.GenerateResolver {
-		// Only queries
 		templateToUse = queryOnlyGraphQLTemplate
 		expectedFields = []string{
 			entity.Name + "ByID",
 			entity.NamePlural,
 		}
-		log.Printf("  GraphQL: Generating queries only\n")
 	} else if entity.GenerateMutation {
-		// Only mutations
 		templateToUse = mutationOnlyGraphQLTemplate
 		expectedFields = []string{
 			"create" + entity.Name,
@@ -344,22 +341,20 @@ func generateGraphQLSchemas(entity EntityInfo) error {
 			"update" + entity.Name,
 			"delete" + entity.Name,
 		}
-		log.Printf("  GraphQL: Generating mutations only\n")
 	} else {
-		// Neither flag set - skip
-		log.Printf("  GraphQL: No generation flags set, skipping\n")
+		// Nothing to generate
 		return nil
 	}
 
-	// Check if all expected fields exist
+	// If fields missing, create or append
 	if !graphqlFieldsExist(fileName, expectedFields) {
-		log.Printf("  GraphQL: Creating/updating schema at %s\n", fileName)
 		err := generateOrAppendGraphQLFile(fileName, templateToUse, entity)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to create/update %s: %w", fileName, err)
 		}
+		log.Printf("GraphQL schema created/updated: %s", fileName)
 	} else {
-		log.Printf("  GraphQL: Schema already exists with all fields at %s\n", fileName)
+		log.Printf("GraphQL schema up-to-date: %s", fileName)
 	}
 
 	return nil
@@ -589,16 +584,14 @@ func generateResolvers(entity EntityInfo) error {
 	if _, err := os.Stat(fileName); err == nil {
 		existingFuncs, err = getExistingFunctions(fileName)
 		if err != nil {
-			log.Printf("Warning: Could not parse existing functions in %s: %v", fileName, err)
+			log.Printf("Warning: could not parse existing functions in %s: %v", fileName, err)
 		}
 	}
 
-	// Determine which functions to generate based on flags
 	var expectedFuncs []string
 	var templateToUse string
 
 	if entity.GenerateResolver && entity.GenerateMutation {
-		// Both flags set - generate everything
 		expectedFuncs = []string{
 			entity.Name + "ByID",
 			entity.NamePlural,
@@ -608,17 +601,13 @@ func generateResolvers(entity EntityInfo) error {
 			"Delete" + entity.Name,
 		}
 		templateToUse = combinedTemplate
-		log.Printf("  Resolvers: Generating both queries and mutations\n")
 	} else if entity.GenerateResolver {
-		// Only queries
 		expectedFuncs = []string{
 			entity.Name + "ByID",
 			entity.NamePlural,
 		}
 		templateToUse = queryOnlyTemplate
-		log.Printf("  Resolvers: Generating queries only\n")
 	} else if entity.GenerateMutation {
-		// Only mutations
 		expectedFuncs = []string{
 			"Create" + entity.Name,
 			"CreateBulk" + entity.Name,
@@ -626,10 +615,7 @@ func generateResolvers(entity EntityInfo) error {
 			"Delete" + entity.Name,
 		}
 		templateToUse = mutationOnlyTemplate
-		log.Printf("  Resolvers: Generating mutations only\n")
 	} else {
-		// Neither flag set - skip
-		log.Printf("  Resolvers: No generation flags set, skipping\n")
 		return nil
 	}
 
@@ -641,19 +627,26 @@ func generateResolvers(entity EntityInfo) error {
 	}
 
 	if len(missingFuncs) == 0 {
-		log.Printf("  Resolvers: All functions exist, skipping\n")
+		log.Printf("Resolvers up-to-date: %s", fileName)
 		return nil
 	}
 
-	// If file doesn't exist, create it with appropriate template
 	if _, err := os.Stat(fileName); os.IsNotExist(err) {
-		log.Printf("  Resolvers: Creating new file with %d functions\n", len(expectedFuncs))
-		return generateFileFromTemplate(fileName, templateToUse, entity)
+		// Create new file
+		if err := generateFileFromTemplate(fileName, templateToUse, entity); err != nil {
+			return fmt.Errorf("failed to create %s: %w", fileName, err)
+		}
+		log.Printf("Created resolver file: %s", fileName)
+		return nil
 	}
 
-	// If file exists, append missing functions
-	log.Printf("  Resolvers: Appending %d missing functions\n", len(missingFuncs))
-	return appendMissingFunctions(fileName, templateToUse, entity, missingFuncs)
+	// Append missing functions
+	if err := appendMissingFunctions(fileName, templateToUse, entity, missingFuncs); err != nil {
+		return fmt.Errorf("failed to append functions to %s: %w", fileName, err)
+	}
+
+	log.Printf("Appended %d functions to %s", len(missingFuncs), fileName)
+	return nil
 }
 
 // Utility functions

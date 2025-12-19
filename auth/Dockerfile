@@ -32,12 +32,8 @@ RUN go env -w GOPROXY=https://proxy.golang.org && go mod download
 # Copy the rest of the source for the dev environment (mounted in compose for live edits)
 COPY auth .
 
-# Copy and set up the development entrypoint script
-COPY auth/docker-entrypoint-dev.sh /usr/local/bin/docker-entrypoint-dev.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint-dev.sh
-
 EXPOSE 8081
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint-dev.sh"]
+
 CMD ["air", "-c", ".air.toml"]
 
 # --------------------

@@ -24,291 +24,136 @@ import (
 
 func AllowIfBypass{{.Entity}}() entprivacy.QueryRule {
 	return entprivacy.QueryRuleFunc(func(ctx context.Context, q ent.Query) error {
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "bypass",
-			"query_type": q,
-		}).Debug("Privacy rule evaluating")
-		
 		status, err := authz.CheckBypass(ctx)
 		if err != nil {
-			logger.WithError(err).WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "bypass",
-			}).Debug("Error checking bypass")
+			logger.WithError(err).WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "bypass"}).Warn("Bypass check error")
 			return entprivacy.Deny
 		}
 		if status == "Allow" {
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "bypass",
-				"result": "allow",
-			}).Debug("Privacy rule result")
 			return entprivacy.Allow
 		}
 		if status == "Deny" {
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "bypass",
-				"result": "deny",
-			}).Debug("Privacy rule result")
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "bypass"}).Warn("Bypass explicitly denied")
 			return entprivacy.Deny
 		}
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "bypass",
-			"result": "skip",
-		}).Debug("Privacy rule result")
 		return entprivacy.Skip
 	})
 }
 
 func HasRoleOrPermission{{.Entity}}() entprivacy.QueryRule {
 	return entprivacy.QueryRuleFunc(func(ctx context.Context, q ent.Query) error {
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "role_permission",
-			"query_type": q,
-		}).Debug("Privacy rule evaluating")
-
 		_, ok := pkgcontext.GetUser(ctx)
 		if !ok {
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "role_permission",
-				"result": "deny",
-				"reason": "no_user_context",
-			}).Debug("Privacy rule result")
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "role_permission"}).Warn("No user in context - denying access")
 			return entprivacy.Deny
 		}
 
 		if authz.HasAnyRole(ctx, []string{ROLES_LIST_PLACEHOLDER}) {
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "role_permission",
-				"result": "allow",
-				"check": "role",
-			}).Debug("Privacy rule result")
 			return entprivacy.Allow
 		}
 
 		if authz.HasPermission(ctx, "{{.PermissionLevel}}", "can_read") {
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "role_permission",
-				"result": "allow",
-				"check": "permission",
-			}).Debug("Privacy rule result")
 			return entprivacy.Allow
 		}
 
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "role_permission",
-			"result": "deny",
-			"reason": "insufficient_privileges",
-		}).Debug("Privacy rule result")
+		logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "role_permission"}).Warn("Insufficient privileges - denying access")
 		return entprivacy.Deny
 	})
 }
 
 func FilterBy{{.Entity}}() entprivacy.{{.Entity}}QueryRuleFunc {
 	return func(ctx context.Context, q *ent.{{.Entity}}Query) error {
+		applied := false
 		{{if .TenantIsolated}}
-		// Tenant isolation enabled via @tenant-isolated annotation
+		// Tenant isolation: apply tenant filter if tenant info is available
 		tenantID, hasTenant := authz.GetTenantIDFromContext(ctx)
 		if hasTenant {
 			q.Where({{.EntPackageName}}.TenantIDEQ(tenantID))
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "filter",
-				"filter_type": "tenant",
-				"tenant_id": tenantID,
-			}).Debug("Applied tenant filter")
+			applied = true
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "tenant", "tenant_id": tenantID}).Info("Applied tenant filter")
 		}
 		{{end}}
 		{{if .UserOwned}}
-		// User ownership filtering enabled via @user-owned annotation
+		// User ownership filtering
 		userID, hasUser := authz.GetUserIDFromContext(ctx)
 		if hasUser {
 			q.Where({{.EntPackageName}}.OwnedByEQ(userID))
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "filter",
-				"filter_type": "user_owned",
-				"user_id": userID,
-			}).Debug("Applied user ownership filter")
+			applied = true
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "user_owned", "user_id": userID}).Info("Applied user ownership filter")
 		}
 		{{end}}
 		{{if .FilterByCreator}}
-		// Creator filtering enabled via @filter-by-creator annotation
+		// Creator filtering
 		userID, hasUser := authz.GetUserIDFromContext(ctx)
 		if hasUser {
 			q.Where({{.EntPackageName}}.CreatedByEQ(userID))
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "filter",
-				"filter_type": "creator",
-				"user_id": userID,
-			}).Debug("Applied creator filter")
+			applied = true
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "filter": "creator", "user_id": userID}).Info("Applied creator filter")
 		}
 		{{end}}
-		{{if not .TenantIsolated}}{{if not .UserOwned}}{{if not .FilterByCreator}}
-		// No filtering annotations - skip filtering
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "filter",
-			"result": "skip",
-			"reason": "no_filter_annotations",
-		}).Debug("Privacy rule result")
-		return entprivacy.Skip
-		{{end}}{{end}}{{end}}
 
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "filter",
-			"result": "allow",
-		}).Debug("Privacy rule result")
+		if !applied {
+			// No filters applied - skip this rule
+			return entprivacy.Skip
+		}
+
 		return entprivacy.Allow
 	}
 }
 
 func AllowIfBypass{{.Entity}}Mutation() entprivacy.MutationRule {
 	return entprivacy.MutationRuleFunc(func(ctx context.Context, m ent.Mutation) error {
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "bypass_mutation",
-			"mutation_type": m,
-		}).Debug("Privacy rule evaluating")
-		
 		status, err := authz.CheckBypass(ctx)
 		if err != nil {
-			logger.WithError(err).WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "bypass_mutation",
-			}).Debug("Error checking bypass")
+			logger.WithError(err).WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "bypass_mutation"}).Warn("Bypass mutation check error")
 			return entprivacy.Deny
 		}
 		if status == "Allow" {
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "bypass_mutation",
-				"result": "allow",
-			}).Debug("Privacy rule result")
 			return entprivacy.Allow
 		}
 		if status == "Deny" {
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "bypass_mutation",
-				"result": "deny",
-			}).Debug("Privacy rule result")
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "bypass_mutation"}).Warn("Bypass mutation explicitly denied")
 			return entprivacy.Deny
 		}
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "bypass_mutation",
-			"result": "skip",
-		}).Debug("Privacy rule result")
 		return entprivacy.Skip
 	})
 }
 
 func HasRoleOrPermission{{.Entity}}Mutation() entprivacy.MutationRule {
 	return entprivacy.MutationRuleFunc(func(ctx context.Context, m ent.Mutation) error {
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "role_permission_mutation",
-			"mutation_type": m,
-			"operation": m.Op(),
-		}).Debug("Privacy rule evaluating")
-
 		_, ok := pkgcontext.GetUser(ctx)
 		if !ok {
-			logger.WithFields(map[string]interface{}{
-				"entity": "{{.Entity}}",
-				"rule": "role_permission_mutation",
-				"result": "deny",
-				"reason": "no_user_context",
-			}).Debug("Privacy rule result")
+			logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "role_permission_mutation"}).Warn("No user in context - denying mutation")
 			return entprivacy.Deny
 		}
 
 		switch m.Op() {
 		case ent.OpCreate:
 			if authz.HasAnyRole(ctx, []string{CREATE_ROLES_LIST_PLACEHOLDER}) {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Entity}}",
-					"rule": "role_permission_mutation",
-					"operation": "create",
-					"result": "allow",
-					"check": "role",
-				}).Debug("Privacy rule result")
 				return entprivacy.Allow
 			}
 			if authz.HasPermission(ctx, "{{.PermissionLevel}}", "can_create") {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Entity}}",
-					"rule": "role_permission_mutation",
-					"operation": "create",
-					"result": "allow",
-					"check": "permission",
-				}).Debug("Privacy rule result")
 				return entprivacy.Allow
 			}
 
 		case ent.OpUpdate, ent.OpUpdateOne:
 			if authz.HasAnyRole(ctx, []string{UPDATE_ROLES_LIST_PLACEHOLDER}) {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Entity}}",
-					"rule": "role_permission_mutation",
-					"operation": "update",
-					"result": "allow",
-					"check": "role",
-				}).Debug("Privacy rule result")
 				return entprivacy.Allow
 			}
 			if authz.HasPermission(ctx, "{{.PermissionLevel}}", "can_update") {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Entity}}",
-					"rule": "role_permission_mutation",
-					"operation": "update",
-					"result": "allow",
-					"check": "permission",
-				}).Debug("Privacy rule result")
 				return entprivacy.Allow
 			}
 
 		case ent.OpDelete, ent.OpDeleteOne:
 			if authz.HasAnyRole(ctx, []string{DELETE_ROLES_LIST_PLACEHOLDER}) {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Entity}}",
-					"rule": "role_permission_mutation",
-					"operation": "delete",
-					"result": "allow",
-					"check": "role",
-				}).Debug("Privacy rule result")
 				return entprivacy.Allow
 			}
 			if authz.HasPermission(ctx, "{{.PermissionLevel}}", "can_delete") {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Entity}}",
-					"rule": "role_permission_mutation",
-					"operation": "delete",
-					"result": "allow",
-					"check": "permission",
-				}).Debug("Privacy rule result")
 				return entprivacy.Allow
 			}
 		}
 
-		logger.WithFields(map[string]interface{}{
-			"entity": "{{.Entity}}",
-			"rule": "role_permission_mutation",
-			"operation": m.Op(),
-			"result": "deny",
-			"reason": "insufficient_privileges",
-		}).Debug("Privacy rule result")
+		logger.WithFields(map[string]interface{}{"entity": "{{.Entity}}", "rule": "role_permission_mutation", "operation": m.Op()}).Warn("Insufficient privileges for mutation - denying")
 		return entprivacy.Deny
 	})
 }
@@ -486,15 +331,6 @@ func run() error {
 		content = strings.ReplaceAll(content, "DELETE_ROLES_LIST_PLACEHOLDER", data.DeleteRolesList)
 		content = strings.ReplaceAll(content, "ROLES_LIST_PLACEHOLDER", data.RolesList)
 
-		// Debug: Show what we're replacing
-		log.Printf("Debug - Roles: %s", data.RolesList)
-		log.Printf("Debug - Create: %s", data.CreateRolesList)
-		log.Printf("Debug - Update: %s", data.UpdateRolesList)
-		log.Printf("Debug - Delete: %s", data.DeleteRolesList)
-
-		// Debug: Print the content before formatting
-		log.Printf("Generated content for %s:\n%s", entity, content)
-
 		// Format the generated code using common utility
 		formatted, err := common.FormatGoCode([]byte(content))
 		if err != nil {
@@ -514,7 +350,8 @@ func run() error {
 			return fmt.Errorf("writing privacy file for %s: %w", entity, err)
 		}
 
-		log.Printf("✅ Generated privacy file: %s", outputFile)
+		// Concise informative log
+		log.Printf("Generated privacy file: %s (%d bytes)", outputFile, len(formatted))
 	}
 
 	return nil

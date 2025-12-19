@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"go/format"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -33,22 +34,13 @@ func {{.Name}}CreateHook() ent.Hook {
 	return func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 			if _, ok := m.(*ent.{{.Name}}Mutation); ok {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Name}}",
-					"operation": "create",
-				}).Debug("Hook executing")
-				
+				// Hook executing for create
+
 				// Call the next mutator
 				result, err := next.Mutate(ctx, m)
 
-				// Post-create logic here
-				if err == nil {
-					logger.WithFields(map[string]interface{}{
-						"entity": "{{.Name}}",
-						"operation": "create",
-					}).Debug("Hook completed successfully")
-				}
-
+				// Post-create logic here (no verbose logs by default)
+				_ = result
 				return result, err
 			}
 			return next.Mutate(ctx, m)
@@ -60,22 +52,13 @@ func {{.Name}}BulkUpdateHook() ent.Hook {
 	return func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 			if _, ok := m.(*ent.{{.Name}}Mutation); ok {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Name}}",
-					"operation": "bulk_update",
-				}).Debug("Hook executing")
+				// Hook executing for bulk update
 
 				// Call the next mutator
 				result, err := next.Mutate(ctx, m)
 
-				// Post-bulk-update logic here
-				if err == nil {
-					logger.WithFields(map[string]interface{}{
-						"entity": "{{.Name}}",
-						"operation": "bulk_update",
-					}).Debug("Hook completed successfully")
-				}
-
+				// Post-bulk-update logic here (no verbose logs by default)
+				_ = result
 				return result, err
 			}
 			return next.Mutate(ctx, m)
@@ -87,26 +70,14 @@ func {{.Name}}SingleUpdateHook() ent.Hook {
 	return func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 			if {{.NameLower}}Mutation, ok := m.(*ent.{{.Name}}Mutation); ok {
-				fields := map[string]interface{}{
-					"entity": "{{.Name}}",
-					"operation": "update",
-				}
-				
-				// Get the specific ID being updated for UpdateOne operations
-				if id, exists := {{.NameLower}}Mutation.ID(); exists {
-					fields["id"] = id
-				}
-				
-				logger.WithFields(fields).Debug("Hook executing")
+				// Hook executing for single update
+				_ = {{.NameLower}}Mutation
 
 				// Call the next mutator
 				result, err := next.Mutate(ctx, m)
 
-				// Post-single-update logic here
-				if err == nil {
-					logger.WithFields(fields).Debug("Hook completed successfully")
-				}
-
+				// Post-single-update logic here (no verbose logs by default)
+				_ = result
 				return result, err
 			}
 			return next.Mutate(ctx, m)
@@ -118,22 +89,13 @@ func {{.Name}}BulkDeleteHook() ent.Hook {
 	return func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 			if _, ok := m.(*ent.{{.Name}}Mutation); ok {
-				logger.WithFields(map[string]interface{}{
-					"entity": "{{.Name}}",
-					"operation": "bulk_delete",
-				}).Debug("Hook executing")
+				// Hook executing for bulk delete
 
 				// Call the next mutator
 				result, err := next.Mutate(ctx, m)
 
-				// Post-bulk-delete logic here
-				if err == nil {
-					logger.WithFields(map[string]interface{}{
-						"entity": "{{.Name}}",
-						"operation": "bulk_delete",
-					}).Debug("Hook completed successfully")
-				}
-
+				// Post-bulk-delete logic here (no verbose logs by default)
+				_ = result
 				return result, err
 			}
 			return next.Mutate(ctx, m)
@@ -145,26 +107,14 @@ func {{.Name}}SingleDeleteHook() ent.Hook {
 	return func(next ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 			if {{.NameLower}}Mutation, ok := m.(*ent.{{.Name}}Mutation); ok {
-				fields := map[string]interface{}{
-					"entity": "{{.Name}}",
-					"operation": "delete",
-				}
-				
-				// Get the specific ID being deleted for DeleteOne operations
-				if id, exists := {{.NameLower}}Mutation.ID(); exists {
-					fields["id"] = id
-				}
-				
-				logger.WithFields(fields).Debug("Hook executing")
+				// Hook executing for single delete
+				_ = {{.NameLower}}Mutation
 
 				// Call the next mutator
 				result, err := next.Mutate(ctx, m)
 
-				// Post-single-delete logic here
-				if err == nil {
-					logger.WithFields(fields).Debug("Hook completed successfully")
-				}
-
+				// Post-single-delete logic here (no verbose logs by default)
+				_ = result
 				return result, err
 			}
 			return next.Mutate(ctx, m)
@@ -240,7 +190,7 @@ func scanForHooksAnnotation() ([]EntityInfo, error) {
 
 		hasAnnotation, err := checkForHooksAnnotation(file)
 		if err != nil {
-			fmt.Printf("Error reading file %s: %v\n", file, err)
+			log.Printf("Error reading file %s: %v", file, err)
 			continue
 		}
 
@@ -248,7 +198,7 @@ func scanForHooksAnnotation() ([]EntityInfo, error) {
 			// Extract the actual entity name from the schema file
 			entityName, err := extractEntityName(file)
 			if err != nil {
-				fmt.Printf("Failed to extract entity name from %s: %v\n", file, err)
+				log.Printf("Failed to extract entity name from %s: %v", file, err)
 				continue
 			}
 
@@ -371,39 +321,39 @@ func formatGoFile(filePath string) error {
 }
 
 func main() {
-	fmt.Println("Starting hooks generation...")
+	log.Println("Generating hooks files...")
 
 	// Scan for entities with @generate-hooks: true annotation
 	entityList, err := scanForHooksAnnotation()
 	if err != nil {
-		fmt.Printf("Error scanning for hooks annotations: %v\n", err)
+		log.Printf("Error scanning for hooks annotations: %v", err)
 		os.Exit(1)
 	}
 
 	if len(entityList) == 0 {
-		fmt.Println("No entities found with @generate-hooks: true annotation")
+		log.Println("No entities found with @generate-hooks: true annotation")
 		return
 	}
 
-	fmt.Printf("Found %d entities with @generate-hooks: true annotation\n", len(entityList))
+	log.Printf("Found %d entities; generating hooks...", len(entityList))
 
 	// Parse the template
 	tmpl, err := template.New("hooks").Parse(hooksTemplate)
 	if err != nil {
-		fmt.Printf("Error parsing template: %v\n", err)
+		log.Printf("Error parsing template: %v", err)
 		os.Exit(1)
 	}
 
 	// Create the schema_hooks directory if it doesn't exist
 	cwd, err := os.Getwd()
 	if err != nil {
-		fmt.Printf("Error getting current working directory: %v\n", err)
+		log.Printf("Error getting current working directory: %v", err)
 		os.Exit(1)
 	}
 	hooksDir := filepath.Join(cwd, "ent", "schema_hooks")
 	err = os.MkdirAll(hooksDir, 0755)
 	if err != nil {
-		fmt.Printf("Error creating directory %s: %v\n", hooksDir, err)
+		log.Printf("Error creating directory %s: %v", hooksDir, err)
 		os.Exit(1)
 	}
 
@@ -415,14 +365,14 @@ func main() {
 
 		// SAFETY CHECK: Skip if file already exists to preserve custom code
 		if _, err := os.Stat(filePath); err == nil {
-			fmt.Printf("⚠️  SKIPPING %s - File already exists with custom code. To regenerate, delete the file first.\n", filename)
+			log.Printf("⚠️  SKIPPING %s - File already exists. To regenerate, delete the file first.", filename)
 			continue
 		}
 
 		// Create the hooks file only if it doesn't exist
 		file, err := os.Create(filePath)
 		if err != nil {
-			fmt.Printf("Error creating file %s: %v\n", filePath, err)
+			log.Printf("Error creating file %s: %v", filePath, err)
 			continue
 		}
 
@@ -430,19 +380,19 @@ func main() {
 		err = tmpl.Execute(file, entityInfo)
 		file.Close()
 		if err != nil {
-			fmt.Printf("Error executing template for %s: %v\n", filename, err)
+			log.Printf("Error executing template for %s: %v", filename, err)
 			continue
 		}
 
 		// Format the generated file
 		err = formatGoFile(filePath)
 		if err != nil {
-			fmt.Printf("Error formatting file %s: %v\n", filePath, err)
+			log.Printf("Error formatting file %s: %v", filePath, err)
 			continue
 		}
 
-		fmt.Printf("✅ Generated hooks file: %s\n", filename)
+		log.Printf("Generated hooks file: %s", filename)
 	}
 
-	fmt.Println("Hooks generation completed!")
+	log.Println("Hooks generation completed.")
 }

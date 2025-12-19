@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/saurabh/entgo-microservices/gateway/grpc"
 	"github.com/saurabh/entgo-microservices/gateway/router"
@@ -88,9 +89,17 @@ func main() {
 	// Setup graceful shutdown
 	setupGracefulShutdown()
 
-	// Start server
+	// Start server with extended timeouts to handle large schema responses
+	server := &http.Server{
+		Addr:         ":" + config.Port,
+		Handler:      r,
+		ReadTimeout:  60 * time.Second,
+		WriteTimeout: 60 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
 	fmt.Printf("🚀 GraphQL Gateway running on port %s...\n", config.Port)
-	if err := http.ListenAndServe(":"+config.Port, r); err != nil {
+	if err := server.ListenAndServe(); err != nil {
 		fmt.Printf("❌ Server failed to start: %v\n", err)
 		os.Exit(1)
 	}

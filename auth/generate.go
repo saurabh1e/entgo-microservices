@@ -14,7 +14,6 @@
 //go:generate go run ./cmd/entc.go
 
 // Step 5: Generate gRPC services
-//go:generate go run ./cmd/generate-grpc/main.go
 
 // Step 6: Generate GraphQL resolvers
 //go:generate go run ./cmd/generate-resolvers/main.go

@@ -2,8 +2,8 @@
 services:
   gateway:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: gateway/Dockerfile
       target: dev
     container_name: entgo_gateway_dev
     restart: on-failure
@@ -27,6 +27,7 @@ services:
       CGO_ENABLED: 0
     volumes:
       - ./:/src:cached
+      - ../pkg:/pkg:cached
       - gomodcache:/go/pkg/mod
       - gocache:/root/.cache/go-build
     command: ["air", "-c", ".air.toml"]
