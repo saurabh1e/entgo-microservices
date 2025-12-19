@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	hook "github.com/saurabh/entgo-microservices/auth/ent/schema_hooks"
 	privacy "github.com/saurabh/entgo-microservices/auth/ent/schema_privacy"
 	"github.com/saurabh/entgo-microservices/pkg/ent/schema"
 )
@@ -19,12 +20,15 @@ func (Role) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		schema.BaseMixin{},
 		schema.TenantMixin{},
+		schema.CodeMixin{}, // Auto-generates code from tenant_id + name
+
 	}
 }
 
 // Fields of the Role.
 // @generate-resolver: true
 // @generate-mutation: true
+// @generate-hooks: true
 // @generate-privacy: true
 // @generate-grpc: true
 // @role-level: admin
@@ -77,4 +81,8 @@ func (Role) Indexes() []ent.Index {
 
 func (Role) Policy() ent.Policy {
 	return privacy.RolePolicy()
+}
+
+func (Role) Hooks() []ent.Hook {
+	return hook.RoleHooks()
 }

@@ -1711,6 +1711,7 @@ type RoleMutation struct {
 	addcreated_by           *int
 	tenant_id               *int
 	addtenant_id            *int
+	code                    *string
 	name                    *string
 	display_name            *string
 	description             *string
@@ -2029,6 +2030,42 @@ func (m *RoleMutation) AddedTenantID() (r int, exists bool) {
 func (m *RoleMutation) ResetTenantID() {
 	m.tenant_id = nil
 	m.addtenant_id = nil
+}
+
+// SetCode sets the "code" field.
+func (m *RoleMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *RoleMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the Role entity.
+// If the Role object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RoleMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *RoleMutation) ResetCode() {
+	m.code = nil
 }
 
 // SetName sets the "name" field.
@@ -2386,7 +2423,7 @@ func (m *RoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RoleMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, role.FieldCreatedAt)
 	}
@@ -2398,6 +2435,9 @@ func (m *RoleMutation) Fields() []string {
 	}
 	if m.tenant_id != nil {
 		fields = append(fields, role.FieldTenantID)
+	}
+	if m.code != nil {
+		fields = append(fields, role.FieldCode)
 	}
 	if m.name != nil {
 		fields = append(fields, role.FieldName)
@@ -2430,6 +2470,8 @@ func (m *RoleMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedBy()
 	case role.FieldTenantID:
 		return m.TenantID()
+	case role.FieldCode:
+		return m.Code()
 	case role.FieldName:
 		return m.Name()
 	case role.FieldDisplayName:
@@ -2457,6 +2499,8 @@ func (m *RoleMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedBy(ctx)
 	case role.FieldTenantID:
 		return m.OldTenantID(ctx)
+	case role.FieldCode:
+		return m.OldCode(ctx)
 	case role.FieldName:
 		return m.OldName(ctx)
 	case role.FieldDisplayName:
@@ -2503,6 +2547,13 @@ func (m *RoleMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTenantID(v)
+		return nil
+	case role.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
 		return nil
 	case role.FieldName:
 		v, ok := value.(string)
@@ -2653,6 +2704,9 @@ func (m *RoleMutation) ResetField(name string) error {
 		return nil
 	case role.FieldTenantID:
 		m.ResetTenantID()
+		return nil
+	case role.FieldCode:
+		m.ResetCode()
 		return nil
 	case role.FieldName:
 		m.ResetName()
@@ -4803,6 +4857,7 @@ type UserMutation struct {
 	addcreated_by     *int
 	tenant_id         *int
 	addtenant_id      *int
+	code              *string
 	email             *string
 	username          *string
 	password_hash     *string
@@ -5127,6 +5182,42 @@ func (m *UserMutation) AddedTenantID() (r int, exists bool) {
 func (m *UserMutation) ResetTenantID() {
 	m.tenant_id = nil
 	m.addtenant_id = nil
+}
+
+// SetCode sets the "code" field.
+func (m *UserMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *UserMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *UserMutation) ResetCode() {
+	m.code = nil
 }
 
 // SetEmail sets the "email" field.
@@ -5867,7 +5958,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 19)
+	fields := make([]string, 0, 20)
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
 	}
@@ -5879,6 +5970,9 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.tenant_id != nil {
 		fields = append(fields, user.FieldTenantID)
+	}
+	if m.code != nil {
+		fields = append(fields, user.FieldCode)
 	}
 	if m.email != nil {
 		fields = append(fields, user.FieldEmail)
@@ -5941,6 +6035,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedBy()
 	case user.FieldTenantID:
 		return m.TenantID()
+	case user.FieldCode:
+		return m.Code()
 	case user.FieldEmail:
 		return m.Email()
 	case user.FieldUsername:
@@ -5988,6 +6084,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedBy(ctx)
 	case user.FieldTenantID:
 		return m.OldTenantID(ctx)
+	case user.FieldCode:
+		return m.OldCode(ctx)
 	case user.FieldEmail:
 		return m.OldEmail(ctx)
 	case user.FieldUsername:
@@ -6054,6 +6152,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTenantID(v)
+		return nil
+	case user.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
 		return nil
 	case user.FieldEmail:
 		v, ok := value.(string)
@@ -6316,6 +6421,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldTenantID:
 		m.ResetTenantID()
+		return nil
+	case user.FieldCode:
+		m.ResetCode()
 		return nil
 	case user.FieldEmail:
 		m.ResetEmail()

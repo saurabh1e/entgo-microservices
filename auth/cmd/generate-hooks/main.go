@@ -55,24 +55,18 @@ func {{.Name}}CreateHook() ent.Hook {
 				}
 				{{end}}
 				{{if .HasCodeMixin}}
-				// Auto-generate code field from tenant_id and name
+				// Auto-generate code field from tenant_id and name (if name is available)
 				if name, nameExists := {{.NameLower}}Mutation.Name(); nameExists {
-					if tenantID, tenantExists := {{.NameLower}}Mutation.TenantID(); tenantExists {
-						code := schema.GenerateCode(tenantID, name)
-						{{.NameLower}}Mutation.SetCode(code)
-					} else {
+					tenantID, tenantExists := {{.NameLower}}Mutation.TenantID()
+					if !tenantExists {
 						logger.WithFields(map[string]interface{}{
 							"entity": "{{.Name}}",
 							"operation": "create",
 						}).Error("tenant_id is required for code generation")
 						return nil, fmt.Errorf("tenant_id is required for code generation")
 					}
-				} else {
-					logger.WithFields(map[string]interface{}{
-						"entity": "{{.Name}}",
-						"operation": "create",
-					}).Error("name is required for code generation")
-					return nil, fmt.Errorf("name is required for code generation")
+					code := schema.GenerateCode(tenantID, name)
+					{{.NameLower}}Mutation.SetCode(code)
 				}
 				{{end}}
 
@@ -236,6 +230,8 @@ func scanForHooksAnnotation() ([]EntityInfo, error) {
 			log.Printf("Error reading file %s: %v", file, err)
 			continue
 		}
+
+		log.Printf("Processing %s: hasAnnotation=%v", basename, hasAnnotation)
 
 		if hasAnnotation {
 			// Extract the actual entity name from the schema file

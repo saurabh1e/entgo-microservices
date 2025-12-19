@@ -168,6 +168,7 @@ type ComplexityRoot struct {
 	}
 
 	Role struct {
+		Code            func(childComplexity int) int
 		CreatedAt       func(childComplexity int) int
 		CreatedBy       func(childComplexity int) int
 		Description     func(childComplexity int) int
@@ -252,6 +253,7 @@ type ComplexityRoot struct {
 
 	User struct {
 		Address         func(childComplexity int) int
+		Code            func(childComplexity int) int
 		CompanyName     func(childComplexity int) int
 		CreatedAt       func(childComplexity int) int
 		CreatedBy       func(childComplexity int) int
@@ -991,6 +993,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.RegisterResponse.User(childComplexity), true
 
+	case "Role.code":
+		if e.complexity.Role.Code == nil {
+			break
+		}
+
+		return e.complexity.Role.Code(childComplexity), true
 	case "Role.createdAt":
 		if e.complexity.Role.CreatedAt == nil {
 			break
@@ -1325,6 +1333,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.Address(childComplexity), true
+	case "User.code":
+		if e.complexity.User.Code == nil {
+			break
+		}
+
+		return e.complexity.User.Code(childComplexity), true
 	case "User.companyName":
 		if e.complexity.User.CompanyName == nil {
 			break
@@ -2652,6 +2666,8 @@ func (ec *executionContext) fieldContext_LoginResponse_user(_ context.Context, f
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -3584,6 +3600,8 @@ func (ec *executionContext) fieldContext_Mutation_createRole(ctx context.Context
 				return ec.fieldContext_Role_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Role_code(ctx, field)
 			case "name":
 				return ec.fieldContext_Role_name(ctx, field)
 			case "displayName":
@@ -3664,6 +3682,8 @@ func (ec *executionContext) fieldContext_Mutation_createBulkRole(ctx context.Con
 				return ec.fieldContext_Role_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Role_code(ctx, field)
 			case "name":
 				return ec.fieldContext_Role_name(ctx, field)
 			case "displayName":
@@ -3744,6 +3764,8 @@ func (ec *executionContext) fieldContext_Mutation_updateRole(ctx context.Context
 				return ec.fieldContext_Role_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Role_code(ctx, field)
 			case "name":
 				return ec.fieldContext_Role_name(ctx, field)
 			case "displayName":
@@ -4166,6 +4188,8 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -4262,6 +4286,8 @@ func (ec *executionContext) fieldContext_Mutation_createBulkUser(ctx context.Con
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -4358,6 +4384,8 @@ func (ec *executionContext) fieldContext_Mutation_updateUser(ctx context.Context
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -5233,6 +5261,8 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -5590,6 +5620,8 @@ func (ec *executionContext) fieldContext_Query_RoleByID(ctx context.Context, fie
 				return ec.fieldContext_Role_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Role_code(ctx, field)
 			case "name":
 				return ec.fieldContext_Role_name(ctx, field)
 			case "displayName":
@@ -5872,6 +5904,8 @@ func (ec *executionContext) fieldContext_Query_UserByID(ctx context.Context, fie
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -6124,6 +6158,8 @@ func (ec *executionContext) fieldContext_RegisterResponse_user(_ context.Context
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -6364,6 +6400,35 @@ func (ec *executionContext) fieldContext_Role_tenantID(_ context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Role_code(ctx context.Context, field graphql.CollectedField, obj *ent.Role) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Role_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Role_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Role",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Role_name(ctx context.Context, field graphql.CollectedField, obj *ent.Role) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -6543,6 +6608,8 @@ func (ec *executionContext) fieldContext_Role_users(_ context.Context, field gra
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -6770,6 +6837,8 @@ func (ec *executionContext) fieldContext_RoleEdge_node(_ context.Context, field 
 				return ec.fieldContext_Role_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Role_code(ctx, field)
 			case "name":
 				return ec.fieldContext_Role_name(ctx, field)
 			case "displayName":
@@ -7115,6 +7184,8 @@ func (ec *executionContext) fieldContext_RolePermission_role(_ context.Context, 
 				return ec.fieldContext_Role_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Role_code(ctx, field)
 			case "name":
 				return ec.fieldContext_Role_name(ctx, field)
 			case "displayName":
@@ -8143,6 +8214,35 @@ func (ec *executionContext) fieldContext_User_tenantID(_ context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _User_code(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_User_code,
+		func(ctx context.Context) (any, error) {
+			return obj.Code, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_User_code(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -8583,6 +8683,8 @@ func (ec *executionContext) fieldContext_User_role(_ context.Context, field grap
 				return ec.fieldContext_Role_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_Role_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_Role_code(ctx, field)
 			case "name":
 				return ec.fieldContext_Role_name(ctx, field)
 			case "displayName":
@@ -8741,6 +8843,8 @@ func (ec *executionContext) fieldContext_UserEdge_node(_ context.Context, field 
 				return ec.fieldContext_User_createdBy(ctx, field)
 			case "tenantID":
 				return ec.fieldContext_User_tenantID(ctx, field)
+			case "code":
+				return ec.fieldContext_User_code(ctx, field)
 			case "email":
 				return ec.fieldContext_User_email(ctx, field)
 			case "username":
@@ -10855,13 +10959,20 @@ func (ec *executionContext) unmarshalInputCreateRoleInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"name", "displayName", "description", "isActive", "priority", "userIDs", "rolePermissionIDs"}
+	fieldsInOrder := [...]string{"code", "name", "displayName", "description", "isActive", "priority", "userIDs", "rolePermissionIDs"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Code = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -11069,13 +11180,20 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"email", "username", "passwordHash", "name", "phone", "address", "userType", "userCode", "companyName", "customerType", "paymentTerms", "isActive", "emailVerified", "emailVerifiedAt", "lastLogin", "roleID"}
+	fieldsInOrder := [...]string{"code", "email", "username", "passwordHash", "name", "phone", "address", "userType", "userCode", "companyName", "customerType", "paymentTerms", "isActive", "emailVerified", "emailVerifiedAt", "lastLogin", "roleID"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
+		case "code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Code = data
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			data, err := ec.unmarshalNString2string(ctx, v)
@@ -12438,7 +12556,7 @@ func (ec *executionContext) unmarshalInputRoleWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "displayName", "displayNameNEQ", "displayNameIn", "displayNameNotIn", "displayNameGT", "displayNameGTE", "displayNameLT", "displayNameLTE", "displayNameContains", "displayNameHasPrefix", "displayNameHasSuffix", "displayNameEqualFold", "displayNameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "isActive", "isActiveNEQ", "priority", "priorityNEQ", "priorityIn", "priorityNotIn", "priorityGT", "priorityGTE", "priorityLT", "priorityLTE", "hasUsers", "hasUsersWith", "hasRolePermissions", "hasRolePermissionsWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "code", "codeNEQ", "codeIn", "codeNotIn", "codeGT", "codeGTE", "codeLT", "codeLTE", "codeContains", "codeHasPrefix", "codeHasSuffix", "codeEqualFold", "codeContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "displayName", "displayNameNEQ", "displayNameIn", "displayNameNotIn", "displayNameGT", "displayNameGTE", "displayNameLT", "displayNameLTE", "displayNameContains", "displayNameHasPrefix", "displayNameHasSuffix", "displayNameEqualFold", "displayNameContainsFold", "description", "descriptionNEQ", "descriptionIn", "descriptionNotIn", "descriptionGT", "descriptionGTE", "descriptionLT", "descriptionLTE", "descriptionContains", "descriptionHasPrefix", "descriptionHasSuffix", "descriptionIsNil", "descriptionNotNil", "descriptionEqualFold", "descriptionContainsFold", "isActive", "isActiveNEQ", "priority", "priorityNEQ", "priorityIn", "priorityNotIn", "priorityGT", "priorityGTE", "priorityLT", "priorityLTE", "hasUsers", "hasUsersWith", "hasRolePermissions", "hasRolePermissionsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12704,6 +12822,97 @@ func (ec *executionContext) unmarshalInputRoleWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.TenantIDLTE = data
+		case "code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Code = data
+		case "codeNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeNEQ = data
+		case "codeIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeIn = data
+		case "codeNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeNotIn = data
+		case "codeGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeGT = data
+		case "codeGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeGTE = data
+		case "codeLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeLT = data
+		case "codeLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeLTE = data
+		case "codeContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeContains = data
+		case "codeHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeHasPrefix = data
+		case "codeHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeHasSuffix = data
+		case "codeEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeEqualFold = data
+		case "codeContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeContainsFold = data
 		case "name":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -14494,7 +14703,7 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "username", "usernameNEQ", "usernameIn", "usernameNotIn", "usernameGT", "usernameGTE", "usernameLT", "usernameLTE", "usernameContains", "usernameHasPrefix", "usernameHasSuffix", "usernameEqualFold", "usernameContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "phone", "phoneNEQ", "phoneIn", "phoneNotIn", "phoneGT", "phoneGTE", "phoneLT", "phoneLTE", "phoneContains", "phoneHasPrefix", "phoneHasSuffix", "phoneIsNil", "phoneNotNil", "phoneEqualFold", "phoneContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressIsNil", "addressNotNil", "addressEqualFold", "addressContainsFold", "userType", "userTypeNEQ", "userTypeIn", "userTypeNotIn", "userTypeGT", "userTypeGTE", "userTypeLT", "userTypeLTE", "userTypeContains", "userTypeHasPrefix", "userTypeHasSuffix", "userTypeEqualFold", "userTypeContainsFold", "userCode", "userCodeNEQ", "userCodeIn", "userCodeNotIn", "userCodeGT", "userCodeGTE", "userCodeLT", "userCodeLTE", "userCodeContains", "userCodeHasPrefix", "userCodeHasSuffix", "userCodeIsNil", "userCodeNotNil", "userCodeEqualFold", "userCodeContainsFold", "companyName", "companyNameNEQ", "companyNameIn", "companyNameNotIn", "companyNameGT", "companyNameGTE", "companyNameLT", "companyNameLTE", "companyNameContains", "companyNameHasPrefix", "companyNameHasSuffix", "companyNameIsNil", "companyNameNotNil", "companyNameEqualFold", "companyNameContainsFold", "customerType", "customerTypeNEQ", "customerTypeIn", "customerTypeNotIn", "customerTypeGT", "customerTypeGTE", "customerTypeLT", "customerTypeLTE", "customerTypeContains", "customerTypeHasPrefix", "customerTypeHasSuffix", "customerTypeIsNil", "customerTypeNotNil", "customerTypeEqualFold", "customerTypeContainsFold", "paymentTerms", "paymentTermsNEQ", "paymentTermsIn", "paymentTermsNotIn", "paymentTermsGT", "paymentTermsGTE", "paymentTermsLT", "paymentTermsLTE", "paymentTermsIsNil", "paymentTermsNotNil", "isActive", "isActiveNEQ", "emailVerified", "emailVerifiedNEQ", "emailVerifiedAt", "emailVerifiedAtNEQ", "emailVerifiedAtIn", "emailVerifiedAtNotIn", "emailVerifiedAtGT", "emailVerifiedAtGTE", "emailVerifiedAtLT", "emailVerifiedAtLTE", "emailVerifiedAtIsNil", "emailVerifiedAtNotNil", "lastLogin", "lastLoginNEQ", "lastLoginIn", "lastLoginNotIn", "lastLoginGT", "lastLoginGTE", "lastLoginLT", "lastLoginLTE", "lastLoginIsNil", "lastLoginNotNil", "hasRole", "hasRoleWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "createdAt", "createdAtNEQ", "createdAtIn", "createdAtNotIn", "createdAtGT", "createdAtGTE", "createdAtLT", "createdAtLTE", "createdBy", "createdByNEQ", "createdByIn", "createdByNotIn", "createdByGT", "createdByGTE", "createdByLT", "createdByLTE", "createdByIsNil", "createdByNotNil", "tenantID", "tenantIDNEQ", "tenantIDIn", "tenantIDNotIn", "tenantIDGT", "tenantIDGTE", "tenantIDLT", "tenantIDLTE", "code", "codeNEQ", "codeIn", "codeNotIn", "codeGT", "codeGTE", "codeLT", "codeLTE", "codeContains", "codeHasPrefix", "codeHasSuffix", "codeEqualFold", "codeContainsFold", "email", "emailNEQ", "emailIn", "emailNotIn", "emailGT", "emailGTE", "emailLT", "emailLTE", "emailContains", "emailHasPrefix", "emailHasSuffix", "emailEqualFold", "emailContainsFold", "username", "usernameNEQ", "usernameIn", "usernameNotIn", "usernameGT", "usernameGTE", "usernameLT", "usernameLTE", "usernameContains", "usernameHasPrefix", "usernameHasSuffix", "usernameEqualFold", "usernameContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "phone", "phoneNEQ", "phoneIn", "phoneNotIn", "phoneGT", "phoneGTE", "phoneLT", "phoneLTE", "phoneContains", "phoneHasPrefix", "phoneHasSuffix", "phoneIsNil", "phoneNotNil", "phoneEqualFold", "phoneContainsFold", "address", "addressNEQ", "addressIn", "addressNotIn", "addressGT", "addressGTE", "addressLT", "addressLTE", "addressContains", "addressHasPrefix", "addressHasSuffix", "addressIsNil", "addressNotNil", "addressEqualFold", "addressContainsFold", "userType", "userTypeNEQ", "userTypeIn", "userTypeNotIn", "userTypeGT", "userTypeGTE", "userTypeLT", "userTypeLTE", "userTypeContains", "userTypeHasPrefix", "userTypeHasSuffix", "userTypeEqualFold", "userTypeContainsFold", "userCode", "userCodeNEQ", "userCodeIn", "userCodeNotIn", "userCodeGT", "userCodeGTE", "userCodeLT", "userCodeLTE", "userCodeContains", "userCodeHasPrefix", "userCodeHasSuffix", "userCodeIsNil", "userCodeNotNil", "userCodeEqualFold", "userCodeContainsFold", "companyName", "companyNameNEQ", "companyNameIn", "companyNameNotIn", "companyNameGT", "companyNameGTE", "companyNameLT", "companyNameLTE", "companyNameContains", "companyNameHasPrefix", "companyNameHasSuffix", "companyNameIsNil", "companyNameNotNil", "companyNameEqualFold", "companyNameContainsFold", "customerType", "customerTypeNEQ", "customerTypeIn", "customerTypeNotIn", "customerTypeGT", "customerTypeGTE", "customerTypeLT", "customerTypeLTE", "customerTypeContains", "customerTypeHasPrefix", "customerTypeHasSuffix", "customerTypeIsNil", "customerTypeNotNil", "customerTypeEqualFold", "customerTypeContainsFold", "paymentTerms", "paymentTermsNEQ", "paymentTermsIn", "paymentTermsNotIn", "paymentTermsGT", "paymentTermsGTE", "paymentTermsLT", "paymentTermsLTE", "paymentTermsIsNil", "paymentTermsNotNil", "isActive", "isActiveNEQ", "emailVerified", "emailVerifiedNEQ", "emailVerifiedAt", "emailVerifiedAtNEQ", "emailVerifiedAtIn", "emailVerifiedAtNotIn", "emailVerifiedAtGT", "emailVerifiedAtGTE", "emailVerifiedAtLT", "emailVerifiedAtLTE", "emailVerifiedAtIsNil", "emailVerifiedAtNotNil", "lastLogin", "lastLoginNEQ", "lastLoginIn", "lastLoginNotIn", "lastLoginGT", "lastLoginGTE", "lastLoginLT", "lastLoginLTE", "lastLoginIsNil", "lastLoginNotNil", "hasRole", "hasRoleWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -14760,6 +14969,97 @@ func (ec *executionContext) unmarshalInputUserWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.TenantIDLTE = data
+		case "code":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("code"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Code = data
+		case "codeNEQ":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeNEQ"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeNEQ = data
+		case "codeIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeIn = data
+		case "codeNotIn":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeNotIn"))
+			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeNotIn = data
+		case "codeGT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeGT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeGT = data
+		case "codeGTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeGTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeGTE = data
+		case "codeLT":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeLT"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeLT = data
+		case "codeLTE":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeLTE"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeLTE = data
+		case "codeContains":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeContains"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeContains = data
+		case "codeHasPrefix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeHasPrefix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeHasPrefix = data
+		case "codeHasSuffix":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeHasSuffix"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeHasSuffix = data
+		case "codeEqualFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeEqualFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeEqualFold = data
+		case "codeContainsFold":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("codeContainsFold"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CodeContainsFold = data
 		case "email":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
@@ -17052,6 +17352,11 @@ func (ec *executionContext) _Role(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "code":
+			out.Values[i] = ec._Role_code(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "name":
 			out.Values[i] = ec._Role_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -17727,6 +18032,11 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_createdBy(ctx, field, obj)
 		case "tenantID":
 			out.Values[i] = ec._User_tenantID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "code":
+			out.Values[i] = ec._User_code(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}

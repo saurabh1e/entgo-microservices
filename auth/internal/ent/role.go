@@ -26,6 +26,8 @@ type Role struct {
 	CreatedBy *int `json:"created_by,omitempty"`
 	// Tenant ID for multi-tenancy isolation
 	TenantID int `json:"tenant_id,omitempty"`
+	// Auto-generated unique code identifier
+	Code string `json:"code,omitempty"`
 	// Role name (e.g., admin, user, moderator)
 	Name string `json:"name,omitempty"`
 	// Human-readable role name
@@ -85,7 +87,7 @@ func (*Role) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case role.FieldID, role.FieldCreatedBy, role.FieldTenantID, role.FieldPriority:
 			values[i] = new(sql.NullInt64)
-		case role.FieldName, role.FieldDisplayName, role.FieldDescription:
+		case role.FieldCode, role.FieldName, role.FieldDisplayName, role.FieldDescription:
 			values[i] = new(sql.NullString)
 		case role.FieldCreatedAt, role.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -134,6 +136,12 @@ func (_m *Role) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
 				_m.TenantID = int(value.Int64)
+			}
+		case role.FieldCode:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field code", values[i])
+			} else if value.Valid {
+				_m.Code = value.String
 			}
 		case role.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -224,6 +232,9 @@ func (_m *Role) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("tenant_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
+	builder.WriteString("code=")
+	builder.WriteString(_m.Code)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)

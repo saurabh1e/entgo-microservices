@@ -23,6 +23,8 @@ const (
 	FieldCreatedBy = "created_by"
 	// FieldTenantID holds the string denoting the tenant_id field in the database.
 	FieldTenantID = "tenant_id"
+	// FieldCode holds the string denoting the code field in the database.
+	FieldCode = "code"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldDisplayName holds the string denoting the display_name field in the database.
@@ -62,6 +64,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldCreatedBy,
 	FieldTenantID,
+	FieldCode,
 	FieldName,
 	FieldDisplayName,
 	FieldDescription,
@@ -85,7 +88,7 @@ func ValidColumn(column string) bool {
 //
 //	import _ "github.com/saurabh/entgo-microservices/auth/internal/ent/runtime"
 var (
-	Hooks  [1]ent.Hook
+	Hooks  [6]ent.Hook
 	Policy ent.Policy
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
@@ -135,6 +138,11 @@ func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
 // ByTenantID orders the results by the tenant_id field.
 func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
+}
+
+// ByCode orders the results by the code field.
+func ByCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCode, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

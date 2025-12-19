@@ -27,6 +27,8 @@ type User struct {
 	CreatedBy *int `json:"created_by,omitempty"`
 	// Tenant ID for multi-tenancy isolation
 	TenantID int `json:"tenant_id,omitempty"`
+	// Auto-generated unique code identifier
+	Code string `json:"code,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Username holds the value of the "username" field.
@@ -95,7 +97,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case user.FieldID, user.FieldCreatedBy, user.FieldTenantID, user.FieldPaymentTerms:
 			values[i] = new(sql.NullInt64)
-		case user.FieldEmail, user.FieldUsername, user.FieldPasswordHash, user.FieldName, user.FieldPhone, user.FieldAddress, user.FieldUserType, user.FieldUserCode, user.FieldCompanyName, user.FieldCustomerType:
+		case user.FieldCode, user.FieldEmail, user.FieldUsername, user.FieldPasswordHash, user.FieldName, user.FieldPhone, user.FieldAddress, user.FieldUserType, user.FieldUserCode, user.FieldCompanyName, user.FieldCustomerType:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt, user.FieldEmailVerifiedAt, user.FieldLastLogin:
 			values[i] = new(sql.NullTime)
@@ -146,6 +148,12 @@ func (_m *User) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
 			} else if value.Valid {
 				_m.TenantID = int(value.Int64)
+			}
+		case user.FieldCode:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field code", values[i])
+			} else if value.Valid {
+				_m.Code = value.String
 			}
 		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -300,6 +308,9 @@ func (_m *User) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("tenant_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
+	builder.WriteString("code=")
+	builder.WriteString(_m.Code)
 	builder.WriteString(", ")
 	builder.WriteString("email=")
 	builder.WriteString(_m.Email)

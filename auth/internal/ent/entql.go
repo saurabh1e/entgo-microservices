@@ -76,6 +76,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			role.FieldUpdatedAt:   {Type: field.TypeTime, Column: role.FieldUpdatedAt},
 			role.FieldCreatedBy:   {Type: field.TypeInt, Column: role.FieldCreatedBy},
 			role.FieldTenantID:    {Type: field.TypeInt, Column: role.FieldTenantID},
+			role.FieldCode:        {Type: field.TypeString, Column: role.FieldCode},
 			role.FieldName:        {Type: field.TypeString, Column: role.FieldName},
 			role.FieldDisplayName: {Type: field.TypeString, Column: role.FieldDisplayName},
 			role.FieldDescription: {Type: field.TypeString, Column: role.FieldDescription},
@@ -144,6 +145,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			user.FieldUpdatedAt:       {Type: field.TypeTime, Column: user.FieldUpdatedAt},
 			user.FieldCreatedBy:       {Type: field.TypeInt, Column: user.FieldCreatedBy},
 			user.FieldTenantID:        {Type: field.TypeInt, Column: user.FieldTenantID},
+			user.FieldCode:            {Type: field.TypeString, Column: user.FieldCode},
 			user.FieldEmail:           {Type: field.TypeString, Column: user.FieldEmail},
 			user.FieldUsername:        {Type: field.TypeString, Column: user.FieldUsername},
 			user.FieldPasswordHash:    {Type: field.TypeString, Column: user.FieldPasswordHash},
@@ -471,6 +473,11 @@ func (f *RoleFilter) WhereTenantID(p entql.IntP) {
 	f.Where(p.Field(role.FieldTenantID))
 }
 
+// WhereCode applies the entql string predicate on the code field.
+func (f *RoleFilter) WhereCode(p entql.StringP) {
+	f.Where(p.Field(role.FieldCode))
+}
+
 // WhereName applies the entql string predicate on the name field.
 func (f *RoleFilter) WhereName(p entql.StringP) {
 	f.Where(p.Field(role.FieldName))
@@ -790,6 +797,11 @@ func (f *UserFilter) WhereCreatedBy(p entql.IntP) {
 // WhereTenantID applies the entql int predicate on the tenant_id field.
 func (f *UserFilter) WhereTenantID(p entql.IntP) {
 	f.Where(p.Field(user.FieldTenantID))
+}
+
+// WhereCode applies the entql string predicate on the code field.
+func (f *UserFilter) WhereCode(p entql.StringP) {
+	f.Where(p.Field(user.FieldCode))
 }
 
 // WhereEmail applies the entql string predicate on the email field.

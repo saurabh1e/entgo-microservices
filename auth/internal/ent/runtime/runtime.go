@@ -168,6 +168,17 @@ func init() {
 			return next.Mutate(ctx, m)
 		})
 	}
+	roleHooks := schema.Role{}.Hooks()
+
+	role.Hooks[1] = roleHooks[0]
+
+	role.Hooks[2] = roleHooks[1]
+
+	role.Hooks[3] = roleHooks[2]
+
+	role.Hooks[4] = roleHooks[3]
+
+	role.Hooks[5] = roleHooks[4]
 	roleMixinFields0 := roleMixin[0].Fields()
 	_ = roleMixinFields0
 	roleMixinFields1 := roleMixin[1].Fields()

@@ -23,6 +23,8 @@ const (
 	FieldCreatedBy = "created_by"
 	// FieldTenantID holds the string denoting the tenant_id field in the database.
 	FieldTenantID = "tenant_id"
+	// FieldCode holds the string denoting the code field in the database.
+	FieldCode = "code"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
 	// FieldUsername holds the string denoting the username field in the database.
@@ -73,6 +75,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldCreatedBy,
 	FieldTenantID,
+	FieldCode,
 	FieldEmail,
 	FieldUsername,
 	FieldPasswordHash,
@@ -181,6 +184,11 @@ func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
 // ByTenantID orders the results by the tenant_id field.
 func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
+}
+
+// ByCode orders the results by the code field.
+func ByCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCode, opts...).ToFunc()
 }
 
 // ByEmail orders the results by the email field.

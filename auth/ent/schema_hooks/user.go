@@ -2,9 +2,11 @@ package hooks
 
 import (
 	"context"
+	"fmt"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent"
 	"github.com/saurabh/entgo-microservices/auth/internal/ent/hook"
 	pkgcontext "github.com/saurabh/entgo-microservices/pkg/context"
+	"github.com/saurabh/entgo-microservices/pkg/ent/schema"
 	"github.com/saurabh/entgo-microservices/pkg/logger"
 )
 
@@ -25,6 +27,20 @@ func UserCreateHook() ent.Hook {
 						return nil, err
 					}
 					userMutation.SetTenantID(tenantID)
+				}
+
+				// Auto-generate code field from tenant_id and name (if name is available)
+				if name, nameExists := userMutation.Name(); nameExists {
+					tenantID, tenantExists := userMutation.TenantID()
+					if !tenantExists {
+						logger.WithFields(map[string]interface{}{
+							"entity":    "User",
+							"operation": "create",
+						}).Error("tenant_id is required for code generation")
+						return nil, fmt.Errorf("tenant_id is required for code generation")
+					}
+					code := schema.GenerateCode(tenantID, name)
+					userMutation.SetCode(code)
 				}
 
 				// Call the next mutator
@@ -63,6 +79,8 @@ func UserSingleUpdateHook() ent.Hook {
 			if userMutation, ok := m.(*ent.UserMutation); ok {
 				// Hook executing for single update
 				_ = userMutation
+
+				// Note: code field is immutable, regeneration on update is not allowed
 
 				// Call the next mutator
 				result, err := next.Mutate(ctx, m)

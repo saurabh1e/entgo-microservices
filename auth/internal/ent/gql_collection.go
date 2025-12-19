@@ -338,6 +338,11 @@ func (_q *RoleQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 				selectedFields = append(selectedFields, role.FieldTenantID)
 				fieldSeen[role.FieldTenantID] = struct{}{}
 			}
+		case "code":
+			if _, ok := fieldSeen[role.FieldCode]; !ok {
+				selectedFields = append(selectedFields, role.FieldCode)
+				fieldSeen[role.FieldCode] = struct{}{}
+			}
 		case "name":
 			if _, ok := fieldSeen[role.FieldName]; !ok {
 				selectedFields = append(selectedFields, role.FieldName)
@@ -767,6 +772,11 @@ func (_q *UserQuery) collectField(ctx context.Context, oneNode bool, opCtx *grap
 			if _, ok := fieldSeen[user.FieldTenantID]; !ok {
 				selectedFields = append(selectedFields, user.FieldTenantID)
 				fieldSeen[user.FieldTenantID] = struct{}{}
+			}
+		case "code":
+			if _, ok := fieldSeen[user.FieldCode]; !ok {
+				selectedFields = append(selectedFields, user.FieldCode)
+				fieldSeen[user.FieldCode] = struct{}{}
 			}
 		case "email":
 			if _, ok := fieldSeen[user.FieldEmail]; !ok {

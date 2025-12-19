@@ -72,6 +72,12 @@ func (_c *RoleCreate) SetTenantID(v int) *RoleCreate {
 	return _c
 }
 
+// SetCode sets the "code" field.
+func (_c *RoleCreate) SetCode(v string) *RoleCreate {
+	_c.mutation.SetCode(v)
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *RoleCreate) SetName(v string) *RoleCreate {
 	_c.mutation.SetName(v)
@@ -240,6 +246,9 @@ func (_c *RoleCreate) check() error {
 			return &ValidationError{Name: "tenant_id", err: fmt.Errorf(`ent: validator failed for field "Role.tenant_id": %w`, err)}
 		}
 	}
+	if _, ok := _c.mutation.Code(); !ok {
+		return &ValidationError{Name: "code", err: errors.New(`ent: missing required field "Role.code"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Role.name"`)}
 	}
@@ -320,6 +329,10 @@ func (_c *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.TenantID(); ok {
 		_spec.SetField(role.FieldTenantID, field.TypeInt, value)
 		_node.TenantID = value
+	}
+	if value, ok := _c.mutation.Code(); ok {
+		_spec.SetField(role.FieldCode, field.TypeString, value)
+		_node.Code = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
@@ -570,6 +583,9 @@ func (u *RoleUpsertOne) UpdateNewValues() *RoleUpsertOne {
 		}
 		if _, exists := u.create.mutation.CreatedAt(); exists {
 			s.SetIgnore(role.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.Code(); exists {
+			s.SetIgnore(role.FieldCode)
 		}
 	}))
 	return u
@@ -933,6 +949,9 @@ func (u *RoleUpsertBulk) UpdateNewValues() *RoleUpsertBulk {
 			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(role.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.Code(); exists {
+				s.SetIgnore(role.FieldCode)
 			}
 		}
 	}))

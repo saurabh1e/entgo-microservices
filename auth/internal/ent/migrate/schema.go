@@ -119,6 +119,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
+		{Name: "code", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "display_name", Type: field.TypeString, Size: 100},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500},
@@ -154,17 +155,17 @@ var (
 			{
 				Name:    "role_name",
 				Unique:  true,
-				Columns: []*schema.Column{RolesColumns[5]},
+				Columns: []*schema.Column{RolesColumns[6]},
 			},
 			{
 				Name:    "role_is_active",
 				Unique:  false,
-				Columns: []*schema.Column{RolesColumns[8]},
+				Columns: []*schema.Column{RolesColumns[9]},
 			},
 			{
 				Name:    "role_priority",
 				Unique:  false,
-				Columns: []*schema.Column{RolesColumns[9]},
+				Columns: []*schema.Column{RolesColumns[10]},
 			},
 			{
 				Name:    "role_created_at",
@@ -300,6 +301,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
 		{Name: "tenant_id", Type: field.TypeInt},
+		{Name: "code", Type: field.TypeString},
 		{Name: "email", Type: field.TypeString, Unique: true},
 		{Name: "username", Type: field.TypeString, Unique: true, Size: 50},
 		{Name: "password_hash", Type: field.TypeString},
@@ -325,7 +327,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "users_roles_role",
-				Columns:    []*schema.Column{UsersColumns[20]},
+				Columns:    []*schema.Column{UsersColumns[21]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

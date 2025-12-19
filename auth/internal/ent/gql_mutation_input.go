@@ -140,6 +140,7 @@ func (c *PermissionUpdateOne) SetInput(i UpdatePermissionInput) *PermissionUpdat
 
 // CreateRoleInput represents a mutation input for creating roles.
 type CreateRoleInput struct {
+	Code              string
 	Name              string
 	DisplayName       string
 	Description       *string
@@ -151,6 +152,7 @@ type CreateRoleInput struct {
 
 // Mutate applies the CreateRoleInput on the RoleMutation builder.
 func (i *CreateRoleInput) Mutate(m *RoleMutation) {
+	m.SetCode(i.Code)
 	m.SetName(i.Name)
 	m.SetDisplayName(i.DisplayName)
 	if v := i.Description; v != nil {
@@ -446,6 +448,7 @@ func (c *TenantUpdateOne) SetInput(i UpdateTenantInput) *TenantUpdateOne {
 
 // CreateUserInput represents a mutation input for creating users.
 type CreateUserInput struct {
+	Code            string
 	Email           string
 	Username        string
 	PasswordHash    string
@@ -466,6 +469,7 @@ type CreateUserInput struct {
 
 // Mutate applies the CreateUserInput on the UserMutation builder.
 func (i *CreateUserInput) Mutate(m *UserMutation) {
+	m.SetCode(i.Code)
 	m.SetEmail(i.Email)
 	m.SetUsername(i.Username)
 	m.SetPasswordHash(i.PasswordHash)

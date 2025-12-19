@@ -18,6 +18,8 @@ func (User) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		schema.BaseMixin{},
 		schema.TenantMixin{},
+		schema.CodeMixin{}, // Auto-generates code from tenant_id + name
+
 	}
 }
 
